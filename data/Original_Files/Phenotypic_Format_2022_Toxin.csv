@@ -1,0 +1,885 @@
+"","EntityID","CPGID","PlantID","source_id","germplasm_id","experiment_id","PlotID","Selection","Entry","planting_date","StartingCorner","Row","Range","easting","northing","altitude","rep","block","notes","DON","ZEA"
+"1","20FHB000001",2001,"2222","20SGH002222","C10_002222","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_1_CPG2001_2222","experimental","C10","2020-10-16","SW",1,1,0,0,0,0,0,NA,0.1,0
+"2","20FHB000002",2002,"3884","20SGH003884","C10_003884","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_2_CPG2002_3884","experimental","C10","2020-10-16","SW",1,2,0,0,0,0,0,NA,0,0
+"3","20FHB000003",2003,"29","20SGH000029","C10_000029","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_3_CPG2003_29","experimental","C10","2020-10-16","SW",1,3,0,0,0,0,0,NA,0,0
+"4","20FHB000004",2004,"C9-3237","19SGH003237","C9_003237","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_4_CPG2004_C9-3237","top33 S FHB","C9 replicate","2020-10-16","SW",1,4,0,0,0,0,0,"C9 replicate",NA,NA
+"5","20FHB000005",2005,"852","20SGH000852","C10_000852","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_5_CPG2005_852","experimental","C10","2020-10-16","SW",1,5,0,0,0,0,0,NA,0,0
+"6","20FHB000006",2006,"1620","20SGH001620","C10_001620","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_6_CPG2006_1620","experimental","C10","2020-10-16","SW",1,6,0,0,0,0,0,NA,0.1,0.1
+"7","20FHB000007",2007,"1827","20SGH001827","C10_001827","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_7_CPG2007_1827","experimental","C10","2020-10-16","SW",1,7,0,0,0,0,0,NA,0,0
+"8","20FHB000008",2008,"2503","20SGH002503","C10_002503","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_8_CPG2008_2503","experimental","C10","2020-10-16","SW",1,8,0,0,0,0,0,NA,0,0
+"9","20FHB000009",2009,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_9_CPG2009_Bacup","resistant check","spring wheat","2020-10-16","SW",1,9,0,0,0,0,0,"sw_check",NA,NA
+"10","20FHB000010",2010,"3952","20SGH003952","C10_003952","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_10_CPG2010_3952","experimental","C10","2020-10-16","SW",1,10,0,0,0,0,0,NA,0,0
+"11","20FHB000011",2011,"C9-1196","19SGH001196","C9_001196","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_11_CPG2011_C9-1196","top33 S FHB","C9 replicate","2020-10-16","SW",1,11,0,0,0,0,0,"C9 replicate",NA,NA
+"12","20FHB000012",2012,"3387","20SGH003387","C10_003387","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_12_CPG2012_3387","experimental","C10","2020-10-16","SW",1,12,0,0,0,0,0,NA,0,0
+"13","20FHB000013",2013,"3335","20SGH003335","C10_003335","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_13_CPG2013_3335","experimental","C10","2020-10-16","SW",1,13,0,0,0,0,0,NA,0,0
+"14","20FHB000014",2014,"578","20SGH000578","C10_000578","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_14_CPG2014_578","experimental","C10","2020-10-16","SW",1,14,0,0,0,0,0,NA,NA,NA
+"15","20FHB000015",2015,"3188","20SGH003188","C10_003188","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_15_CPG2015_3188","experimental","C10","2020-10-16","SW",1,15,0,0,0,0,0,NA,0.1,0
+"16","20FHB000016",2016,"2817","20SGH002817","C10_002817","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_16_CPG2016_2817","experimental","C10","2020-10-16","SW",1,16,0,0,0,0,0,NA,0.7,0.1
+"17","20FHB000017",2017,"302","20SGH000302","C10_000302","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_17_CPG2017_302","experimental","C10","2020-10-16","SW",1,17,0,0,0,0,0,NA,0,0
+"18","20FHB000018",2018,"1780","20SGH001780","C10_001780","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_18_CPG2018_1780","experimental","C10","2020-10-16","SW",1,18,0,0,0,0,0,NA,0,0
+"19","20FHB000019",2019,"2374","20SGH002374","C10_002374","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_19_CPG2019_2374","experimental","C10","2020-10-16","SW",1,19,0,0,0,0,0,NA,0.2,0.1
+"20","20FHB000020",2020,"1810","20SGH001810","C10_001810","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_20_CPG2020_1810","experimental","C10","2020-10-16","SW",1,20,0,0,0,0,0,NA,0,0
+"21","20FHB000021",2021,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_21_CPG2021_Everest","resistant check","winter wheat","2020-10-16","SW",1,21,0,0,0,0,0,"ww_check",NA,NA
+"22","20FHB000022",2022,"898","20SGH000898","C10_000898","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_22_CPG2022_898","experimental","C10","2020-10-16","SW",1,22,0,0,0,0,0,NA,0,0
+"23","20FHB000023",2023,"3267","20SGH003267","C10_003267","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_23_CPG2023_3267","experimental","C10","2020-10-16","SW",1,23,0,0,0,0,0,NA,0,0
+"24","20FHB000024",2024,"2753","20SGH002753","C10_002753","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_24_CPG2024_2753","experimental","C10","2020-10-16","SW",1,24,0,0,0,0,0,NA,0,0
+"25","20FHB000025",2025,"1626","20SGH001626","C10_001626","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_25_CPG2025_1626","experimental","C10","2020-10-16","SW",1,25,0,0,0,0,0,NA,0.1,0.1
+"26","20FHB000026",2026,"2541","20SGH002541","C10_002541","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_26_CPG2026_2541","experimental","C10","2020-10-16","SW",1,26,0,0,0,0,0,NA,0.2,0
+"27","20FHB000027",2027,"409","20SGH000409","C10_000409","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_27_CPG2027_409","experimental","C10","2020-10-16","SW",1,27,0,0,0,0,0,NA,0,0
+"28","20FHB000028",2028,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_28_CPG2028_Roblin","susceptible check","spring wheat","2020-10-16","SW",1,28,0,0,0,0,0,"sw_check",NA,NA
+"29","20FHB000029",2029,"1704","20SGH001704","C10_001704","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_29_CPG2029_1704","experimental","C10","2020-10-16","SW",1,29,0,0,0,0,0,NA,0.2,0
+"30","20FHB000030",2030,"2837","20SGH002837","C10_002837","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_30_CPG2030_2837","experimental","C10","2020-10-16","SW",1,30,0,0,0,0,0,NA,0,0
+"31","20FHB000031",2031,"2859","20SGH002859","C10_002859","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_31_CPG2031_2859","experimental","C10","2020-10-16","SW",1,32,0,0,0,0,0,NA,0,0
+"32","20FHB000032",2032,"3170","20SGH003170","C10_003170","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_32_CPG2032_3170","experimental","C10","2020-10-16","SW",2,32,0,0,0,0,0,NA,NA,NA
+"33","20FHB000033",2033,"C9-3816","19SGH003816","C9_003816","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_33_CPG2033_C9-3816","top33 S FHB","C9 replicate","2020-10-16","SW",2,30,0,0,0,0,0,"C9 replicate",NA,NA
+"34","20FHB000034",2034,"C9-4136","19SGH004136","C9_004136","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_34_CPG2034_C9-4136","top10 R FHB","C9 replicate","2020-10-16","SW",2,29,0,0,0,0,0,"C9 replicate",NA,NA
+"35","20FHB000035",2035,"2632","20SGH002632","C10_002632","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_35_CPG2035_2632","experimental","C10","2020-10-16","SW",2,28,0,0,0,0,0,NA,0.8,0
+"36","20FHB000036",2036,"480","20SGH000480","C10_000480","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_36_CPG2036_480","experimental","C10","2020-10-16","SW",2,27,0,0,0,0,0,NA,0.3,0
+"37","20FHB000037",2037,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_37_CPG2037_Overley","susceptible check","winter wheat","2020-10-16","SW",2,26,0,0,0,0,0,"ww_check",NA,NA
+"38","20FHB000038",2038,"3787","20SGH003787","C10_003787","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_38_CPG2038_3787","experimental","C10","2020-10-16","SW",2,25,0,0,0,0,0,NA,0,0.2
+"39","20FHB000039",2039,"1953","20SGH001953","C10_001953","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_39_CPG2039_1953","experimental","C10","2020-10-16","SW",2,24,0,0,0,0,0,NA,NA,NA
+"40","20FHB000040",2040,"698","20SGH000698","C10_000698","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_40_CPG2040_698","experimental","C10","2020-10-16","SW",2,23,0,0,0,0,0,NA,0,0
+"41","20FHB000041",2041,"771","20SGH000771","C10_000771","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_41_CPG2041_771","experimental","C10","2020-10-16","SW",2,22,0,0,0,0,0,NA,0,0
+"42","20FHB000042",2042,"1616","20SGH001616","C10_001616","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_42_CPG2042_1616","experimental","C10","2020-10-16","SW",2,21,0,0,0,0,0,NA,NA,NA
+"43","20FHB000043",2043,"228","20SGH000228","C10_000228","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_43_CPG2043_228","experimental","C10","2020-10-16","SW",2,20,0,0,0,0,0,NA,0,0
+"44","20FHB000044",2044,"C9-3816","19SGH003816","C9_003816","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_44_CPG2044_C9-3816","top33 S FHB","C9 replicate","2020-10-16","SW",2,19,0,0,0,0,0,"C9 replicate",0,0
+"45","20FHB000045",2045,"1992","20SGH001992","C10_001992","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_45_CPG2045_1992","experimental","C10","2020-10-16","SW",2,18,0,0,0,0,0,NA,0,0
+"46","20FHB000046",2046,"918","20SGH000918","C10_000918","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_46_CPG2046_918","experimental","C10","2020-10-16","SW",2,17,0,0,0,0,0,NA,0,0
+"47","20FHB000047",2047,"3380","20SGH003380","C10_003380","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_47_CPG2047_3380","experimental","C10","2020-10-16","SW",2,16,0,0,0,0,0,NA,0,0.2
+"48","20FHB000048",2048,"3276","20SGH003276","C10_003276","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_48_CPG2048_3276","experimental","C10","2020-10-16","SW",2,15,0,0,0,0,0,NA,0,0
+"49","20FHB000049",2049,"1579","20SGH001579","C10_001579","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_49_CPG2049_1579","experimental","C10","2020-10-16","SW",2,14,0,0,0,0,0,NA,NA,NA
+"50","20FHB000050",2050,"1610","20SGH001610","C10_001610","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_50_CPG2050_1610","experimental","C10","2020-10-16","SW",2,13,0,0,0,0,0,NA,0,0
+"51","20FHB000051",2051,"2835","20SGH002835","C10_002835","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_51_CPG2051_2835","experimental","C10","2020-10-16","SW",2,12,0,0,0,0,0,NA,0.1,0
+"52","20FHB000052",2052,"1348","20SGH001348","C10_001348","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_52_CPG2052_1348","experimental","C10","2020-10-16","SW",2,11,0,0,0,0,0,NA,0,0
+"53","20FHB000053",2053,"1935","20SGH001935","C10_001935","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_53_CPG2053_1935","experimental","C10","2020-10-16","SW",2,10,0,0,0,0,0,NA,0.1,0
+"54","20FHB000054",2054,"3418","20SGH003418","C10_003418","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_54_CPG2054_3418","experimental","C10","2020-10-16","SW",2,9,0,0,0,0,0,NA,NA,NA
+"55","20FHB000055",2055,"C9-1194","19SGH001194","C9_001194","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_55_CPG2055_C9-1194","top10 S FHB","C9 replicate","2020-10-16","SW",2,8,0,0,0,0,0,"C9 replicate",0.2,0.1
+"56","20FHB000056",2056,"1573","20SGH001573","C10_001573","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_56_CPG2056_1573","experimental","C10","2020-10-16","SW",2,7,0,0,0,0,0,NA,0,0.1
+"57","20FHB000057",2057,"380","20SGH000380","C10_000380","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_57_CPG2057_380","experimental","C10","2020-10-16","SW",2,6,0,0,0,0,0,NA,0,0
+"58","20FHB000058",2058,"2099","20SGH002099","C10_002099","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_58_CPG2058_2099","experimental","C10","2020-10-16","SW",2,5,0,0,0,0,0,NA,0,0
+"59","20FHB000059",2059,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_59_CPG2059_Roblin","susceptible check","spring wheat","2020-10-16","SW",2,4,0,0,0,0,0,"sw_check",NA,NA
+"60","20FHB000060",2060,"3835","20SGH003835","C10_003835","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_60_CPG2060_3835","experimental","C10","2020-10-16","SW",2,3,0,0,0,0,0,NA,0,0
+"61","20FHB000061",2061,"3060","20SGH003060","C10_003060","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_61_CPG2061_3060","experimental","C10","2020-10-16","SW",2,2,0,0,0,0,0,NA,0,0
+"62","20FHB000062",2062,"1274","20SGH001274","C10_001274","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_62_CPG2062_1274","experimental","C10","2020-10-16","SW",2,1,0,0,0,0,0,NA,0,0
+"63","20FHB000063",2063,"2733","20SGH002733","C10_002733","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_63_CPG2063_2733","experimental","C10","2020-10-16","SW",3,1,0,0,0,0,0,NA,0,0
+"64","20FHB000064",2064,"1939","20SGH001939","C10_001939","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_64_CPG2064_1939","experimental","C10","2020-10-16","SW",3,2,0,0,0,0,0,NA,NA,NA
+"65","20FHB000065",2065,"1745","20SGH001745","C10_001745","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_65_CPG2065_1745","experimental","C10","2020-10-16","SW",3,3,0,0,0,0,0,NA,0,0
+"66","20FHB000066",2066,"1494","20SGH001494","C10_001494","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_66_CPG2066_1494","experimental","C10","2020-10-16","SW",3,4,0,0,0,0,0,NA,NA,NA
+"67","20FHB000067",2067,"1645","20SGH001645","C10_001645","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_67_CPG2067_1645","experimental","C10","2020-10-16","SW",3,5,0,0,0,0,0,NA,0,0
+"68","20FHB000068",2068,"3856","20SGH003856","C10_003856","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_68_CPG2068_3856","experimental","C10","2020-10-16","SW",3,6,0,0,0,0,0,NA,0.4,0
+"69","20FHB000069",2069,"1256","20SGH001256","C10_001256","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_69_CPG2069_1256","experimental","C10","2020-10-16","SW",3,7,0,0,0,0,0,NA,NA,NA
+"70","20FHB000070",2070,"3541","20SGH003541","C10_003541","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_70_CPG2070_3541","experimental","C10","2020-10-16","SW",3,8,0,0,0,0,0,NA,0,0
+"71","20FHB000071",2071,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_71_CPG2071_Bacup","resistant check","spring wheat","2020-10-16","SW",3,9,0,0,0,0,0,"sw_check",NA,NA
+"72","20FHB000072",2072,"3130","20SGH003130","C10_003130","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_72_CPG2072_3130","experimental","C10","2020-10-16","SW",3,10,0,0,0,0,0,NA,0.1,0
+"73","20FHB000073",2073,"3913","20SGH003913","C10_003913","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_73_CPG2073_3913","experimental","C10","2020-10-16","SW",3,11,0,0,0,0,0,NA,0,0
+"74","20FHB000074",2074,"1446","20SGH001446","C10_001446","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_74_CPG2074_1446","experimental","C10","2020-10-16","SW",3,12,0,0,0,0,0,NA,0,0
+"75","20FHB000075",2075,"C9-1829","19SGH001829","C9_001829","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_75_CPG2075_C9-1829","top33 S FHB","C9 replicate","2020-10-16","SW",3,13,0,0,0,0,0,"C9 replicate",0,0.1
+"76","20FHB000076",2076,"2358","20SGH002358","C10_002358","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_76_CPG2076_2358","experimental","C10","2020-10-16","SW",3,14,0,0,0,0,0,NA,0.3,0.1
+"77","20FHB000077",2077,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_77_CPG2077_Overley","susceptible check","winter wheat","2020-10-16","SW",3,15,0,0,0,0,0,"ww_check",NA,NA
+"78","20FHB000078",2078,"146","20SGH000146","C10_000146","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_78_CPG2078_146","experimental","C10","2020-10-16","SW",3,16,0,0,0,0,0,NA,NA,NA
+"79","20FHB000079",2079,"1411","20SGH001411","C10_001411","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_79_CPG2079_1411","experimental","C10","2020-10-16","SW",3,17,0,0,0,0,0,NA,0,0
+"80","20FHB000080",2080,"3771","20SGH003771","C10_003771","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_80_CPG2080_3771","experimental","C10","2020-10-16","SW",3,18,0,0,0,0,0,NA,NA,NA
+"81","20FHB000081",2081,"1430","20SGH001430","C10_001430","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_81_CPG2081_1430","experimental","C10","2020-10-16","SW",3,19,0,0,0,0,0,NA,0,0
+"82","20FHB000082",2082,"3026","20SGH003026","C10_003026","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_82_CPG2082_3026","experimental","C10","2020-10-16","SW",3,20,0,0,0,0,0,NA,0,0
+"83","20FHB000083",2083,"2278","20SGH002278","C10_002278","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_83_CPG2083_2278","experimental","C10","2020-10-16","SW",3,21,0,0,0,0,0,NA,0,0
+"84","20FHB000084",2084,"701","20SGH000701","C10_000701","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_84_CPG2084_701","experimental","C10","2020-10-16","SW",3,22,0,0,0,0,0,NA,0,0
+"85","20FHB000085",2085,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_85_CPG2085_Roblin","susceptible check","spring wheat","2020-10-16","SW",3,23,0,0,0,0,0,"sw_check",NA,NA
+"86","20FHB000086",2086,"166","20SGH000166","C10_000166","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_86_CPG2086_166","experimental","C10","2020-10-16","SW",3,24,0,0,0,0,0,NA,0,0
+"87","20FHB000087",2087,"1476","20SGH001476","C10_001476","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_87_CPG2087_1476","experimental","C10","2020-10-16","SW",3,25,0,0,0,0,0,NA,0,0
+"88","20FHB000088",2088,"905","20SGH000905","C10_000905","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_88_CPG2088_905","experimental","C10","2020-10-16","SW",3,26,0,0,0,0,0,NA,0,0
+"89","20FHB000089",2089,"2320","20SGH002320","C10_002320","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_89_CPG2089_2320","experimental","C10","2020-10-16","SW",3,27,0,0,0,0,0,NA,0,0
+"90","20FHB000090",2090,"3740","20SGH003740","C10_003740","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_90_CPG2090_3740","experimental","C10","2020-10-16","SW",3,28,0,0,0,0,0,NA,NA,NA
+"91","20FHB000091",2091,"530","20SGH000530","C10_000530","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_91_CPG2091_530","experimental","C10","2020-10-16","SW",3,29,0,0,0,0,0,NA,0.1,0.1
+"92","20FHB000092",2092,"1344","20SGH001344","C10_001344","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_92_CPG2092_1344","experimental","C10","2020-10-16","SW",3,30,0,0,0,0,0,NA,0,0
+"93","20FHB000093",2093,"405","20SGH000405","C10_000405","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_93_CPG2093_405","experimental","C10","2020-10-16","SW",3,31,0,0,0,0,0,NA,0.1,0
+"94","20FHB000094",2094,"3141","20SGH003141","C10_003141","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_94_CPG2094_3141","experimental","C10","2020-10-16","SW",4,31,0,0,0,0,0,NA,0,0
+"95","20FHB000095",2095,"1310","20SGH001310","C10_001310","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_95_CPG2095_1310","experimental","C10","2020-10-16","SW",4,30,0,0,0,0,0,NA,0.2,0
+"96","20FHB000096",2096,"C9-932","19SGH000932","C9_000932","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_96_CPG2096_C9-932","top 1 Inc3 R","C9 replicate","2020-10-16","SW",4,29,0,0,0,0,0,"C9 replicate",0,0
+"97","20FHB000097",2097,"3000","20SGH003000","C10_003000","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_97_CPG2097_3000","experimental","C10","2020-10-16","SW",4,28,0,0,0,0,0,NA,NA,NA
+"98","20FHB000098",2098,"1511","20SGH001511","C10_001511","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_98_CPG2098_1511","experimental","C10","2020-10-16","SW",4,27,0,0,0,0,0,NA,0,0
+"99","20FHB000099",2099,"1857","20SGH001857","C10_001857","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_99_CPG2099_1857","experimental","C10","2020-10-16","SW",4,26,0,0,0,0,0,NA,0,0.1
+"100","20FHB000100",2100,"1822","20SGH001822","C10_001822","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_100_CPG2100_1822","experimental","C10","2020-10-16","SW",4,25,0,0,0,0,0,NA,0,0
+"101","20FHB000101",2101,"3145","20SGH003145","C10_003145","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_101_CPG2101_3145","experimental","C10","2020-10-16","SW",4,24,0,0,0,0,0,NA,0,0
+"102","20FHB000102",2102,"1781","20SGH001781","C10_001781","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_102_CPG2102_1781","experimental","C10","2020-10-16","SW",4,23,0,0,0,0,0,NA,0,0
+"103","20FHB000103",2103,"1311","20SGH001311","C10_001311","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_103_CPG2103_1311","experimental","C10","2020-10-16","SW",4,22,0,0,0,0,0,NA,0,0
+"104","20FHB000104",2104,"3184","20SGH003184","C10_003184","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_104_CPG2104_3184","experimental","C10","2020-10-16","SW",4,21,0,0,0,0,0,NA,0,0
+"105","20FHB000105",2105,"3413","20SGH003413","C10_003413","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_105_CPG2105_3413","experimental","C10","2020-10-16","SW",4,20,0,0,0,0,0,NA,0,0
+"106","20FHB000106",2106,"786","20SGH000786","C10_000786","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_106_CPG2106_786","experimental","C10","2020-10-16","SW",4,19,0,0,0,0,0,NA,0,0
+"107","20FHB000107",2107,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_107_CPG2107_Bacup","resistant check","spring wheat","2020-10-16","SW",4,18,0,0,0,0,0,"sw_check",NA,NA
+"108","20FHB000108",2108,"1304","20SGH001304","C10_001304","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_108_CPG2108_1304","experimental","C10","2020-10-16","SW",4,17,0,0,0,0,0,NA,0,0
+"109","20FHB000109",2109,"2576","20SGH002576","C10_002576","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_109_CPG2109_2576","experimental","C10","2020-10-16","SW",4,16,0,0,0,0,0,NA,0.2,0.1
+"110","20FHB000110",2110,"502","20SGH000502","C10_000502","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_110_CPG2110_502","experimental","C10","2020-10-16","SW",4,15,0,0,0,0,0,NA,0,0
+"111","20FHB000111",2111,"3225","20SGH003225","C10_003225","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_111_CPG2111_3225","experimental","C10","2020-10-16","SW",4,14,0,0,0,0,0,NA,0.2,0.1
+"112","20FHB000112",2112,"3893","20SGH003893","C10_003893","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_112_CPG2112_3893","experimental","C10","2020-10-16","SW",4,13,0,0,0,0,0,NA,0,0
+"113","20FHB000113",2113,"1013","20SGH001013","C10_001013","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_113_CPG2113_1013","experimental","C10","2020-10-16","SW",4,12,0,0,0,0,0,NA,0,0
+"114","20FHB000114",2114,"C9-4077","19SGH004077","C9_004077","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_114_CPG2114_C9-4077","top33 S FHB","C9 replicate","2020-10-16","SW",4,11,0,0,0,0,0,"C9 replicate",0,0
+"115","20FHB000115",2115,"1859","20SGH001859","C10_001859","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_115_CPG2115_1859","experimental","C10","2020-10-16","SW",4,10,0,0,0,0,0,NA,0,0
+"116","20FHB000116",2116,"1933","20SGH001933","C10_001933","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_116_CPG2116_1933","experimental","C10","2020-10-16","SW",4,9,0,0,0,0,0,NA,0.1,0
+"117","20FHB000117",2117,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_117_CPG2117_Everest","resistant check","winter wheat","2020-10-16","SW",4,8,0,0,0,0,0,"ww_check",NA,NA
+"118","20FHB000118",2118,"743","20SGH000743","C10_000743","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_118_CPG2118_743","experimental","C10","2020-10-16","SW",4,7,0,0,0,0,0,NA,0,0.1
+"119","20FHB000119",2119,"1159","20SGH001159","C10_001159","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_119_CPG2119_1159","experimental","C10","2020-10-16","SW",4,6,0,0,0,0,0,NA,0,0
+"120","20FHB000120",2120,"849","20SGH000849","C10_000849","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_120_CPG2120_849","experimental","C10","2020-10-16","SW",4,5,0,0,0,0,0,NA,NA,NA
+"121","20FHB000121",2121,"1919","20SGH001919","C10_001919","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_121_CPG2121_1919","experimental","C10","2020-10-16","SW",4,4,0,0,0,0,0,NA,0,0
+"122","20FHB000122",2122,"3220","20SGH003220","C10_003220","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_122_CPG2122_3220","experimental","C10","2020-10-16","SW",4,3,0,0,0,0,0,NA,0,0
+"123","20FHB000123",2123,"1070","20SGH001070","C10_001070","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_123_CPG2123_1070","experimental","C10","2020-10-16","SW",4,2,0,0,0,0,0,NA,0,0
+"124","20FHB000124",2124,"574","20SGH000574","C10_000574","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_124_CPG2124_574","experimental","C10","2020-10-16","SW",4,1,0,0,0,0,0,NA,NA,NA
+"125","20FHB000125",2125,"1691","20SGH001691","C10_001691","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_125_CPG2125_1691","experimental","C10","2020-10-16","SW",5,1,0,0,0,0,0,NA,2.5,0.6
+"126","20FHB000126",2126,"3795","20SGH003795","C10_003795","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_126_CPG2126_3795","experimental","C10","2020-10-16","SW",5,2,0,0,0,0,0,NA,0,0
+"127","20FHB000127",2127,"C9-3726","19SGH003726","C9_003726","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_127_CPG2127_C9-3726","top33 S FHB","C9 replicate","2020-10-16","SW",5,3,0,0,0,0,0,"C9 replicate",NA,NA
+"128","20FHB000128",2128,"3358","20SGH003358","C10_003358","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_128_CPG2128_3358","experimental","C10","2020-10-16","SW",5,4,0,0,0,0,0,NA,0,0.1
+"129","20FHB000129",2129,"1240","20SGH001240","C10_001240","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_129_CPG2129_1240","experimental","C10","2020-10-16","SW",5,5,0,0,0,0,0,NA,0,0
+"130","20FHB000130",2130,"1871","20SGH001871","C10_001871","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_130_CPG2130_1871","experimental","C10","2020-10-16","SW",5,6,0,0,0,0,0,NA,0,0
+"131","20FHB000131",2131,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_131_CPG2131_Overley","susceptible check","winter wheat","2020-10-16","SW",5,7,0,0,0,0,0,"ww_check",0,5.9
+"132","20FHB000132",2132,"C9-2633","19SGH002633","C9_002633","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_132_CPG2132_C9-2633","top10% R OH","C9 replicate","2020-10-16","SW",5,8,0,0,0,0,0,"C9 replicate",NA,NA
+"133","20FHB000133",2133,"1215","20SGH001215","C10_001215","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_133_CPG2133_1215","experimental","C10","2020-10-16","SW",5,9,0,0,0,0,0,NA,0,0
+"134","20FHB000134",2134,"2496","20SGH002496","C10_002496","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_134_CPG2134_2496","experimental","C10","2020-10-16","SW",5,10,0,0,0,0,0,NA,0,0
+"135","20FHB000135",2135,"869","20SGH000869","C10_000869","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_135_CPG2135_869","experimental","C10","2020-10-16","SW",5,11,0,0,0,0,0,NA,0.1,0
+"136","20FHB000136",2136,"740","20SGH000740","C10_000740","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_136_CPG2136_740","experimental","C10","2020-10-16","SW",5,12,0,0,0,0,0,NA,0,0
+"137","20FHB000137",2137,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_137_CPG2137_Roblin","susceptible check","spring wheat","2020-10-16","SW",5,13,0,0,0,0,0,"sw_check",NA,NA
+"138","20FHB000138",2138,"3784","20SGH003784","C10_003784","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_138_CPG2138_3784","experimental","C10","2020-10-16","SW",5,14,0,0,0,0,0,NA,0,0.1
+"139","20FHB000139",2139,"3816","20SGH003816","C10_003816","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_139_CPG2139_3816","experimental","C10","2020-10-16","SW",5,15,0,0,0,0,0,NA,0.5,0
+"140","20FHB000140",2140,"C9-512","19SGH000512","C9_000512","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_140_CPG2140_C9-512","top 1 Inc2 R","C9 replicate","2020-10-16","SW",5,16,0,0,0,0,0,"C9 replicate",NA,NA
+"141","20FHB000141",2141,"2353","20SGH002353","C10_002353","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_141_CPG2141_2353","experimental","C10","2020-10-16","SW",5,17,0,0,0,0,0,NA,0.8,0.1
+"142","20FHB000142",2142,"3279","20SGH003279","C10_003279","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_142_CPG2142_3279","experimental","C10","2020-10-16","SW",5,18,0,0,0,0,0,NA,0,0
+"143","20FHB000143",2143,"1627","20SGH001627","C10_001627","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_143_CPG2143_1627","experimental","C10","2020-10-16","SW",5,19,0,0,0,0,0,NA,0,0
+"144","20FHB000144",2144,"2971","20SGH002971","C10_002971","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_144_CPG2144_2971","experimental","C10","2020-10-16","SW",5,20,0,0,0,0,0,NA,0,0
+"145","20FHB000145",2145,"896","20SGH000896","C10_000896","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_145_CPG2145_896","experimental","C10","2020-10-16","SW",5,21,0,0,0,0,0,NA,0,0
+"146","20FHB000146",2146,"1010","20SGH001010","C10_001010","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_146_CPG2146_1010","experimental","C10","2020-10-16","SW",5,22,0,0,0,0,0,NA,0,0
+"147","20FHB000147",2147,"2260","20SGH002260","C10_002260","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_147_CPG2147_2260","experimental","C10","2020-10-16","SW",5,23,0,0,0,0,0,NA,0.5,0.1
+"148","20FHB000148",2148,"371","20SGH000371","C10_000371","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_148_CPG2148_371","experimental","C10","2020-10-16","SW",5,24,0,0,0,0,0,NA,0,0
+"149","20FHB000149",2149,"2438","20SGH002438","C10_002438","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_149_CPG2149_2438","experimental","C10","2020-10-16","SW",5,25,0,0,0,0,0,NA,NA,NA
+"150","20FHB000150",2150,"693","20SGH000693","C10_000693","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_150_CPG2150_693","experimental","C10","2020-10-16","SW",5,26,0,0,0,0,0,NA,0,0
+"151","20FHB000151",2151,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_151_CPG2151_Bacup","resistant check","spring wheat","2020-10-16","SW",5,27,0,0,0,0,0,"sw_check",NA,NA
+"152","20FHB000152",2152,"1102","20SGH001102","C10_001102","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_152_CPG2152_1102","experimental","C10","2020-10-16","SW",5,28,0,0,0,0,0,NA,0,0
+"153","20FHB000153",2153,"1957","20SGH001957","C10_001957","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_153_CPG2153_1957","experimental","C10","2020-10-16","SW",5,29,0,0,0,0,0,NA,0.2,0
+"154","20FHB000154",2154,"2913","20SGH002913","C10_002913","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_154_CPG2154_2913","experimental","C10","2020-10-16","SW",5,30,0,0,0,0,0,NA,0,0
+"155","20FHB000155",2155,"23","20SGH000023","C10_000023","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_155_CPG2155_23","experimental","C10","2020-10-16","SW",5,31,0,0,0,0,0,NA,0,0
+"156","20FHB000156",2156,"2871","20SGH002871","C10_002871","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_156_CPG2156_2871","experimental","C10","2020-10-16","SW",6,31,0,0,0,0,0,NA,NA,NA
+"157","20FHB000157",2157,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_157_CPG2157_Overley","susceptible check","winter wheat","2020-10-16","SW",6,30,0,0,0,0,0,"ww_check",NA,NA
+"158","20FHB000158",2158,"C9-2587","19SGH002587","C9_002587","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_158_CPG2158_C9-2587","top10% R OH","C9 replicate","2020-10-16","SW",6,29,0,0,0,0,0,"C9 replicate",0,0
+"159","20FHB000159",2159,"2790","20SGH002790","C10_002790","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_159_CPG2159_2790","experimental","C10","2020-10-16","SW",6,28,0,0,0,0,0,NA,0,0
+"160","20FHB000160",2160,"C9-1829","19SGH001829","C9_001829","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_160_CPG2160_C9-1829","top33 S FHB","C9 replicate","2020-10-16","SW",6,27,0,0,0,0,0,"C9 replicate",NA,NA
+"161","20FHB000161",2161,"1559","20SGH001559","C10_001559","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_161_CPG2161_1559","experimental","C10","2020-10-16","SW",6,26,0,0,0,0,0,NA,0,0.1
+"162","20FHB000162",2162,"3234","20SGH003234","C10_003234","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_162_CPG2162_3234","experimental","C10","2020-10-16","SW",6,25,0,0,0,0,0,NA,0,0
+"163","20FHB000163",2163,"676","20SGH000676","C10_000676","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_163_CPG2163_676","experimental","C10","2020-10-16","SW",6,24,0,0,0,0,0,NA,0.4,0
+"164","20FHB000164",2164,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_164_CPG2164_Overley","susceptible check","winter wheat","2020-10-16","SW",6,23,0,0,0,0,0,"ww_check",NA,NA
+"165","20FHB000165",2165,"2000","20SGH002000","C10_002000","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_165_CPG2165_2000","experimental","C10","2020-10-16","SW",6,22,0,0,0,0,0,NA,0,0
+"166","20FHB000166",2166,"2854","20SGH002854","C10_002854","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_166_CPG2166_2854","experimental","C10","2020-10-16","SW",6,21,0,0,0,0,0,NA,0.2,0.1
+"167","20FHB000167",2167,"2233","20SGH002233","C10_002233","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_167_CPG2167_2233","experimental","C10","2020-10-16","SW",6,20,0,0,0,0,0,NA,0.6,0.1
+"168","20FHB000168",2168,"1436","20SGH001436","C10_001436","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_168_CPG2168_1436","experimental","C10","2020-10-16","SW",6,19,0,0,0,0,0,NA,0,0
+"169","20FHB000169",2169,"1533","20SGH001533","C10_001533","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_169_CPG2169_1533","experimental","C10","2020-10-16","SW",6,18,0,0,0,0,0,NA,0,0
+"170","20FHB000170",2170,"561","20SGH000561","C10_000561","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_170_CPG2170_561","experimental","C10","2020-10-16","SW",6,17,0,0,0,0,0,NA,0,0
+"171","20FHB000171",2171,"3030","20SGH003030","C10_003030","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_171_CPG2171_3030","experimental","C10","2020-10-16","SW",6,16,0,0,0,0,0,NA,0,0
+"172","20FHB000172",2172,"792","20SGH000792","C10_000792","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_172_CPG2172_792","experimental","C10","2020-10-16","SW",6,15,0,0,0,0,0,NA,0.4,0.1
+"173","20FHB000173",2173,"2176","20SGH002176","C10_002176","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_173_CPG2173_2176","experimental","C10","2020-10-16","SW",6,14,0,0,0,0,0,NA,0,0
+"174","20FHB000174",2174,"2522","20SGH002522","C10_002522","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_174_CPG2174_2522","experimental","C10","2020-10-16","SW",6,13,0,0,0,0,0,NA,0.1,0.3
+"175","20FHB000175",2175,"1763","20SGH001763","C10_001763","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_175_CPG2175_1763","experimental","C10","2020-10-16","SW",6,12,0,0,0,0,0,NA,NA,NA
+"176","20FHB000176",2176,"1212","20SGH001212","C10_001212","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_176_CPG2176_1212","experimental","C10","2020-10-16","SW",6,11,0,0,0,0,0,NA,0,0
+"177","20FHB000177",2177,"846","20SGH000846","C10_000846","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_177_CPG2177_846","experimental","C10","2020-10-16","SW",6,10,0,0,0,0,0,NA,0,0
+"178","20FHB000178",2178,"3090","20SGH003090","C10_003090","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_178_CPG2178_3090","experimental","C10","2020-10-16","SW",6,9,0,0,0,0,0,NA,0,0
+"179","20FHB000179",2179,"C9-932","19SGH000932","C9_000932","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_179_CPG2179_C9-932","top 1 Inc3 R","C9 replicate","2020-10-16","SW",6,8,0,0,0,0,0,"C9 replicate",0,0
+"180","20FHB000180",2180,"1031","20SGH001031","C10_001031","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_180_CPG2180_1031","experimental","C10","2020-10-16","SW",6,7,0,0,0,0,0,NA,0,0
+"181","20FHB000181",2181,"454","20SGH000454","C10_000454","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_181_CPG2181_454","experimental","C10","2020-10-16","SW",6,6,0,0,0,0,0,NA,0,0
+"182","20FHB000182",2182,"1473","20SGH001473","C10_001473","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_182_CPG2182_1473","experimental","C10","2020-10-16","SW",6,5,0,0,0,0,0,NA,0.3,0
+"183","20FHB000183",2183,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_183_CPG2183_Bacup","resistant check","spring wheat","2020-10-16","SW",6,4,0,0,0,0,0,"sw_check",NA,NA
+"184","20FHB000184",2184,"245","20SGH000245","C10_000245","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_184_CPG2184_245","experimental","C10","2020-10-16","SW",6,3,0,0,0,0,0,NA,0.3,0
+"185","20FHB000185",2185,"18","20SGH000018","C10_000018","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_185_CPG2185_18","experimental","C10","2020-10-16","SW",6,2,0,0,0,0,0,NA,0,0
+"186","20FHB000186",2186,"2124","20SGH002124","C10_002124","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_186_CPG2186_2124","experimental","C10","2020-10-16","SW",6,1,0,0,0,0,0,NA,1.3,0
+"187","20FHB000187",2187,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_187_CPG2187_Everest","resistant check","winter wheat","2020-10-16","SW",7,1,0,0,0,0,0,"ww_check",NA,NA
+"188","20FHB000188",2188,"545","20SGH000545","C10_000545","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_188_CPG2188_545","experimental","C10","2020-10-16","SW",7,2,0,0,0,0,0,NA,0.5,0
+"189","20FHB000189",2189,"2199","20SGH002199","C10_002199","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_189_CPG2189_2199","experimental","C10","2020-10-16","SW",7,3,0,0,0,0,0,NA,2.7,0
+"190","20FHB000190",2190,"C9-3370","19SGH003370","C9_003370","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_190_CPG2190_C9-3370","top10 R FHB","C9 replicate","2020-10-16","SW",7,4,0,0,0,0,0,"C9 replicate",0.8,0
+"191","20FHB000191",2191,"1555","20SGH001555","C10_001555","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_191_CPG2191_1555","experimental","C10","2020-10-16","SW",7,5,0,0,0,0,0,NA,0,0.1
+"192","20FHB000192",2192,"2655","20SGH002655","C10_002655","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_192_CPG2192_2655","experimental","C10","2020-10-16","SW",7,6,0,0,0,0,0,NA,0,0
+"193","20FHB000193",2193,"3307","20SGH003307","C10_003307","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_193_CPG2193_3307","experimental","C10","2020-10-16","SW",7,7,0,0,0,0,0,NA,0,0.1
+"194","20FHB000194",2194,"307","20SGH000307","C10_000307","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_194_CPG2194_307","experimental","C10","2020-10-16","SW",7,8,0,0,0,0,0,NA,0.5,0.1
+"195","20FHB000195",2195,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_195_CPG2195_Everest","resistant check","winter wheat","2020-10-16","SW",7,9,0,0,0,0,0,"ww_check",NA,NA
+"196","20FHB000196",2196,"1302","20SGH001302","C10_001302","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_196_CPG2196_1302","experimental","C10","2020-10-16","SW",7,10,0,0,0,0,0,NA,0,0
+"197","20FHB000197",2197,"2670","20SGH002670","C10_002670","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_197_CPG2197_2670","experimental","C10","2020-10-16","SW",7,11,0,0,0,0,0,NA,0,0
+"198","20FHB000198",2198,"2055","20SGH002055","C10_002055","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_198_CPG2198_2055","experimental","C10","2020-10-16","SW",7,12,0,0,0,0,0,NA,0,0.1
+"199","20FHB000199",2199,"3613","20SGH003613","C10_003613","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_199_CPG2199_3613","experimental","C10","2020-10-16","SW",7,13,0,0,0,0,0,NA,0.2,0.2
+"200","20FHB000200",2200,"823","20SGH000823","C10_000823","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_200_CPG2200_823","experimental","C10","2020-10-16","SW",7,14,0,0,0,0,0,NA,0,0
+"201","20FHB000201",2201,"3705","20SGH003705","C10_003705","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_201_CPG2201_3705","experimental","C10","2020-10-16","SW",7,15,0,0,0,0,0,NA,0.1,0
+"202","20FHB000202",2202,"3470","20SGH003470","C10_003470","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_202_CPG2202_3470","experimental","C10","2020-10-16","SW",7,16,0,0,0,0,0,NA,0.1,0.1
+"203","20FHB000203",2203,"781","20SGH000781","C10_000781","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_203_CPG2203_781","experimental","C10","2020-10-16","SW",7,17,0,0,0,0,0,NA,0,0
+"204","20FHB000204",2204,"3492","20SGH003492","C10_003492","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_204_CPG2204_3492","experimental","C10","2020-10-16","SW",7,18,0,0,0,0,0,NA,0.1,0
+"205","20FHB000205",2205,"C9-1222","19SGH001222","C9_001222","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_205_CPG2205_C9-1222","top10% S EB","C9 replicate","2020-10-16","SW",7,19,0,0,0,0,0,"C9 replicate",0,0
+"206","20FHB000206",2206,"1362","20SGH001362","C10_001362","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_206_CPG2206_1362","experimental","C10","2020-10-16","SW",7,20,0,0,0,0,0,NA,0.2,0.1
+"207","20FHB000207",2207,"2637","20SGH002637","C10_002637","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_207_CPG2207_2637","experimental","C10","2020-10-16","SW",7,21,0,0,0,0,0,NA,0.2,0
+"208","20FHB000208",2208,"190","20SGH000190","C10_000190","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_208_CPG2208_190","experimental","C10","2020-10-16","SW",7,22,0,0,0,0,0,NA,0,0
+"209","20FHB000209",2209,"2413","20SGH002413","C10_002413","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_209_CPG2209_2413","experimental","C10","2020-10-16","SW",7,23,0,0,0,0,0,NA,0,0
+"210","20FHB000210",2210,"C9-2695","19SGH002695","C9_002695","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_210_CPG2210_C9-2695","top10% S EB","C9 replicate","2020-10-16","SW",7,24,0,0,0,0,0,"C9 replicate",NA,NA
+"211","20FHB000211",2211,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_211_CPG2211_Roblin","susceptible check","spring wheat","2020-10-16","SW",7,25,0,0,0,0,0,"sw_check",NA,NA
+"212","20FHB000212",2212,"1708","20SGH001708","C10_001708","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_212_CPG2212_1708","experimental","C10","2020-10-16","SW",7,26,0,0,0,0,0,NA,0.3,0.1
+"213","20FHB000213",2213,"3338","20SGH003338","C10_003338","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_213_CPG2213_3338","experimental","C10","2020-10-16","SW",7,27,0,0,0,0,0,NA,0.2,0.1
+"214","20FHB000214",2214,"546","20SGH000546","C10_000546","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_214_CPG2214_546","experimental","C10","2020-10-16","SW",7,28,0,0,0,0,0,NA,0.2,0.1
+"215","20FHB000215",2215,"3618","20SGH003618","C10_003618","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_215_CPG2215_3618","experimental","C10","2020-10-16","SW",7,29,0,0,0,0,0,NA,0,0
+"216","20FHB000216",2216,"1394","20SGH001394","C10_001394","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_216_CPG2216_1394","experimental","C10","2020-10-16","SW",7,30,0,0,0,0,0,NA,2.3,0
+"217","20FHB000217",2217,"1898","20SGH001898","C10_001898","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_217_CPG2217_1898","experimental","C10","2020-10-16","SW",7,31,0,0,0,0,0,NA,0.1,0.2
+"218","20FHB000218",2218,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_218_CPG2218_Bacup","resistant check","spring wheat","2020-10-16","SW",8,31,0,0,0,0,0,"sw_check",NA,NA
+"219","20FHB000219",2219,"C9-4136","19SGH004136","C9_004136","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_219_CPG2219_C9-4136","top10 R FHB","C9 replicate","2020-10-16","SW",8,30,0,0,0,0,0,"C9 replicate",NA,NA
+"220","20FHB000220",2220,"3717","20SGH003717","C10_003717","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_220_CPG2220_3717","experimental","C10","2020-10-16","SW",8,29,0,0,0,0,0,NA,0.2,0.1
+"221","20FHB000221",2221,"1352","20SGH001352","C10_001352","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_221_CPG2221_1352","experimental","C10","2020-10-16","SW",8,28,0,0,0,0,0,NA,0.2,0.1
+"222","20FHB000222",2222,"3180","20SGH003180","C10_003180","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_222_CPG2222_3180","experimental","C10","2020-10-16","SW",8,27,0,0,0,0,0,NA,0.1,0.4
+"223","20FHB000223",2223,"1467","20SGH001467","C10_001467","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_223_CPG2223_1467","experimental","C10","2020-10-16","SW",8,26,0,0,0,0,0,NA,0.3,0.1
+"224","20FHB000224",2224,"2584","20SGH002584","C10_002584","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_224_CPG2224_2584","experimental","C10","2020-10-16","SW",8,25,0,0,0,0,0,NA,0,0
+"225","20FHB000225",2225,"321","20SGH000321","C10_000321","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_225_CPG2225_321","experimental","C10","2020-10-16","SW",8,24,0,0,0,0,0,NA,0,0
+"226","20FHB000226",2226,"3318","20SGH003318","C10_003318","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_226_CPG2226_3318","experimental","C10","2020-10-16","SW",8,23,0,0,0,0,0,NA,0,0
+"227","20FHB000227",2227,"1053","20SGH001053","C10_001053","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_227_CPG2227_1053","experimental","C10","2020-10-16","SW",8,22,0,0,0,0,0,NA,0,0
+"228","20FHB000228",2228,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_228_CPG2228_Overley","susceptible check","winter wheat","2020-10-16","SW",8,21,0,0,0,0,0,"ww_check",NA,NA
+"229","20FHB000229",2229,"448","20SGH000448","C10_000448","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_229_CPG2229_448","experimental","C10","2020-10-16","SW",8,20,0,0,0,0,0,NA,0,0
+"230","20FHB000230",2230,"2465","20SGH002465","C10_002465","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_230_CPG2230_2465","experimental","C10","2020-10-16","SW",8,19,0,0,0,0,0,NA,0,0
+"231","20FHB000231",2231,"1749","20SGH001749","C10_001749","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_231_CPG2231_1749","experimental","C10","2020-10-16","SW",8,18,0,0,0,0,0,NA,0,0.1
+"232","20FHB000232",2232,"1532","20SGH001532","C10_001532","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_232_CPG2232_1532","experimental","C10","2020-10-16","SW",8,17,0,0,0,0,0,NA,0.1,0.1
+"233","20FHB000233",2233,"2132","20SGH002132","C10_002132","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_233_CPG2233_2132","experimental","C10","2020-10-16","SW",8,16,0,0,0,0,0,NA,NA,NA
+"234","20FHB000234",2234,"3353","20SGH003353","C10_003353","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_234_CPG2234_3353","experimental","C10","2020-10-16","SW",8,15,0,0,0,0,0,NA,0,0
+"235","20FHB000235",2235,"378","20SGH00378","C10_00378","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_235_CPG2235_378","experimental","C10","2020-10-16","SW",8,14,0,0,0,0,0,NA,0,0
+"236","20FHB000236",2236,"3312","20SGH003312","C10_003312","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_236_CPG2236_3312","experimental","C10","2020-10-16","SW",8,13,0,0,0,0,0,NA,0,0
+"237","20FHB000237",2237,"1152","20SGH001152","C10_001152","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_237_CPG2237_1152","experimental","C10","2020-10-16","SW",8,12,0,0,0,0,0,NA,0,0
+"238","20FHB000238",2238,"3092","20SGH003092","C10_003092","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_238_CPG2238_3092","experimental","C10","2020-10-16","SW",8,11,0,0,0,0,0,NA,0,0
+"239","20FHB000239",2239,"2235","20SGH002235","C10_002235","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_239_CPG2239_2235","experimental","C10","2020-10-16","SW",8,10,0,0,0,0,0,NA,0,0.1
+"240","20FHB000240",2240,"591","20SGH000591","C10_000591","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_240_CPG2240_591","experimental","C10","2020-10-16","SW",8,9,0,0,0,0,0,NA,0.1,0.2
+"241","20FHB000241",2241,"1669","20SGH001669","C10_001669","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_241_CPG2241_1669","experimental","C10","2020-10-16","SW",8,8,0,0,0,0,0,NA,0,0
+"242","20FHB000242",2242,"995","20SGH000995","C10_000995","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_242_CPG2242_995","experimental","C10","2020-10-16","SW",8,7,0,0,0,0,0,NA,0,0.3
+"243","20FHB000243",2243,"C9-369","19SGH000369","C9_000369","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_243_CPG2243_C9-369","top33 S FHB","C9 replicate","2020-10-16","SW",8,6,0,0,0,0,0,"C9 replicate",0,0
+"244","20FHB000244",2244,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_244_CPG2244_Bacup","resistant check","spring wheat","2020-10-16","SW",8,5,0,0,0,0,0,"sw_check",NA,NA
+"245","20FHB000245",2245,"358","20SGH000358","C10_000358","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_245_CPG2245_358","experimental","C10","2020-10-16","SW",8,4,0,0,0,0,0,NA,NA,NA
+"246","20FHB000246",2246,"1088","20SGH001088","C10_001088","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_246_CPG2246_1088","experimental","C10","2020-10-16","SW",8,3,0,0,0,0,0,NA,0.1,0.1
+"247","20FHB000247",2247,"3455","20SGH003455","C10_003455","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_247_CPG2247_3455","experimental","C10","2020-10-16","SW",8,2,0,0,0,0,0,NA,0,0
+"248","20FHB000248",2248,"1155","20SGH001155","C10_001155","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_248_CPG2248_1155","experimental","C10","2020-10-16","SW",8,1,0,0,0,0,0,NA,0.2,0.1
+"249","20FHB000249",2249,"3834","20SGH003834","C10_003834","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_249_CPG2249_3834","experimental","C10","2020-10-16","SW",9,1,0,0,0,0,0,NA,0,0
+"250","20FHB000250",2250,"20","20SGH000020","C10_000020","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_250_CPG2250_20","experimental","C10","2020-10-16","SW",9,2,0,0,0,0,0,NA,0.2,0
+"251","20FHB000251",2251,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_251_CPG2251_Everest","resistant check","winter wheat","2020-10-16","SW",9,3,0,0,0,0,0,"ww_check",NA,NA
+"252","20FHB000252",2252,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_252_CPG2252_Overley","susceptible check","winter wheat","2020-10-16","SW",9,4,0,0,0,0,0,"ww_check",NA,NA
+"253","20FHB000253",2253,"2350","20SGH002350","C10_002350","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_253_CPG2253_2350","experimental","C10","2020-10-16","SW",9,5,0,0,0,0,0,NA,0.1,0
+"254","20FHB000254",2254,"3830","20SGH003830","C10_003830","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_254_CPG2254_3830","experimental","C10","2020-10-16","SW",9,6,0,0,0,0,0,NA,0,0
+"255","20FHB000255",2255,"3261","20SGH003261","C10_003261","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_255_CPG2255_3261","experimental","C10","2020-10-16","SW",9,7,0,0,0,0,0,NA,0.1,0
+"256","20FHB000256",2256,"2302","20SGH002302","C10_002302","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_256_CPG2256_2302","experimental","C10","2020-10-16","SW",9,8,0,0,0,0,0,NA,0,0.1
+"257","20FHB000257",2257,"1136","20SGH001136","C10_001136","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_257_CPG2257_1136","experimental","C10","2020-10-16","SW",9,9,0,0,0,0,0,NA,0,0
+"258","20FHB000258",2258,"119","20SGH000119","C10_000119","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_258_CPG2258_119","experimental","C10","2020-10-16","SW",9,10,0,0,0,0,0,NA,0,0
+"259","20FHB000259",2259,"2388","20SGH002388","C10_002388","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_259_CPG2259_2388","experimental","C10","2020-10-16","SW",9,11,0,0,0,0,0,NA,0.1,0.1
+"260","20FHB000260",2260,"2450","20SGH002450","C10_002450","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_260_CPG2260_2450","experimental","C10","2020-10-16","SW",9,12,0,0,0,0,0,NA,1.1,0.1
+"261","20FHB000261",2261,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_261_CPG2261_Roblin","susceptible check","spring wheat","2020-10-16","SW",9,13,0,0,0,0,0,"sw_check",NA,NA
+"262","20FHB000262",2262,"2400","20SGH002400","C10_002400","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_262_CPG2262_2400","experimental","C10","2020-10-16","SW",9,14,0,0,0,0,0,NA,NA,NA
+"263","20FHB000263",2263,"2653","20SGH002653","C10_002653","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_263_CPG2263_2653","experimental","C10","2020-10-16","SW",9,15,0,0,0,0,0,NA,0.1,0.5
+"264","20FHB000264",2264,"1085","20SGH001085","C10_001085","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_264_CPG2264_1085","experimental","C10","2020-10-16","SW",9,16,0,0,0,0,0,NA,NA,NA
+"265","20FHB000265",2265,"3507","20SGH003507","C10_003507","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_265_CPG2265_3507","experimental","C10","2020-10-16","SW",9,17,0,0,0,0,0,NA,0.1,0
+"266","20FHB000266",2266,"3611","20SGH003611","C10_003611","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_266_CPG2266_3611","experimental","C10","2020-10-16","SW",9,18,0,0,0,0,0,NA,0,0
+"267","20FHB000267",2267,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_267_CPG2267_Roblin","susceptible check","spring wheat","2020-10-16","SW",9,19,0,0,0,0,0,"sw_check",NA,NA
+"268","20FHB000268",2268,"2621","20SGH002621","C10_002621","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_268_CPG2268_2621","experimental","C10","2020-10-16","SW",9,20,0,0,0,0,0,NA,0,0
+"269","20FHB000269",2269,"2486","20SGH002486","C10_002486","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_269_CPG2269_2486","experimental","C10","2020-10-16","SW",9,21,0,0,0,0,0,NA,NA,NA
+"270","20FHB000270",2270,"585","20SGH000585","C10_000585","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_270_CPG2270_585","experimental","C10","2020-10-16","SW",9,22,0,0,0,0,0,NA,0,0
+"271","20FHB000271",2271,"1234","20SGH001234","C10_001234","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_271_CPG2271_1234","experimental","C10","2020-10-16","SW",9,23,0,0,0,0,0,NA,0,0
+"272","20FHB000272",2272,"275","20SGH000275","C10_000275","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_272_CPG2272_275","experimental","C10","2020-10-16","SW",9,24,0,0,0,0,0,NA,0,0
+"273","20FHB000273",2273,"3542","20SGH003542","C10_003542","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_273_CPG2273_3542","experimental","C10","2020-10-16","SW",9,25,0,0,0,0,0,NA,0.1,0.1
+"274","20FHB000274",2274,"277","20SGH000277","C10_000277","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_274_CPG2274_277","experimental","C10","2020-10-16","SW",9,26,0,0,0,0,0,NA,0.2,0.1
+"275","20FHB000275",2275,"2750","20SGH002750","C10_002750","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_275_CPG2275_2750","experimental","C10","2020-10-16","SW",9,27,0,0,0,0,0,NA,0,0
+"276","20FHB000276",2276,"3097","20SGH003097","C10_003097","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_276_CPG2276_3097","experimental","C10","2020-10-16","SW",9,28,0,0,0,0,0,NA,0.1,0.1
+"277","20FHB000277",2277,"C9-3370","19SGH003370","C9_003370","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_277_CPG2277_C9-3370","top10 R FHB","C9 replicate","2020-10-16","SW",9,29,0,0,0,0,0,"C9 replicate",NA,NA
+"278","20FHB000278",2278,"C9-1196","19SGH001196","C9_001196","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_278_CPG2278_C9-1196","top33 S FHB","C9 replicate","2020-10-16","SW",9,30,0,0,0,0,0,"C9 replicate",NA,NA
+"279","20FHB000279",2279,"619","20SGH000619","C10_000619","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_279_CPG2279_619","experimental","C10","2020-10-16","SW",9,31,0,0,0,0,0,NA,0,0
+"280","20FHB000280",2280,"C9-369","19SGH000369","C9_000369","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_280_CPG2280_C9-369","top33 S FHB","C9 replicate","2020-10-16","SW",10,31,0,0,0,0,0,"C9 replicate",1,0.2
+"281","20FHB000281",2281,"3715","20SGH003715","C10_003715","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_281_CPG2281_3715","experimental","C10","2020-10-16","SW",10,30,0,0,0,0,0,NA,0,0
+"282","20FHB000282",2282,"179","20SGH000179","C10_000179","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_282_CPG2282_179","experimental","C10","2020-10-16","SW",10,29,0,0,0,0,0,NA,0,0
+"283","20FHB000283",2283,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_283_CPG2283_Everest","resistant check","winter wheat","2020-10-16","SW",10,28,0,0,0,0,0,"ww_check",NA,NA
+"284","20FHB000284",2284,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_284_CPG2284_Roblin","susceptible check","spring wheat","2020-10-16","SW",10,27,0,0,0,0,0,"sw_check",NA,NA
+"285","20FHB000285",2285,"959","20SGH000959","C10_000959","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_285_CPG2285_959","experimental","C10","2020-10-16","SW",10,26,0,0,0,0,0,NA,0,0
+"286","20FHB000286",2286,"3650","20SGH003650","C10_003650","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_286_CPG2286_3650","experimental","C10","2020-10-16","SW",10,25,0,0,0,0,0,NA,0.5,0
+"287","20FHB000287",2287,"2091","20SGH002091","C10_002091","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_287_CPG2287_2091","experimental","C10","2020-10-16","SW",10,24,0,0,0,0,0,NA,0,0
+"288","20FHB000288",2288,"2934","20SGH002934","C10_002934","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_288_CPG2288_2934","experimental","C10","2020-10-16","SW",10,23,0,0,0,0,0,NA,0,0
+"289","20FHB000289",2289,"3301","20SGH003301","C10_003301","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_289_CPG2289_3301","experimental","C10","2020-10-16","SW",10,22,0,0,0,0,0,NA,0.4,0
+"290","20FHB000290",2290,"1984","20SGH001984","C10_001984","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_290_CPG2290_1984","experimental","C10","2020-10-16","SW",10,21,0,0,0,0,0,NA,0.4,0
+"291","20FHB000291",2291,"1075","20SGH001075","C10_001075","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_291_CPG2291_1075","experimental","C10","2020-10-16","SW",10,20,0,0,0,0,0,NA,0,0
+"292","20FHB000292",2292,"2077","20SGH002077","C10_002077","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_292_CPG2292_2077","experimental","C10","2020-10-16","SW",10,19,0,0,0,0,0,NA,0,0
+"293","20FHB000293",2293,"511","20SGH000511","C10_000511","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_293_CPG2293_511","experimental","C10","2020-10-16","SW",10,18,0,0,0,0,0,NA,0,0
+"294","20FHB000294",2294,"3146","20SGH003146","C10_003146","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_294_CPG2294_3146","experimental","C10","2020-10-16","SW",10,17,0,0,0,0,0,NA,0,0
+"295","20FHB000295",2295,"2252","20SGH002252","C10_002252","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_295_CPG2295_2252","experimental","C10","2020-10-16","SW",10,16,0,0,0,0,0,NA,0,0
+"296","20FHB000296",2296,"3039","20SGH003039","C10_003039","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_296_CPG2296_3039","experimental","C10","2020-10-16","SW",10,15,0,0,0,0,0,NA,0,0.3
+"297","20FHB000297",2297,"445","20SGH000445","C10_000445","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_297_CPG2297_445","experimental","C10","2020-10-16","SW",10,14,0,0,0,0,0,NA,0,0
+"298","20FHB000298",2298,"813","20SGH000813","C10_000813","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_298_CPG2298_813","experimental","C10","2020-10-16","SW",10,13,0,0,0,0,0,NA,0.1,0
+"299","20FHB000299",2299,"2311","20SGH002311","C10_002311","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_299_CPG2299_2311","experimental","C10","2020-10-16","SW",10,12,0,0,0,0,0,NA,0.4,0
+"300","20FHB000300",2300,"2529","20SGH002529","C10_002529","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_300_CPG2300_2529","experimental","C10","2020-10-16","SW",10,11,0,0,0,0,0,NA,0.2,0.1
+"301","20FHB000301",2301,"2996","20SGH002996","C10_002996","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_301_CPG2301_2996","experimental","C10","2020-10-16","SW",10,10,0,0,0,0,0,NA,0,0.1
+"302","20FHB000302",2302,"634","20SGH000634","C10_000634","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_302_CPG2302_634","experimental","C10","2020-10-16","SW",10,9,0,0,0,0,0,NA,0.2,0.1
+"303","20FHB000303",2303,"732","20SGH000732","C10_000732","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_303_CPG2303_732","experimental","C10","2020-10-16","SW",10,8,0,0,0,0,0,NA,0.1,0.1
+"304","20FHB000304",2304,"2201","20SGH002201","C10_002201","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_304_CPG2304_2201","experimental","C10","2020-10-16","SW",10,7,0,0,0,0,0,NA,0.5,0
+"305","20FHB000305",2305,"1018","20SGH001018","C10_001018","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_305_CPG2305_1018","experimental","C10","2020-10-16","SW",10,6,0,0,0,0,0,NA,0,0
+"306","20FHB000306",2306,"C9-2225","19SGH002225","C9_002225","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_306_CPG2306_C9-2225","top10 R FHB","C9 replicate","2020-10-16","SW",10,5,0,0,0,0,0,"C9 replicate",0.4,0.2
+"307","20FHB000307",2307,"3557","20SGH003557","C10_003557","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_307_CPG2307_3557","experimental","C10","2020-10-16","SW",10,4,0,0,0,0,0,NA,NA,NA
+"308","20FHB000308",2308,"748","20SGH000748","C10_000748","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_308_CPG2308_748","experimental","C10","2020-10-16","SW",10,3,0,0,0,0,0,NA,0.6,0.4
+"309","20FHB000309",2309,"1255","20SGH001255","C10_001255","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_309_CPG2309_1255","experimental","C10","2020-10-16","SW",10,2,0,0,0,0,0,NA,0,0
+"310","20FHB000310",2310,"2335","20SGH002335","C10_002335","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_310_CPG2310_2335","experimental","C10","2020-10-16","SW",10,1,0,0,0,0,0,NA,0,0
+"311","20FHB000311",2311,"3055","20SGH003055","C10_003055","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_311_CPG2311_3055","experimental","C10","2020-10-16","SW",11,1,0,0,0,0,0,NA,NA,NA
+"312","20FHB000312",2312,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_312_CPG2312_Roblin","susceptible check","spring wheat","2020-10-16","SW",11,2,0,0,0,0,0,"sw_check",NA,NA
+"313","20FHB000313",2313,"948","20SGH000948","C10_000948","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_313_CPG2313_948","experimental","C10","2020-10-16","SW",11,3,0,0,0,0,0,NA,0.2,0.2
+"314","20FHB000314",2314,"2577","20SGH002577","C10_002577","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_314_CPG2314_2577","experimental","C10","2020-10-16","SW",11,4,0,0,0,0,0,NA,0,0
+"315","20FHB000315",2315,"C9-2695","19SGH002695","C9_002695","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_315_CPG2315_C9-2695","top10% S EB","C9 replicate","2020-10-16","SW",11,5,0,0,0,0,0,"C9 replicate",NA,NA
+"316","20FHB000316",2316,"2588","20SGH002588","C10_002588","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_316_CPG2316_2588","experimental","C10","2020-10-16","SW",11,6,0,0,0,0,0,NA,0,0
+"317","20FHB000317",2317,"2033","20SGH002033","C10_002033","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_317_CPG2317_2033","experimental","C10","2020-10-16","SW",11,7,0,0,0,0,0,NA,0,0
+"318","20FHB000318",2318,"344","20SGH000344","C10_000344","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_318_CPG2318_344","experimental","C10","2020-10-16","SW",11,8,0,0,0,0,0,NA,0,0
+"319","20FHB000319",2319,"2911","20SGH002911","C10_002911","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_319_CPG2319_2911","experimental","C10","2020-10-16","SW",11,9,0,0,0,0,0,NA,0,0
+"320","20FHB000320",2320,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_320_CPG2320_Everest","resistant check","winter wheat","2020-10-16","SW",11,10,0,0,0,0,0,"ww_check",NA,NA
+"321","20FHB000321",2321,"3534","20SGH003534","C10_003534","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_321_CPG2321_3534","experimental","C10","2020-10-16","SW",11,11,0,0,0,0,0,NA,0.1,0.1
+"322","20FHB000322",2322,"C9-4077","19SGH004077","C9_004077","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_322_CPG2322_C9-4077","top33 S FHB","C9 replicate","2020-10-16","SW",11,12,0,0,0,0,0,"C9 replicate",0.1,0.1
+"323","20FHB000323",2323,"2815","20SGH002815","C10_002815","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_323_CPG2323_2815","experimental","C10","2020-10-16","SW",11,13,0,0,0,0,0,NA,0,0
+"324","20FHB000324",2324,"2513","20SGH002513","C10_002513","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_324_CPG2324_2513","experimental","C10","2020-10-16","SW",11,14,0,0,0,0,0,NA,0.5,0
+"325","20FHB000325",2325,"3593","20SGH003593","C10_003593","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_325_CPG2325_3593","experimental","C10","2020-10-16","SW",11,15,0,0,0,0,0,NA,0.3,0
+"326","20FHB000326",2326,"2024","20SGH002024","C10_002024","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_326_CPG2326_2024","experimental","C10","2020-10-16","SW",11,16,0,0,0,0,0,NA,0.3,0.1
+"327","20FHB000327",2327,"3311","20SGH003311","C10_003311","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_327_CPG2327_3311","experimental","C10","2020-10-16","SW",11,17,0,0,0,0,0,NA,0,0
+"328","20FHB000328",2328,"493","20SGH000493","C10_000493","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_328_CPG2328_493","experimental","C10","2020-10-16","SW",11,18,0,0,0,0,0,NA,0,0.1
+"329","20FHB000329",2329,"799","20SGH000799","C10_000799","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_329_CPG2329_799","experimental","C10","2020-10-16","SW",11,19,0,0,0,0,0,NA,0.1,0
+"330","20FHB000330",2330,"937","20SGH000937","C10_000937","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_330_CPG2330_937","experimental","C10","2020-10-16","SW",11,20,0,0,0,0,0,NA,0.1,0.2
+"331","20FHB000331",2331,"3670","20SGH003670","C10_003670","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_331_CPG2331_3670","experimental","C10","2020-10-16","SW",11,21,0,0,0,0,0,NA,NA,NA
+"332","20FHB000332",2332,"2383","20SGH002383","C10_002383","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_332_CPG2332_2383","experimental","C10","2020-10-16","SW",11,22,0,0,0,0,0,NA,NA,NA
+"333","20FHB000333",2333,"3498","20SGH003498","C10_003498","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_333_CPG2333_3498","experimental","C10","2020-10-16","SW",11,23,0,0,0,0,0,NA,NA,NA
+"334","20FHB000334",2334,"434","20SGH000434","C10_000434","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_334_CPG2334_434","experimental","C10","2020-10-16","SW",11,24,0,0,0,0,0,NA,0,0
+"335","20FHB000335",2335,"2646","20SGH002646","C10_002646","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_335_CPG2335_2646","experimental","C10","2020-10-16","SW",11,25,0,0,0,0,0,NA,2.5,0
+"336","20FHB000336",2336,"1058","20SGH001058","C10_001058","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_336_CPG2336_1058","experimental","C10","2020-10-16","SW",11,26,0,0,0,0,0,NA,0,0
+"337","20FHB000337",2337,"2917","20SGH002917","C10_002917","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_337_CPG2337_2917","experimental","C10","2020-10-16","SW",11,27,0,0,0,0,0,NA,0,0
+"338","20FHB000338",2338,"2479","20SGH002479","C10_002479","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_338_CPG2338_2479","experimental","C10","2020-10-16","SW",11,28,0,0,0,0,0,NA,0,0
+"339","20FHB000339",2339,"866","20SGH000866","C10_000866","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_339_CPG2339_866","experimental","C10","2020-10-16","SW",11,29,0,0,0,0,0,NA,0.9,0.1
+"340","20FHB000340",2340,"2731","20SGH002731","C10_002731","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_340_CPG2340_2731","experimental","C10","2020-10-16","SW",11,30,0,0,0,0,0,NA,0,0.2
+"341","20FHB000341",2341,"1121","20SGH001121","C10_001121","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_341_CPG2341_1121","experimental","C10","2020-10-16","SW",11,31,0,0,0,0,0,NA,0.3,0.4
+"342","20FHB000342",2342,"2793","20SGH002793","C10_002793","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_342_CPG2342_2793","experimental","C10","2020-10-16","SW",12,31,0,0,0,0,0,NA,0,0
+"343","20FHB000343",2343,"2421","20SGH002421","C10_002421","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_343_CPG2343_2421","experimental","C10","2020-10-16","SW",12,30,0,0,0,0,0,NA,0.1,0
+"344","20FHB000344",2344,"2136","20SGH002136","C10_002136","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_344_CPG2344_2136","experimental","C10","2020-10-16","SW",12,29,0,0,0,0,0,NA,0.3,0
+"345","20FHB000345",2345,"3845","20SGH003845","C10_003845","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_345_CPG2345_3845","experimental","C10","2020-10-16","SW",12,28,0,0,0,0,0,NA,0.4,0.3
+"346","20FHB000346",2346,"3417","20SGH003417","C10_003417","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_346_CPG2346_3417","experimental","C10","2020-10-16","SW",12,27,0,0,0,0,0,NA,NA,NA
+"347","20FHB000347",2347,"1108","20SGH001108","C10_001108","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_347_CPG2347_1108","experimental","C10","2020-10-16","SW",12,26,0,0,0,0,0,NA,0.1,0.1
+"348","20FHB000348",2348,"2923","20SGH002923","C10_002923","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_348_CPG2348_2923","experimental","C10","2020-10-16","SW",12,25,0,0,0,0,0,NA,0,0
+"349","20FHB000349",2349,"309","20SGH000309","C10_000309","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_349_CPG2349_309","experimental","C10","2020-10-16","SW",12,24,0,0,0,0,0,NA,0.9,0.5
+"350","20FHB000350",2350,"2160","20SGH002160","C10_002160","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_350_CPG2350_2160","experimental","C10","2020-10-16","SW",12,23,0,0,0,0,0,NA,0,0
+"351","20FHB000351",2351,"294","20SGH000294","C10_000294","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_351_CPG2351_294","experimental","C10","2020-10-16","SW",12,22,0,0,0,0,0,NA,NA,NA
+"352","20FHB000352",2352,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_352_CPG2352_Bacup","resistant check","spring wheat","2020-10-16","SW",12,21,0,0,0,0,0,"sw_check",NA,NA
+"353","20FHB000353",2353,"2510","20SGH002510","C10_002510","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_353_CPG2353_2510","experimental","C10","2020-10-16","SW",12,20,0,0,0,0,0,NA,0,0
+"354","20FHB000354",2354,"1198","20SGH001198","C10_001198","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_354_CPG2354_1198","experimental","C10","2020-10-16","SW",12,19,0,0,0,0,0,NA,0.2,0
+"355","20FHB000355",2355,"3822","20SGH003822","C10_003822","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_355_CPG2355_3822","experimental","C10","2020-10-16","SW",12,18,0,0,0,0,0,NA,0.2,0
+"356","20FHB000356",2356,"112","20SGH000112","C10_000112","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_356_CPG2356_112","experimental","C10","2020-10-16","SW",12,17,0,0,0,0,0,NA,NA,NA
+"357","20FHB000357",2357,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_357_CPG2357_Overley","susceptible check","winter wheat","2020-10-16","SW",12,16,0,0,0,0,0,"ww_check",NA,NA
+"358","20FHB000358",2358,"181","20SGH000181","C10_000181","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_358_CPG2358_181","experimental","C10","2020-10-16","SW",12,15,0,0,0,0,0,NA,0,0
+"359","20FHB000359",2359,"2038","20SGH002038","C10_002038","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_359_CPG2359_2038","experimental","C10","2020-10-16","SW",12,14,0,0,0,0,0,NA,0.1,0.1
+"360","20FHB000360",2360,"3735","20SGH003735","C10_003735","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_360_CPG2360_3735","experimental","C10","2020-10-16","SW",12,13,0,0,0,0,0,NA,0.2,0
+"361","20FHB000361",2361,"226","20SGH000226","C10_000226","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_361_CPG2361_226","experimental","C10","2020-10-16","SW",12,12,0,0,0,0,0,NA,0,0
+"362","20FHB000362",2362,"3871","20SGH003871","C10_003871","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_362_CPG2362_3871","experimental","C10","2020-10-16","SW",12,11,0,0,0,0,0,NA,0,0
+"363","20FHB000363",2363,"3684","20SGH003684","C10_003684","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_363_CPG2363_3684","experimental","C10","2020-10-16","SW",12,10,0,0,0,0,0,NA,0.2,0
+"364","20FHB000364",2364,"1183","20SGH001183","C10_001183","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_364_CPG2364_1183","experimental","C10","2020-10-16","SW",12,9,0,0,0,0,0,NA,0.3,0
+"365","20FHB000365",2365,"262","20SGH000262","C10_000262","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_365_CPG2365_262","experimental","C10","2020-10-16","SW",12,8,0,0,0,0,0,NA,NA,NA
+"366","20FHB000366",2366,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_366_CPG2366_Bacup","resistant check","spring wheat","2020-10-16","SW",12,7,0,0,0,0,0,"sw_check",NA,NA
+"367","20FHB000367",2367,"2700","20SGH002700","C10_002700","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_367_CPG2367_2700","experimental","C10","2020-10-16","SW",12,6,0,0,0,0,0,NA,0,0
+"368","20FHB000368",2368,"1185","20SGH001185","C10_001185","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_368_CPG2368_1185","experimental","C10","2020-10-16","SW",12,5,0,0,0,0,0,NA,0,0
+"369","20FHB000369",2369,"3547","20SGH003547","C10_003547","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_369_CPG2369_3547","experimental","C10","2020-10-16","SW",12,4,0,0,0,0,0,NA,0.1,0.1
+"370","20FHB000370",2370,"C9-2587","19SGH002587","C9_002587","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_370_CPG2370_C9-2587","top10% R OH","C9 replicate","2020-10-16","SW",12,3,0,0,0,0,0,"C9 replicate",NA,NA
+"371","20FHB000371",2371,"2777","20SGH002777","C10_002777","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_371_CPG2371_2777","experimental","C10","2020-10-16","SW",12,2,0,0,0,0,0,NA,0,0
+"372","20FHB000372",2372,"1011","20SGH001011","C10_001011","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_372_CPG2372_1011","experimental","C10","2020-10-16","SW",12,1,0,0,0,0,0,NA,0.2,0.1
+"373","20FHB000373",2373,"1821","20SGH001821","C10_001821","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_373_CPG2373_1821","experimental","C10","2020-10-16","SW",13,1,0,0,0,0,0,NA,NA,NA
+"374","20FHB000374",2374,"2060","20SGH002060","C10_002060","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_374_CPG2374_2060","experimental","C10","2020-10-16","SW",13,2,0,0,0,0,0,NA,0,0
+"375","20FHB000375",2375,"3633","20SGH003633","C10_003633","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_375_CPG2375_3633","experimental","C10","2020-10-16","SW",13,3,0,0,0,0,0,NA,0,0
+"376","20FHB000376",2376,"1830","20SGH001830","C10_001830","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_376_CPG2376_1830","experimental","C10","2020-10-16","SW",13,4,0,0,0,0,0,NA,0,0
+"377","20FHB000377",2377,"2172","20SGH002172","C10_002172","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_377_CPG2377_2172","experimental","C10","2020-10-16","SW",13,5,0,0,0,0,0,NA,0.9,0.1
+"378","20FHB000378",2378,"2788","20SGH002788","C10_002788","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_378_CPG2378_2788","experimental","C10","2020-10-16","SW",13,6,0,0,0,0,0,NA,0,0
+"379","20FHB000379",2379,"1287","20SGH001287","C10_001287","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_379_CPG2379_1287","experimental","C10","2020-10-16","SW",13,7,0,0,0,0,0,NA,0,0
+"380","20FHB000380",2380,"3866","20SGH003866","C10_003866","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_380_CPG2380_3866","experimental","C10","2020-10-16","SW",13,8,0,0,0,0,0,NA,0.3,0
+"381","20FHB000381",2381,"2999","20SGH002999","C10_002999","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_381_CPG2381_2999","experimental","C10","2020-10-16","SW",13,9,0,0,0,0,0,NA,0.2,0.4
+"382","20FHB000382",2382,"3595","20SGH003595","C10_003595","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_382_CPG2382_3595","experimental","C10","2020-10-16","SW",13,10,0,0,0,0,0,NA,0.2,0
+"383","20FHB000383",2383,"105","20SGH000105","C10_000105","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_383_CPG2383_105","experimental","C10","2020-10-16","SW",13,11,0,0,0,0,0,NA,0.4,0
+"384","20FHB000384",2384,"2810","20SGH002810","C10_002810","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_384_CPG2384_2810","experimental","C10","2020-10-16","SW",13,12,0,0,0,0,0,NA,0,0
+"385","20FHB000385",2385,"Bacup",NA,"Bacup","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_385_CPG2385_Bacup","resistant check","spring wheat","2020-10-16","SW",13,13,0,0,0,0,0,"sw_check",NA,NA
+"386","20FHB000386",2386,"1268","20SGH001268","C10_001268","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_386_CPG2386_1268","experimental","C10","2020-10-16","SW",13,14,0,0,0,0,0,NA,0,0
+"387","20FHB000387",2387,"2956","20SGH002956","C10_002956","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_387_CPG2387_2956","experimental","C10","2020-10-16","SW",13,15,0,0,0,0,0,NA,0,0
+"388","20FHB000388",2388,"C9-3237","19SGH003237","C9_003237","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_388_CPG2388_C9-3237","top33 S FHB","C9 replicate","2020-10-16","SW",13,16,0,0,0,0,0,"C9 replicate",0,0
+"389","20FHB000389",2389,"3578","20SGH003578","C10_003578","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_389_CPG2389_3578","experimental","C10","2020-10-16","SW",13,17,0,0,0,0,0,NA,0,0
+"390","20FHB000390",2390,"3351","20SGH003351","C10_003351","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_390_CPG2390_3351","experimental","C10","2020-10-16","SW",13,18,0,0,0,0,0,NA,0,0
+"391","20FHB000391",2391,"219","20SGH000219","C10_000219","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_391_CPG2391_219","experimental","C10","2020-10-16","SW",13,19,0,0,0,0,0,NA,0,0
+"392","20FHB000392",2392,"654","20SGH000654","C10_000654","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_392_CPG2392_654","experimental","C10","2020-10-16","SW",13,20,0,0,0,0,0,NA,0,0
+"393","20FHB000393",2393,"C9-3726","19SGH003726","C9_003726","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_393_CPG2393_C9-3726","top33 S FHB","C9 replicate","2020-10-16","SW",13,21,0,0,0,0,0,"C9 replicate",NA,NA
+"394","20FHB000394",2394,"C9-512","19SGH000512","C9_000512","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_394_CPG2394_C9-512","top 1 Inc2 R","C9 replicate","2020-10-16","SW",13,22,0,0,0,0,0,"C9 replicate",0,0.1
+"395","20FHB000395",2395,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_395_CPG2395_Everest","resistant check","winter wheat","2020-10-16","SW",13,23,0,0,0,0,0,"ww_check",NA,NA
+"396","20FHB000396",2396,"130","20SGH000130","C10_000130","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_396_CPG2396_130","experimental","C10","2020-10-16","SW",13,24,0,0,0,0,0,NA,0,0.1
+"397","20FHB000397",2397,"2691","20SGH002691","C10_002691","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_397_CPG2397_2691","experimental","C10","2020-10-16","SW",13,25,0,0,0,0,0,NA,0,0
+"398","20FHB000398",2398,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_398_CPG2398_Overley","susceptible check","winter wheat","2020-10-16","SW",13,26,0,0,0,0,0,"ww_check",NA,NA
+"399","20FHB000399",2399,"3831","20SGH003831","C10_003831","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_399_CPG2399_3831","experimental","C10","2020-10-16","SW",13,27,0,0,0,0,0,NA,0,0
+"400","20FHB000400",2400,"1667","20SGH001667","C10_001667","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_400_CPG2400_1667","experimental","C10","2020-10-16","SW",13,28,0,0,0,0,0,NA,0,0
+"401","20FHB000401",2401,"3739","20SGH003739","C10_003739","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_401_CPG2401_3739","experimental","C10","2020-10-16","SW",13,29,0,0,0,0,0,NA,NA,NA
+"402","20FHB000402",2402,"1225","20SGH001225","C10_001225","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_402_CPG2402_1225","experimental","C10","2020-10-16","SW",13,30,0,0,0,0,0,NA,0,0
+"403","20FHB000403",2403,"626","20SGH000626","C10_000626","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_403_CPG2403_626","experimental","C10","2020-10-16","SW",13,31,0,0,0,0,0,NA,2.4,2.7
+"404","20FHB000404",2404,"C9-1222","19SGH001222","C9_001222","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_404_CPG2404_C9-1222","top10% S EB","C9 replicate","2020-10-16","SW",14,31,0,0,0,0,0,"C9 replicate",NA,NA
+"405","20FHB000405",2405,"3329","20SGH003329","C10_003329","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_405_CPG2405_3329","experimental","C10","2020-10-16","SW",14,30,0,0,0,0,0,NA,0.1,0
+"406","20FHB000406",2406,"Roblin",NA,"Roblin","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_406_CPG2406_Roblin","susceptible check","spring wheat","2020-10-16","SW",14,29,0,0,0,0,0,"sw_check",NA,NA
+"407","20FHB000407",2407,"2223","20SGH002223","C10_002223","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_407_CPG2407_2223","experimental","C10","2020-10-16","SW",14,28,0,0,0,0,0,NA,0,0
+"408","20FHB000408",2408,"1509","20SGH001509","C10_001509","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_408_CPG2408_1509","experimental","C10","2020-10-16","SW",14,27,0,0,0,0,0,NA,0.1,0.1
+"409","20FHB000409",2409,"2904","20SGH002904","C10_002904","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_409_CPG2409_2904","experimental","C10","2020-10-16","SW",14,26,0,0,0,0,0,NA,0,0
+"410","20FHB000410",2410,"99","20SGH000099","C10_000099","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_410_CPG2410_99","experimental","C10","2020-10-16","SW",14,25,0,0,0,0,0,NA,0,0
+"411","20FHB000411",2411,"1725","20SGH001725","C10_001725","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_411_CPG2411_1725","experimental","C10","2020-10-16","SW",14,24,0,0,0,0,0,NA,0,0
+"412","20FHB000412",2412,"3019","20SGH003019","C10_003019","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_412_CPG2412_3019","experimental","C10","2020-10-16","SW",14,23,0,0,0,0,0,NA,0,0
+"413","20FHB000413",2413,"668","20SGH000668","C10_000668","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_413_CPG2413_668","experimental","C10","2020-10-16","SW",14,22,0,0,0,0,0,NA,0,0
+"414","20FHB000414",2414,"3386","20SGH003386","C10_003386","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_414_CPG2414_3386","experimental","C10","2020-10-16","SW",14,21,0,0,0,0,0,NA,0.1,0
+"415","20FHB000415",2415,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_415_CPG2415_Everest","resistant check","winter wheat","2020-10-16","SW",14,20,0,0,0,0,0,"ww_check",NA,NA
+"416","20FHB000416",2416,"3389","20SGH003389","C10_003389","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_416_CPG2416_3389","experimental","C10","2020-10-16","SW",14,19,0,0,0,0,0,NA,0.2,0.1
+"417","20FHB000417",2417,"1734","20SGH001734","C10_001734","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_417_CPG2417_1734","experimental","C10","2020-10-16","SW",14,18,0,0,0,0,0,NA,0.1,0
+"418","20FHB000418",2418,"1177","20SGH001177","C10_001177","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_418_CPG2418_1177","experimental","C10","2020-10-16","SW",14,17,0,0,0,0,0,NA,0.1,0
+"419","20FHB000419",2419,"2173","20SGH002173","C10_002173","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_419_CPG2419_2173","experimental","C10","2020-10-16","SW",14,16,0,0,0,0,0,NA,0.3,0
+"420","20FHB000420",2420,"2963","20SGH002963","C10_002963","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_420_CPG2420_2963","experimental","C10","2020-10-16","SW",14,15,0,0,0,0,0,NA,0,0
+"421","20FHB000421",2421,"3409","20SGH003409","C10_003409","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_421_CPG2421_3409","experimental","C10","2020-10-16","SW",14,14,0,0,0,0,0,NA,0,0
+"422","20FHB000422",2422,"1885","20SGH001885","C10_001885","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_422_CPG2422_1885","experimental","C10","2020-10-16","SW",14,13,0,0,0,0,0,NA,0.1,0.1
+"423","20FHB000423",2423,"C9-2633","19SGH002633","C9_002633","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_423_CPG2423_C9-2633","top10% R OH","C9 replicate","2020-10-16","SW",14,12,0,0,0,0,0,"C9 replicate",0.6,1.1
+"424","20FHB000424",2424,"3598","20SGH003598","C10_003598","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_424_CPG2424_3598","experimental","C10","2020-10-16","SW",14,11,0,0,0,0,0,NA,0,0
+"425","20FHB000425",2425,"429","20SGH000429","C10_000429","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_425_CPG2425_429","experimental","C10","2020-10-16","SW",14,10,0,0,0,0,0,NA,0,0
+"426","20FHB000426",2426,"3667","20SGH003667","C10_003667","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_426_CPG2426_3667","experimental","C10","2020-10-16","SW",14,9,0,0,0,0,0,NA,0,0
+"427","20FHB000427",2427,"1893","20SGH001893","C10_001893","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_427_CPG2427_1893","experimental","C10","2020-10-16","SW",14,8,0,0,0,0,0,NA,0.4,0
+"428","20FHB000428",2428,"C9-1194","19SGH001194","C9_001194","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_428_CPG2428_C9-1194","top10 S FHB","C9 replicate","2020-10-16","SW",14,7,0,0,0,0,0,"C9 replicate",0,0
+"429","20FHB000429",2429,"150","20SGH000150","C10_000150","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_429_CPG2429_150","experimental","C10","2020-10-16","SW",14,6,0,0,0,0,0,NA,0,0
+"430","20FHB000430",2430,"Everest",NA,"Everest","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_430_CPG2430_Everest","resistant check","winter wheat","2020-10-16","SW",14,5,0,0,0,0,0,"ww_check",NA,NA
+"431","20FHB000431",2431,"1223","20SGH001223","C10_001223","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_431_CPG2431_1223","experimental","C10","2020-10-16","SW",14,4,0,0,0,0,0,NA,0.4,1.4
+"432","20FHB000432",2432,"Overley",NA,"Overley","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_432_CPG2432_Overley","susceptible check","winter wheat","2020-10-16","SW",14,3,0,0,0,0,0,"ww_check",NA,NA
+"433","20FHB000433",2433,"3985","20SGH003985","C10_003985","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_433_CPG2433_3985","experimental","C10","2020-10-16","SW",14,2,0,0,0,0,0,NA,NA,NA
+"434","20FHB000434",2434,"3794","20SGH003794","C10_003794","20_SAL_FusariumCycle10Training","F2021_Salina_FHB_Iwg_434_CPG2434_3794","experimental","C10","2020-10-16","SW",14,1,0,0,0,0,0,NA,0,0
+"435","20FHB000435",2501,"699","20SGH000699","C10_000699","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_1_CPG2501_699","experimental","C10","2020-10-22","SW",1,1,0,0,0,0,0,NA,7.7,0
+"436","20FHB000436",2502,"2602","20SGH002602","C10_002602","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_2_CPG2502_2602","experimental","C10","2020-10-22","SW",1,2,0,0,0,0,0,NA,NA,NA
+"437","20FHB000437",2503,"1595","20SGH001595","C10_001595","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_3_CPG2503_1595","experimental","C10","2020-10-22","SW",1,3,0,0,0,0,0,NA,6.4,0
+"438","20FHB000438",2504,"C9-1194","19SGH001194","C9_001194","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_4_CPG2504_C9-1194","top10 S FHB","C9 replicate","2020-10-22","SW",1,4,0,0,0,0,0,"C9 replicate",NA,NA
+"439","20FHB000439",2505,"2569","20SGH002569","C10_002569","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_5_CPG2505_2569","experimental","C10","2020-10-22","SW",1,5,0,0,0,0,0,NA,2.5,0
+"440","20FHB000440",2506,"C9-1194","19SGH001194","C9_001194","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_6_CPG2506_C9-1194","top10 S FHB","C9 replicate","2020-10-22","SW",1,6,0,0,0,0,0,"C9 replicate",NA,NA
+"441","20FHB000441",2507,"1512","20SGH001512","C10_001512","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_7_CPG2507_1512","experimental","C10","2020-10-22","SW",1,7,0,0,0,0,0,NA,15,0
+"442","20FHB000442",2508,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_8_CPG2508_Everest","resistant check","winter wheat","2020-10-22","SW",1,8,0,0,0,0,0,"ww_check",16.2,1.6
+"443","20FHB000443",2509,"1980","20SGH001980","C10_001980","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_9_CPG2509_1980","experimental","C10","2020-10-22","SW",1,9,0,0,0,0,0,NA,6,0
+"444","20FHB000444",2510,"3266","20SGH003266","C10_003266","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_10_CPG2510_3266","experimental","C10","2020-10-22","SW",1,10,0,0,0,0,0,NA,NA,NA
+"445","20FHB000445",2511,"533","20SGH000533","C10_000533","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_11_CPG2511_533","experimental","C10","2020-10-22","SW",1,11,0,0,0,0,0,NA,NA,NA
+"446","20FHB000446",2512,"2914","20SGH002914","C10_002914","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_12_CPG2512_2914","experimental","C10","2020-10-22","SW",1,12,0,0,0,0,0,NA,5,0
+"447","20FHB000447",2513,"2403","20SGH002403","C10_002403","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_13_CPG2513_2403","experimental","C10","2020-10-22","SW",1,13,0,0,0,0,0,NA,NA,NA
+"448","20FHB000448",2514,"3258","20SGH003258","C10_003258","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_14_CPG2514_3258","experimental","C10","2020-10-22","SW",1,14,0,0,0,0,0,NA,NA,NA
+"449","20FHB000449",2515,"1071","20SGH001071","C10_001071","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_15_CPG2515_1071","experimental","C10","2020-10-22","SW",1,15,0,0,0,0,0,NA,NA,NA
+"450","20FHB000450",2516,"178","20SGH000178","C10_000178","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_16_CPG2516_178","experimental","C10","2020-10-22","SW",1,16,0,0,0,0,0,NA,0.8,0
+"451","20FHB000451",2517,"3592","20SGH003592","C10_003592","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_17_CPG2517_3592","experimental","C10","2020-10-22","SW",1,17,0,0,0,0,0,NA,3.5,0
+"452","20FHB000452",2518,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_18_CPG2518_Roblin","susceptible check","spring wheat","2020-10-22","SW",1,18,0,0,0,0,0,"sw_check",NA,NA
+"453","20FHB000453",2519,"1896","20SGH001896","C10_001896","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_19_CPG2519_1896","experimental","C10","2020-10-22","SW",1,19,0,0,0,0,0,NA,5.1,0
+"454","20FHB000454",2520,"3584","20SGH003584","C10_003584","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_20_CPG2520_3584","experimental","C10","2020-10-22","SW",1,20,0,0,0,0,0,NA,6.4,0
+"455","20FHB000455",2521,"670","20SGH000670","C10_000670","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_21_CPG2521_670","experimental","C10","2020-10-22","SW",1,21,0,0,0,0,0,NA,2.4,0
+"456","20FHB000456",2522,"1067","20SGH001067","C10_001067","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_22_CPG2522_1067","experimental","C10","2020-10-22","SW",1,22,0,0,0,0,0,NA,0.5,0
+"457","20FHB000457",2523,"1814","20SGH001814","C10_001814","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_23_CPG2523_1814","experimental","C10","2020-10-22","SW",1,23,0,0,0,0,0,NA,7.3,0.1
+"458","20FHB000458",2524,"1648","20SGH001648","C10_001648","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_24_CPG2524_1648","experimental","C10","2020-10-22","SW",1,24,0,0,0,0,0,NA,4,0.9
+"459","20FHB000459",2525,"3237","20SGH003237","C10_003237","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_25_CPG2525_3237","experimental","C10","2020-10-22","SW",1,25,0,0,0,0,0,NA,4.1,0
+"460","20FHB000460",2526,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_26_CPG2526_Overley","susceptible check","winter wheat","2020-10-22","SW",1,26,0,0,0,0,0,"ww_check",34.5,7.1
+"461","20FHB000461",2527,"187","20SGH000187","C10_000187","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_27_CPG2527_187","experimental","C10","2020-10-22","SW",1,27,0,0,0,0,0,NA,8.3,0
+"462","20FHB000462",2528,"1566","20SGH001566","C10_001566","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_28_CPG2528_1566","experimental","C10","2020-10-22","SW",1,28,0,0,0,0,0,NA,1.2,0
+"463","20FHB000463",2529,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_29_CPG2529_Everest","resistant check","winter wheat","2020-10-22","SW",1,29,0,0,0,0,0,"ww_check",2.7,0
+"464","20FHB000464",2530,"1587","20SGH001587","C10_001587","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_30_CPG2530_1587","experimental","C10","2020-10-22","SW",1,30,0,0,0,0,0,NA,2.5,0
+"465","20FHB000465",2531,"3910","20SGH003910","C10_003910","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_31_CPG2531_3910","experimental","C10","2020-10-22","SW",1,31,0,0,0,0,0,NA,1.1,0
+"466","20FHB000466",2532,"3947","20SGH003947","C10_003947","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_32_CPG2532_3947","experimental","C10","2020-10-22","SW",1,32,0,0,0,0,0,NA,NA,NA
+"467","20FHB000467",2533,"249","20SGH000249","C10_000249","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_33_CPG2533_249","experimental","C10","2020-10-22","SW",1,33,0,0,0,0,0,NA,NA,NA
+"468","20FHB000468",2534,"3061","20SGH003061","C10_003061","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_34_CPG2534_3061","experimental","C10","2020-10-22","SW",1,34,0,0,0,0,0,NA,NA,NA
+"469","20FHB000469",2535,"1675","20SGH001675","C10_001675","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_35_CPG2535_1675","experimental","C10","2020-10-22","SW",1,35,0,0,0,0,0,NA,NA,NA
+"470","20FHB000470",2536,"1618","20SGH001618","C10_001618","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_36_CPG2536_1618","experimental","C10","2020-10-22","SW",1,36,0,0,0,0,0,NA,NA,NA
+"471","20FHB000471",2537,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_37_CPG2537_Bacup","resistant check","spring wheat","2020-10-22","SW",1,37,0,0,0,0,0,"sw_check",6.7,2.3
+"472","20FHB000472",2538,"989","20SGH000989","C10_000989","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_38_CPG2538_989","experimental","C10","2020-10-22","SW",1,38,0,0,0,0,0,NA,NA,NA
+"473","20FHB000473",2539,"2359","20SGH002359","C10_002359","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_39_CPG2539_2359","experimental","C10","2020-10-22","SW",1,39,0,0,0,0,0,NA,3.5,0
+"474","20FHB000474",2540,"490","20SGH000490","C10_000490","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_40_CPG2540_490","experimental","C10","2020-10-22","SW",1,40,0,0,0,0,0,NA,NA,NA
+"475","20FHB000475",2541,"1224","20SGH001224","C10_001224","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_41_CPG2541_1224","experimental","C10","2020-10-22","SW",1,41,0,0,0,0,0,NA,0.7,0
+"476","20FHB000476",2542,"408","20SGH000408","C10_000408","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_42_CPG2542_408","experimental","C10","2020-10-22","SW",1,42,0,0,0,0,0,NA,3.2,0
+"477","20FHB000477",2543,"3694","20SGH003694","C10_003694","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_43_CPG2543_3694","experimental","C10","2020-10-22","SW",1,43,0,0,0,0,0,NA,1.2,0
+"478","20FHB000478",2544,"3420","20SGH003420","C10_003420","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_44_CPG2544_3420","experimental","C10","2020-10-22","SW",1,44,0,0,0,0,0,NA,NA,NA
+"479","20FHB000479",2545,"C9-1196","19SGH001196","C9_001196","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_45_CPG2545_C9-1196","top33 S FHB","C9 replicate","2020-10-22","SW",1,45,0,0,0,0,0,"C9 replicate",NA,NA
+"480","20FHB000480",2546,"3729","20SGH003729","C10_003729","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_46_CPG2546_3729","experimental","C10","2020-10-22","SW",1,46,0,0,0,0,0,NA,NA,NA
+"481","20FHB000481",2547,"2877","20SGH002877","C10_002877","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_47_CPG2547_2877","experimental","C10","2020-10-22","SW",1,47,0,0,0,0,0,NA,NA,NA
+"482","20FHB000482",2548,"1350","20SGH001350","C10_001350","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_48_CPG2548_1350","experimental","C10","2020-10-22","SW",1,48,0,0,0,0,0,NA,NA,NA
+"483","20FHB000483",2549,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_49_CPG2549_Everest","resistant check","winter wheat","2020-10-22","SW",1,49,0,0,0,0,0,"ww_check",4.6,0.1
+"484","20FHB000484",2550,"3179","20SGH003179","C10_003179","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_50_CPG2550_3179","experimental","C10","2020-10-22","SW",1,50,0,0,0,0,0,NA,3.7,0
+"485","20FHB000485",2551,"631","20SGH000631","C10_000631","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_51_CPG2551_631","experimental","C10","2020-10-22","SW",2,50,0,0,0,0,0,NA,10.2,0
+"486","20FHB000486",2552,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_52_CPG2552_Bacup","resistant check","spring wheat","2020-10-22","SW",2,49,0,0,0,0,0,"sw_check",0.7,0
+"487","20FHB000487",2553,"2671","20SGH002671","C10_002671","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_53_CPG2553_2671","experimental","C10","2020-10-22","SW",2,48,0,0,0,0,0,NA,NA,NA
+"488","20FHB000488",2554,"1864","20SGH001864","C10_001864","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_54_CPG2554_1864","experimental","C10","2020-10-22","SW",2,47,0,0,0,0,0,NA,1.7,0
+"489","20FHB000489",2555,"2736","20SGH002736","C10_002736","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_55_CPG2555_2736","experimental","C10","2020-10-22","SW",2,46,0,0,0,0,0,NA,0.7,0
+"490","20FHB000490",2556,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_56_CPG2556_Roblin","susceptible check","spring wheat","2020-10-22","SW",2,45,0,0,0,0,0,"sw_check",12.2,0.7
+"491","20FHB000491",2557,"1782","20SGH001782","C10_001782","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_57_CPG2557_1782","experimental","C10","2020-10-22","SW",2,44,0,0,0,0,0,NA,NA,NA
+"492","20FHB000492",2558,"3837","20SGH003837","C10_003837","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_58_CPG2558_3837","experimental","C10","2020-10-22","SW",2,43,0,0,0,0,0,NA,NA,NA
+"493","20FHB000493",2559,"C9-1196","19SGH001196","C9_001196","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_59_CPG2559_C9-1196","top33 S FHB","C9 replicate","2020-10-22","SW",2,42,0,0,0,0,0,"C9 replicate",NA,NA
+"494","20FHB000494",2560,"718","20SGH000718","C10_000718","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_60_CPG2560_718","experimental","C10","2020-10-22","SW",2,41,0,0,0,0,0,NA,2,0
+"495","20FHB000495",2561,"3018","20SGH003018","C10_003018","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_61_CPG2561_3018","experimental","C10","2020-10-22","SW",2,40,0,0,0,0,0,NA,4.6,0
+"496","20FHB000496",2562,"3977","20SGH003977","C10_003977","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_62_CPG2562_3977","experimental","C10","2020-10-22","SW",2,39,0,0,0,0,0,NA,NA,NA
+"497","20FHB000497",2563,"3157","20SGH003157","C10_003157","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_63_CPG2563_3157","experimental","C10","2020-10-22","SW",2,38,0,0,0,0,0,NA,NA,NA
+"498","20FHB000498",2564,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_64_CPG2564_Overley","susceptible check","winter wheat","2020-10-22","SW",2,37,0,0,0,0,0,"ww_check",NA,NA
+"499","20FHB000499",2565,"1016","20SGH001016","C10_001016","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_65_CPG2565_1016","experimental","C10","2020-10-22","SW",2,36,0,0,0,0,0,NA,6.1,0
+"500","20FHB000500",2566,"3827","20SGH003827","C10_003827","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_66_CPG2566_3827","experimental","C10","2020-10-22","SW",2,35,0,0,0,0,0,NA,0.4,0
+"501","20FHB000501",2567,"1231","20SGH001231","C10_001231","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_67_CPG2567_1231","experimental","C10","2020-10-22","SW",2,34,0,0,0,0,0,NA,NA,NA
+"502","20FHB000502",2568,"C9-1222","19SGH001222","C9_001222","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_68_CPG2568_C9-1222","top10% S EB","C9 replicate","2020-10-22","SW",2,33,0,0,0,0,0,"C9 replicate",NA,NA
+"503","20FHB000503",2569,"3825","20SGH003825","C10_003825","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_69_CPG2569_3825","experimental","C10","2020-10-22","SW",2,32,0,0,0,0,0,NA,NA,NA
+"504","20FHB000504",2570,"1150","20SGH001150","C10_001150","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_70_CPG2570_1150","experimental","C10","2020-10-22","SW",2,31,0,0,0,0,0,NA,9,0
+"505","20FHB000505",2571,"3370","20SGH003370","C10_003370","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_71_CPG2571_3370","experimental","C10","2020-10-22","SW",2,30,0,0,0,0,0,NA,6.8,0.3
+"506","20FHB000506",2572,"2711","20SGH002711","C10_002711","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_72_CPG2572_2711","experimental","C10","2020-10-22","SW",2,29,0,0,0,0,0,NA,NA,NA
+"507","20FHB000507",2573,"1135","20SGH001135","C10_001135","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_73_CPG2573_1135","experimental","C10","2020-10-22","SW",2,28,0,0,0,0,0,NA,7.8,0
+"508","20FHB000508",2574,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_74_CPG2574_Everest","resistant check","winter wheat","2020-10-22","SW",2,27,0,0,0,0,0,"ww_check",NA,NA
+"509","20FHB000509",2575,"1239","20SGH001239","C10_001239","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_75_CPG2575_1239","experimental","C10","2020-10-22","SW",2,26,0,0,0,0,0,NA,15.1,0.6
+"510","20FHB000510",2576,"911","20SGH000911","C10_000911","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_76_CPG2576_911","experimental","C10","2020-10-22","SW",2,25,0,0,0,0,0,NA,6.3,0
+"511","20FHB000511",2577,"2622","20SGH002622","C10_002622","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_77_CPG2577_2622","experimental","C10","2020-10-22","SW",2,24,0,0,0,0,0,NA,1.9,0
+"512","20FHB000512",2578,"3339","20SGH003339","C10_003339","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_78_CPG2578_3339","experimental","C10","2020-10-22","SW",2,23,0,0,0,0,0,NA,4.5,0.2
+"513","20FHB000513",2579,"3057","20SGH003057","C10_003057","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_79_CPG2579_3057","experimental","C10","2020-10-22","SW",2,22,0,0,0,0,0,NA,8,0.6
+"514","20FHB000514",2580,"551","20SGH000551","C10_000551","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_80_CPG2580_551","experimental","C10","2020-10-22","SW",2,21,0,0,0,0,0,NA,1.4,0
+"515","20FHB000515",2581,"C9-1222","19SGH001222","C9_001222","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_81_CPG2581_C9-1222","top10% S EB","C9 replicate","2020-10-22","SW",2,20,0,0,0,0,0,"C9 replicate",0.7,0
+"516","20FHB000516",2582,"3089","20SGH003089","C10_003089","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_82_CPG2582_3089","experimental","C10","2020-10-22","SW",2,19,0,0,0,0,0,NA,5.4,0
+"517","20FHB000517",2583,"3623","20SGH003623","C10_003623","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_83_CPG2583_3623","experimental","C10","2020-10-22","SW",2,18,0,0,0,0,0,NA,3.4,0.5
+"518","20FHB000518",2584,"2372","20SGH002372","C10_002372","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_84_CPG2584_2372","experimental","C10","2020-10-22","SW",2,17,0,0,0,0,0,NA,8.7,0.3
+"519","20FHB000519",2585,"621","20SGH000621","C10_000621","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_85_CPG2585_621","experimental","C10","2020-10-22","SW",2,16,0,0,0,0,0,NA,8.9,0
+"520","20FHB000520",2586,"2689","20SGH002689","C10_002689","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_86_CPG2586_2689","experimental","C10","2020-10-22","SW",2,15,0,0,0,0,0,NA,7.4,0
+"521","20FHB000521",2587,"2672","20SGH002672","C10_002672","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_87_CPG2587_2672","experimental","C10","2020-10-22","SW",2,14,0,0,0,0,0,NA,14.8,0.4
+"522","20FHB000522",2588,"3897","20SGH003897","C10_003897","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_88_CPG2588_3897","experimental","C10","2020-10-22","SW",2,13,0,0,0,0,0,NA,3,0
+"523","20FHB000523",2589,"2546","20SGH002546","C10_002546","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_89_CPG2589_2546","experimental","C10","2020-10-22","SW",2,12,0,0,0,0,0,NA,11.1,0.2
+"524","20FHB000524",2590,"2234","20SGH002234","C10_002234","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_90_CPG2590_2234","experimental","C10","2020-10-22","SW",2,11,0,0,0,0,0,NA,16.4,0.5
+"525","20FHB000525",2591,"C9-1829","19SGH001829","C9_001829","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_91_CPG2591_C9-1829","top33 S FHB","C9 replicate","2020-10-22","SW",2,10,0,0,0,0,0,"C9 replicate",0,0
+"526","20FHB000526",2592,"933","20SGH000933","C10_000933","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_92_CPG2592_933","experimental","C10","2020-10-22","SW",2,9,0,0,0,0,0,NA,13.6,0.5
+"527","20FHB000527",2593,"938","20SGH000938","C10_000938","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_93_CPG2593_938","experimental","C10","2020-10-22","SW",2,8,0,0,0,0,0,NA,5.6,0
+"528","20FHB000528",2594,"1174","20SGH001174","C10_001174","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_94_CPG2594_1174","experimental","C10","2020-10-22","SW",2,7,0,0,0,0,0,NA,4.1,0
+"529","20FHB000529",2595,"983","20SGH000983","C10_000983","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_95_CPG2595_983","experimental","C10","2020-10-22","SW",2,6,0,0,0,0,0,NA,NA,NA
+"530","20FHB000530",2596,"2341","20SGH002341","C10_002341","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_96_CPG2596_2341","experimental","C10","2020-10-22","SW",2,5,0,0,0,0,0,NA,7.2,0.1
+"531","20FHB000531",2597,"3799","20SGH003799","C10_003799","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_97_CPG2597_3799","experimental","C10","2020-10-22","SW",2,4,0,0,0,0,0,NA,2.8,0
+"532","20FHB000532",2598,"C9-1829","19SGH001829","C9_001829","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_98_CPG2598_C9-1829","top33 S FHB","C9 replicate","2020-10-22","SW",2,3,0,0,0,0,0,"C9 replicate",3.7,0
+"533","20FHB000533",2599,"333","20SGH000333","C10_000333","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_99_CPG2599_333","experimental","C10","2020-10-22","SW",2,2,0,0,0,0,0,NA,16,0.6
+"534","20FHB000534",2600,"3332","20SGH003332","C10_003332","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_100_CPG2600_3332","experimental","C10","2020-10-22","SW",2,1,0,0,0,0,0,NA,11.2,0
+"535","20FHB000535",2601,"2170","20SGH002170","C10_002170","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_101_CPG2601_2170","experimental","C10","2020-10-22","SW",3,1,0,0,0,0,0,NA,5.3,0.3
+"536","20FHB000536",2602,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_102_CPG2602_Bacup","resistant check","spring wheat","2020-10-22","SW",3,2,0,0,0,0,0,"sw_check",NA,NA
+"537","20FHB000537",2603,"2305","20SGH002305","C10_002305","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_103_CPG2603_2305","experimental","C10","2020-10-22","SW",3,3,0,0,0,0,0,NA,5.1,0
+"538","20FHB000538",2604,"2428","20SGH002428","C10_002428","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_104_CPG2604_2428","experimental","C10","2020-10-22","SW",3,4,0,0,0,0,0,NA,8.6,0
+"539","20FHB000539",2605,"1456","20SGH001456","C10_001456","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_105_CPG2605_1456","experimental","C10","2020-10-22","SW",3,5,0,0,0,0,0,NA,10.6,0
+"540","20FHB000540",2606,"2509","20SGH002509","C10_002509","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_106_CPG2606_2509","experimental","C10","2020-10-22","SW",3,6,0,0,0,0,0,NA,8.1,0
+"541","20FHB000541",2607,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_107_CPG2607_Bacup","resistant check","spring wheat","2020-10-22","SW",3,7,0,0,0,0,0,"sw_check",3.3,0
+"542","20FHB000542",2608,"3292","20SGH003292","C10_003292","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_108_CPG2608_3292","experimental","C10","2020-10-22","SW",3,8,0,0,0,0,0,NA,NA,NA
+"543","20FHB000543",2609,"2272","20SGH002272","C10_002272","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_109_CPG2609_2272","experimental","C10","2020-10-22","SW",3,9,0,0,0,0,0,NA,0.6,0
+"544","20FHB000544",2610,"420","20SGH000420","C10_000420","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_110_CPG2610_420","experimental","C10","2020-10-22","SW",3,10,0,0,0,0,0,NA,NA,NA
+"545","20FHB000545",2611,"285","20SGH000285","C10_000285","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_111_CPG2611_285","experimental","C10","2020-10-22","SW",3,11,0,0,0,0,0,NA,1.7,0
+"546","20FHB000546",2612,"2847","20SGH002847","C10_002847","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_112_CPG2612_2847","experimental","C10","2020-10-22","SW",3,12,0,0,0,0,0,NA,2.9,0
+"547","20FHB000547",2613,"2745","20SGH002745","C10_002745","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_113_CPG2613_2745","experimental","C10","2020-10-22","SW",3,13,0,0,0,0,0,NA,8.5,0
+"548","20FHB000548",2614,"3379","20SGH003379","C10_003379","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_114_CPG2614_3379","experimental","C10","2020-10-22","SW",3,14,0,0,0,0,0,NA,NA,NA
+"549","20FHB000549",2615,"930","20SGH000930","C10_000930","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_115_CPG2615_930","experimental","C10","2020-10-22","SW",3,15,0,0,0,0,0,NA,3.6,0.4
+"550","20FHB000550",2616,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_116_CPG2616_Everest","resistant check","winter wheat","2020-10-22","SW",3,16,0,0,0,0,0,"ww_check",22,1.3
+"551","20FHB000551",2617,"3293","20SGH003293","C10_003293","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_117_CPG2617_3293","experimental","C10","2020-10-22","SW",3,17,0,0,0,0,0,NA,NA,NA
+"552","20FHB000552",2618,"902","20SGH000902","C10_000902","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_118_CPG2618_902","experimental","C10","2020-10-22","SW",3,18,0,0,0,0,0,NA,NA,NA
+"553","20FHB000553",2619,"2471","20SGH002471","C10_002471","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_119_CPG2619_2471","experimental","C10","2020-10-22","SW",3,19,0,0,0,0,0,NA,4.5,0.1
+"554","20FHB000554",2620,"2442","20SGH002442","C10_002442","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_120_CPG2620_2442","experimental","C10","2020-10-22","SW",3,20,0,0,0,0,0,NA,0.2,0
+"555","20FHB000555",2621,"3788","20SGH003788","C10_003788","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_121_CPG2621_3788","experimental","C10","2020-10-22","SW",3,21,0,0,0,0,0,NA,6.5,0.1
+"556","20FHB000556",2622,"3240","20SGH003240","C10_003240","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_122_CPG2622_3240","experimental","C10","2020-10-22","SW",3,22,0,0,0,0,0,NA,10.9,1.5
+"557","20FHB000557",2623,"1556","20SGH001556","C10_001556","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_123_CPG2623_1556","experimental","C10","2020-10-22","SW",3,23,0,0,0,0,0,NA,7.6,0
+"558","20FHB000558",2624,"299","20SGH000299","C10_000299","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_124_CPG2624_299","experimental","C10","2020-10-22","SW",3,24,0,0,0,0,0,NA,13.5,0
+"559","20FHB000559",2625,"2373","20SGH002373","C10_002373","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_125_CPG2625_2373","experimental","C10","2020-10-22","SW",3,25,0,0,0,0,0,NA,9.3,0
+"560","20FHB000560",2626,"1359","20SGH001359","C10_001359","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_126_CPG2626_1359","experimental","C10","2020-10-22","SW",3,26,0,0,0,0,0,NA,9.9,0
+"561","20FHB000561",2627,"C9-2587","19SGH002587","C9_002587","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_127_CPG2627_C9-2587","top10% R OH","C9 replicate","2020-10-22","SW",3,27,0,0,0,0,0,"C9 replicate",4.3,0
+"562","20FHB000562",2628,"3187","20SGH003187","C10_003187","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_128_CPG2628_3187","experimental","C10","2020-10-22","SW",3,28,0,0,0,0,0,NA,NA,NA
+"563","20FHB000563",2629,"3443","20SGH003443","C10_003443","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_129_CPG2629_3443","experimental","C10","2020-10-22","SW",3,29,0,0,0,0,0,NA,2.9,0
+"564","20FHB000564",2630,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_130_CPG2630_Roblin","susceptible check","spring wheat","2020-10-22","SW",3,30,0,0,0,0,0,"sw_check",8.8,0
+"565","20FHB000565",2631,"979","20SGH000979","C10_000979","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_131_CPG2631_979","experimental","C10","2020-10-22","SW",3,31,0,0,0,0,0,NA,3.3,0
+"566","20FHB000566",2632,"3359","20SGH003359","C10_003359","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_132_CPG2632_3359","experimental","C10","2020-10-22","SW",3,32,0,0,0,0,0,NA,NA,NA
+"567","20FHB000567",2633,"27","20SGH000027","C10_000027","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_133_CPG2633_27","experimental","C10","2020-10-22","SW",3,33,0,0,0,0,0,NA,11.4,2.5
+"568","20FHB000568",2634,"1387","20SGH001387","C10_001387","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_134_CPG2634_1387","experimental","C10","2020-10-22","SW",3,34,0,0,0,0,0,NA,3.4,0
+"569","20FHB000569",2635,"2778","20SGH002778","C10_002778","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_135_CPG2635_2778","experimental","C10","2020-10-22","SW",3,35,0,0,0,0,0,NA,NA,NA
+"570","20FHB000570",2636,"132","20SGH000132","C10_000132","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_136_CPG2636_132","experimental","C10","2020-10-22","SW",3,36,0,0,0,0,0,NA,NA,NA
+"571","20FHB000571",2637,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_137_CPG2637_Overley","susceptible check","winter wheat","2020-10-22","SW",3,37,0,0,0,0,0,"ww_check",NA,NA
+"572","20FHB000572",2638,"1923","20SGH001923","C10_001923","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_138_CPG2638_1923","experimental","C10","2020-10-22","SW",3,38,0,0,0,0,0,NA,0,0
+"573","20FHB000573",2639,"2441","20SGH002441","C10_002441","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_139_CPG2639_2441","experimental","C10","2020-10-22","SW",3,39,0,0,0,0,0,NA,NA,NA
+"574","20FHB000574",2640,"897","20SGH000897","C10_000897","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_140_CPG2640_897","experimental","C10","2020-10-22","SW",3,40,0,0,0,0,0,NA,0,0
+"575","20FHB000575",2641,"50","20SGH000050","C10_000050","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_141_CPG2641_50","experimental","C10","2020-10-22","SW",3,41,0,0,0,0,0,NA,NA,NA
+"576","20FHB000576",2642,"1332","20SGH001332","C10_001332","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_142_CPG2642_1332","experimental","C10","2020-10-22","SW",3,42,0,0,0,0,0,NA,2.1,0.3
+"577","20FHB000577",2643,"C9-2587","19SGH002587","C9_002587","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_143_CPG2643_C9-2587","top10% R OH","C9 replicate","2020-10-22","SW",3,43,0,0,0,0,0,"C9 replicate",0.6,0
+"578","20FHB000578",2644,"3259","20SGH003259","C10_003259","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_144_CPG2644_3259","experimental","C10","2020-10-22","SW",3,44,0,0,0,0,0,NA,0,0
+"579","20FHB000579",2645,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_145_CPG2645_Bacup","resistant check","spring wheat","2020-10-22","SW",3,45,0,0,0,0,0,"sw_check",5.4,0.3
+"580","20FHB000580",2646,"2262","20SGH002262","C10_002262","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_146_CPG2646_2262","experimental","C10","2020-10-22","SW",3,46,0,0,0,0,0,NA,0.5,0
+"581","20FHB000581",2647,"61","20SGH000061","C10_000061","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_147_CPG2647_61","experimental","C10","2020-10-22","SW",3,47,0,0,0,0,0,NA,1.7,0
+"582","20FHB000582",2648,"90","20SGH000090","C10_000090","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_148_CPG2648_90","experimental","C10","2020-10-22","SW",3,48,0,0,0,0,0,NA,2,0
+"583","20FHB000583",2649,"3272","20SGH003272","C10_003272","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_149_CPG2649_3272","experimental","C10","2020-10-22","SW",3,49,0,0,0,0,0,NA,3.5,0
+"584","20FHB000584",2650,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_150_CPG2650_Everest","resistant check","winter wheat","2020-10-22","SW",3,50,0,0,0,0,0,"ww_check",NA,NA
+"585","20FHB000585",2651,"3277","20SGH003277","C10_003277","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_151_CPG2651_3277","experimental","C10","2020-10-22","SW",4,50,0,0,0,0,0,NA,NA,NA
+"586","20FHB000586",2652,"1772","20SGH001772","C10_001772","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_152_CPG2652_1772","experimental","C10","2020-10-22","SW",4,49,0,0,0,0,0,NA,NA,NA
+"587","20FHB000587",2653,"1899","20SGH001899","C10_001899","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_153_CPG2653_1899","experimental","C10","2020-10-22","SW",4,48,0,0,0,0,0,NA,0.9,0
+"588","20FHB000588",2654,"2109","20SGH002109","C10_002109","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_154_CPG2654_2109","experimental","C10","2020-10-22","SW",4,47,0,0,0,0,0,NA,1.2,0
+"589","20FHB000589",2655,"3693","20SGH003693","C10_003693","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_155_CPG2655_3693","experimental","C10","2020-10-22","SW",4,46,0,0,0,0,0,NA,NA,NA
+"590","20FHB000590",2656,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_156_CPG2656_Roblin","susceptible check","spring wheat","2020-10-22","SW",4,45,0,0,0,0,0,"sw_check",21.8,0.8
+"591","20FHB000591",2657,"1692","20SGH001692","C10_001692","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_157_CPG2657_1692","experimental","C10","2020-10-22","SW",4,44,0,0,0,0,0,NA,NA,NA
+"592","20FHB000592",2658,"2903","20SGH002903","C10_002903","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_158_CPG2658_2903","experimental","C10","2020-10-22","SW",4,43,0,0,0,0,0,NA,9.3,0.4
+"593","20FHB000593",2659,"2057","20SGH002057","C10_002057","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_159_CPG2659_2057","experimental","C10","2020-10-22","SW",4,42,0,0,0,0,0,NA,10.9,0.6
+"594","20FHB000594",2660,"239","20SGH000239","C10_000239","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_160_CPG2660_239","experimental","C10","2020-10-22","SW",4,41,0,0,0,0,0,NA,7.5,0
+"595","20FHB000595",2661,"1906","20SGH001906","C10_001906","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_161_CPG2661_1906","experimental","C10","2020-10-22","SW",4,40,0,0,0,0,0,NA,2.5,0
+"596","20FHB000596",2662,"1259","20SGH001259","C10_001259","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_162_CPG2662_1259","experimental","C10","2020-10-22","SW",4,39,0,0,0,0,0,NA,NA,NA
+"597","20FHB000597",2663,"1943","20SGH001943","C10_001943","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_163_CPG2663_1943","experimental","C10","2020-10-22","SW",4,38,0,0,0,0,0,NA,1.9,0
+"598","20FHB000598",2664,"847","20SGH000847","C10_000847","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_164_CPG2664_847","experimental","C10","2020-10-22","SW",4,37,0,0,0,0,0,NA,NA,NA
+"599","20FHB000599",2665,"3703","20SGH003703","C10_003703","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_165_CPG2665_3703","experimental","C10","2020-10-22","SW",4,36,0,0,0,0,0,NA,6.5,0
+"600","20FHB000600",2666,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_166_CPG2666_Overley","susceptible check","winter wheat","2020-10-22","SW",4,35,0,0,0,0,0,"ww_check",5.8,0.3
+"601","20FHB000601",2667,"667","20SGH000667","C10_000667","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_167_CPG2667_667","experimental","C10","2020-10-22","SW",4,34,0,0,0,0,0,NA,1.5,0
+"602","20FHB000602",2668,"1382","20SGH001382","C10_001382","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_168_CPG2668_1382","experimental","C10","2020-10-22","SW",4,33,0,0,0,0,0,NA,10,0
+"603","20FHB000603",2669,"2660","20SGH002660","C10_002660","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_169_CPG2669_2660","experimental","C10","2020-10-22","SW",4,32,0,0,0,0,0,NA,20.2,0.5
+"604","20FHB000604",2670,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_170_CPG2670_Roblin","susceptible check","spring wheat","2020-10-22","SW",4,31,0,0,0,0,0,"sw_check",16,0.4
+"605","20FHB000605",2671,"1727","20SGH001727","C10_001727","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_171_CPG2671_1727","experimental","C10","2020-10-22","SW",4,30,0,0,0,0,0,NA,18.9,0.9
+"606","20FHB000606",2672,"2171","20SGH002171","C10_002171","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_172_CPG2672_2171","experimental","C10","2020-10-22","SW",4,29,0,0,0,0,0,NA,3.8,0.9
+"607","20FHB000607",2673,"3551","20SGH003551","C10_003551","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_173_CPG2673_3551","experimental","C10","2020-10-22","SW",4,28,0,0,0,0,0,NA,2.4,0
+"608","20FHB000608",2674,"3620","20SGH003620","C10_003620","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_174_CPG2674_3620","experimental","C10","2020-10-22","SW",4,27,0,0,0,0,0,NA,3.9,0
+"609","20FHB000609",2675,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_175_CPG2675_Roblin","susceptible check","spring wheat","2020-10-22","SW",4,26,0,0,0,0,0,"sw_check",20.1,1.7
+"610","20FHB000610",2676,"1101","20SGH001101","C10_001101","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_176_CPG2676_1101","experimental","C10","2020-10-22","SW",4,25,0,0,0,0,0,NA,4.9,0
+"611","20FHB000611",2677,"C9-2633","19SGH002633","C9_002633","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_177_CPG2677_C9-2633","top10% R OH","C9 replicate","2020-10-22","SW",4,24,0,0,0,0,0,"C9 replicate",3,0.5
+"612","20FHB000612",2678,"1974","20SGH001974","C10_001974","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_178_CPG2678_1974","experimental","C10","2020-10-22","SW",4,23,0,0,0,0,0,NA,8.3,0.3
+"613","20FHB000613",2679,"31","20SGH000031","C10_000031","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_179_CPG2679_31","experimental","C10","2020-10-22","SW",4,22,0,0,0,0,0,NA,24.8,0.9
+"614","20FHB000614",2680,"1622","20SGH001622","C10_001622","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_180_CPG2680_1622","experimental","C10","2020-10-22","SW",4,21,0,0,0,0,0,NA,3.8,0
+"615","20FHB000615",2681,"2013","20SGH002013","C10_002013","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_181_CPG2681_2013","experimental","C10","2020-10-22","SW",4,20,0,0,0,0,0,NA,2.1,0.1
+"616","20FHB000616",2682,"811","20SGH000811","C10_000811","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_182_CPG2682_811","experimental","C10","2020-10-22","SW",4,19,0,0,0,0,0,NA,21.6,3.9
+"617","20FHB000617",2683,"57","20SGH000057","C10_000057","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_183_CPG2683_57","experimental","C10","2020-10-22","SW",4,18,0,0,0,0,0,NA,9.6,0.4
+"618","20FHB000618",2684,"60","20SGH000060","C10_000060","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_184_CPG2684_60","experimental","C10","2020-10-22","SW",4,17,0,0,0,0,0,NA,NA,NA
+"619","20FHB000619",2685,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_185_CPG2685_Overley","susceptible check","winter wheat","2020-10-22","SW",4,16,0,0,0,0,0,"ww_check",34.7,2.7
+"620","20FHB000620",2686,"2563","20SGH002563","C10_002563","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_186_CPG2686_2563","experimental","C10","2020-10-22","SW",4,15,0,0,0,0,0,NA,11.9,0.3
+"621","20FHB000621",2687,"1959","20SGH001959","C10_001959","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_187_CPG2687_1959","experimental","C10","2020-10-22","SW",4,14,0,0,0,0,0,NA,25.2,0.3
+"622","20FHB000622",2688,"3178","20SGH003178","C10_003178","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_188_CPG2688_3178","experimental","C10","2020-10-22","SW",4,13,0,0,0,0,0,NA,NA,NA
+"623","20FHB000623",2689,"1965","20SGH001965","C10_001965","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_189_CPG2689_1965","experimental","C10","2020-10-22","SW",4,12,0,0,0,0,0,NA,2,0
+"624","20FHB000624",2690,"860","20SGH000860","C10_000860","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_190_CPG2690_860","experimental","C10","2020-10-22","SW",4,11,0,0,0,0,0,NA,10.8,0.5
+"625","20FHB000625",2691,"1173","20SGH001173","C10_001173","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_191_CPG2691_1173","experimental","C10","2020-10-22","SW",4,10,0,0,0,0,0,NA,5.3,0.5
+"626","20FHB000626",2692,"2190","20SGH002190","C10_002190","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_192_CPG2692_2190","experimental","C10","2020-10-22","SW",4,9,0,0,0,0,0,NA,0.4,0
+"627","20FHB000627",2693,"3751","20SGH003751","C10_003751","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_193_CPG2693_3751","experimental","C10","2020-10-22","SW",4,8,0,0,0,0,0,NA,NA,NA
+"628","20FHB000628",2694,"2537","20SGH002537","C10_002537","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_194_CPG2694_2537","experimental","C10","2020-10-22","SW",4,7,0,0,0,0,0,NA,0,0
+"629","20FHB000629",2695,"3360","20SGH003360","C10_003360","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_195_CPG2695_3360","experimental","C10","2020-10-22","SW",4,6,0,0,0,0,0,NA,NA,NA
+"630","20FHB000630",2696,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_196_CPG2696_Roblin","susceptible check","spring wheat","2020-10-22","SW",4,5,0,0,0,0,0,"sw_check",14,1.3
+"631","20FHB000631",2697,"267","20SGH000267","C10_000267","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_197_CPG2697_267","experimental","C10","2020-10-22","SW",4,4,0,0,0,0,0,NA,20.7,0
+"632","20FHB000632",2698,"2698","20SGH002698","C10_002698","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_198_CPG2698_2698","experimental","C10","2020-10-22","SW",4,3,0,0,0,0,0,NA,9.7,0
+"633","20FHB000633",2699,"2304","20SGH002304","C10_002304","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_199_CPG2699_2304","experimental","C10","2020-10-22","SW",4,2,0,0,0,0,0,NA,4.7,0
+"634","20FHB000634",2700,"1856","20SGH001856","C10_001856","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_200_CPG2700_1856","experimental","C10","2020-10-22","SW",4,1,0,0,0,0,0,NA,42.1,0
+"635","20FHB000635",2701,"C9-2633","19SGH002633","C9_002633","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_201_CPG2701_C9-2633","top10% R OH","C9 replicate","2020-10-22","SW",5,1,0,0,0,0,0,"C9 replicate",2.3,0
+"636","20FHB000636",2702,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_202_CPG2702_Everest","resistant check","winter wheat","2020-10-22","SW",5,2,0,0,0,0,0,"ww_check",16.8,7.5
+"637","20FHB000637",2703,"2180","20SGH002180","C10_002180","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_203_CPG2703_2180","experimental","C10","2020-10-22","SW",5,3,0,0,0,0,0,NA,19.8,0.2
+"638","20FHB000638",2704,"2020","20SGH002020","C10_002020","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_204_CPG2704_2020","experimental","C10","2020-10-22","SW",5,4,0,0,0,0,0,NA,24.3,1
+"639","20FHB000639",2705,"C9-2695","19SGH002695","C9_002695","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_205_CPG2705_C9-2695","top10% S EB","C9 replicate","2020-10-22","SW",5,5,0,0,0,0,0,"C9 replicate",5.6,0.1
+"640","20FHB000640",2706,"2461","20SGH002461","C10_002461","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_206_CPG2706_2461","experimental","C10","2020-10-22","SW",5,6,0,0,0,0,0,NA,3.8,0.2
+"641","20FHB000641",2707,"2540","20SGH002540","C10_002540","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_207_CPG2707_2540","experimental","C10","2020-10-22","SW",5,7,0,0,0,0,0,NA,23.5,0.8
+"642","20FHB000642",2708,"3501","20SGH003501","C10_003501","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_208_CPG2708_3501","experimental","C10","2020-10-22","SW",5,8,0,0,0,0,0,NA,16.5,0.2
+"643","20FHB000643",2709,"2036","20SGH002036","C10_002036","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_209_CPG2709_2036","experimental","C10","2020-10-22","SW",5,9,0,0,0,0,0,NA,26.2,0
+"644","20FHB000644",2710,"2571","20SGH002571","C10_002571","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_210_CPG2710_2571","experimental","C10","2020-10-22","SW",5,10,0,0,0,0,0,NA,7.8,0
+"645","20FHB000645",2711,"382","20SGH000382","C10_000382","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_211_CPG2711_382","experimental","C10","2020-10-22","SW",5,11,0,0,0,0,0,NA,9.1,0.7
+"646","20FHB000646",2712,"1707","20SGH001707","C10_001707","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_212_CPG2712_1707","experimental","C10","2020-10-22","SW",5,12,0,0,0,0,0,NA,8.6,0.4
+"647","20FHB000647",2713,"535","20SGH000535","C10_000535","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_213_CPG2713_535","experimental","C10","2020-10-22","SW",5,13,0,0,0,0,0,NA,12.4,0.4
+"648","20FHB000648",2714,"1774","20SGH001774","C10_001774","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_214_CPG2714_1774","experimental","C10","2020-10-22","SW",5,14,0,0,0,0,0,NA,6.1,0
+"649","20FHB000649",2715,"744","20SGH000744","C10_000744","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_215_CPG2715_744","experimental","C10","2020-10-22","SW",5,15,0,0,0,0,0,NA,18.4,0
+"650","20FHB000650",2716,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_216_CPG2716_Bacup","resistant check","spring wheat","2020-10-22","SW",5,16,0,0,0,0,0,"sw_check",1.5,0
+"651","20FHB000651",2717,"780","20SGH000780","C10_000780","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_217_CPG2717_780","experimental","C10","2020-10-22","SW",5,17,0,0,0,0,0,NA,35.5,1.3
+"652","20FHB000652",2718,"2776","20SGH002776","C10_002776","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_218_CPG2718_2776","experimental","C10","2020-10-22","SW",5,18,0,0,0,0,0,NA,NA,NA
+"653","20FHB000653",2719,"C9-2695","19SGH002695","C9_002695","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_219_CPG2719_C9-2695","top10% S EB","C9 replicate","2020-10-22","SW",5,19,0,0,0,0,0,"C9 replicate",2.5,0
+"654","20FHB000654",2720,"1831","20SGH001831","C10_001831","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_220_CPG2720_1831","experimental","C10","2020-10-22","SW",5,20,0,0,0,0,0,NA,20.2,0
+"655","20FHB000655",2721,"855","20SGH000855","C10_000855","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_221_CPG2721_855","experimental","C10","2020-10-22","SW",5,21,0,0,0,0,0,NA,13.6,0.2
+"656","20FHB000656",2722,"3829","20SGH003829","C10_003829","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_222_CPG2722_3829","experimental","C10","2020-10-22","SW",5,22,0,0,0,0,0,NA,37.1,1.5
+"657","20FHB000657",2723,"3862","20SGH003862","C10_003862","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_223_CPG2723_3862","experimental","C10","2020-10-22","SW",5,23,0,0,0,0,0,NA,12.8,0
+"658","20FHB000658",2724,"2791","20SGH002791","C10_002791","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_224_CPG2724_2791","experimental","C10","2020-10-22","SW",5,24,0,0,0,0,0,NA,20.9,2.6
+"659","20FHB000659",2725,"2506","20SGH002506","C10_002506","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_225_CPG2725_2506","experimental","C10","2020-10-22","SW",5,25,0,0,0,0,0,NA,9.7,0.4
+"660","20FHB000660",2726,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_226_CPG2726_Bacup","resistant check","spring wheat","2020-10-22","SW",5,26,0,0,0,0,0,"sw_check",3.9,0
+"661","20FHB000661",2727,"2941","20SGH002941","C10_002941","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_227_CPG2727_2941","experimental","C10","2020-10-22","SW",5,27,0,0,0,0,0,NA,8.2,0
+"662","20FHB000662",2728,"C9-3237","19SGH003237","C9_003237","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_228_CPG2728_C9-3237","top33 S FHB","C9 replicate","2020-10-22","SW",5,28,0,0,0,0,0,"C9 replicate",8.5,0.3
+"663","20FHB000663",2729,"2314","20SGH002314","C10_002314","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_229_CPG2729_2314","experimental","C10","2020-10-22","SW",5,29,0,0,0,0,0,NA,10.3,0
+"664","20FHB000664",2730,"349","20SGH000349","C10_000349","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_230_CPG2730_349","experimental","C10","2020-10-22","SW",5,30,0,0,0,0,0,NA,8.2,0.2
+"665","20FHB000665",2731,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_231_CPG2731_Overley","susceptible check","winter wheat","2020-10-22","SW",5,31,0,0,0,0,0,"ww_check",17.1,4.8
+"666","20FHB000666",2732,"1541","20SGH001541","C10_001541","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_232_CPG2732_1541","experimental","C10","2020-10-22","SW",5,32,0,0,0,0,0,NA,0.9,0
+"667","20FHB000667",2733,"2701","20SGH002701","C10_002701","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_233_CPG2733_2701","experimental","C10","2020-10-22","SW",5,33,0,0,0,0,0,NA,10.1,0
+"668","20FHB000668",2734,"1235","20SGH001235","C10_001235","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_234_CPG2734_1235","experimental","C10","2020-10-22","SW",5,34,0,0,0,0,0,NA,3.2,0.5
+"669","20FHB000669",2735,"2548","20SGH002548","C10_002548","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_235_CPG2735_2548","experimental","C10","2020-10-22","SW",5,35,0,0,0,0,0,NA,14,1
+"670","20FHB000670",2736,"3748","20SGH003748","C10_003748","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_236_CPG2736_3748","experimental","C10","2020-10-22","SW",5,36,0,0,0,0,0,NA,2.3,0
+"671","20FHB000671",2737,"972","20SGH000972","C10_000972","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_237_CPG2737_972","experimental","C10","2020-10-22","SW",5,37,0,0,0,0,0,NA,13.2,0.4
+"672","20FHB000672",2738,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_238_CPG2738_Roblin","susceptible check","spring wheat","2020-10-22","SW",5,38,0,0,0,0,0,"sw_check",14.2,1.8
+"673","20FHB000673",2739,"2709","20SGH002709","C10_002709","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_239_CPG2739_2709","experimental","C10","2020-10-22","SW",5,39,0,0,0,0,0,NA,1.5,0
+"674","20FHB000674",2740,"3027","20SGH003027","C10_003027","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_240_CPG2740_3027","experimental","C10","2020-10-22","SW",5,40,0,0,0,0,0,NA,NA,NA
+"675","20FHB000675",2741,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_241_CPG2741_Everest","resistant check","winter wheat","2020-10-22","SW",5,41,0,0,0,0,0,"ww_check",26.8,7.3
+"676","20FHB000676",2742,"839","20SGH000839","C10_000839","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_242_CPG2742_839","experimental","C10","2020-10-22","SW",5,42,0,0,0,0,0,NA,3.3,0
+"677","20FHB000677",2743,"C9-3370","19SGH003370","C9_003370","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_243_CPG2743_C9-3370","top10 R FHB","C9 replicate","2020-10-22","SW",5,43,0,0,0,0,0,"C9 replicate",4.4,0
+"678","20FHB000678",2744,"2611","20SGH002611","C10_002611","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_244_CPG2744_2611","experimental","C10","2020-10-22","SW",5,44,0,0,0,0,0,NA,3.3,0.2
+"679","20FHB000679",2745,"2662","20SGH002662","C10_002662","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_245_CPG2745_2662","experimental","C10","2020-10-22","SW",5,45,0,0,0,0,0,NA,1.3,0
+"680","20FHB000680",2746,"706","20SGH000706","C10_000706","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_246_CPG2746_706","experimental","C10","2020-10-22","SW",5,46,0,0,0,0,0,NA,1.3,0.6
+"681","20FHB000681",2747,"88","20SGH000088","C10_000088","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_247_CPG2747_88","experimental","C10","2020-10-22","SW",5,47,0,0,0,0,0,NA,1.4,0
+"682","20FHB000682",2748,"3817","20SGH003817","C10_003817","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_248_CPG2748_3817","experimental","C10","2020-10-22","SW",5,48,0,0,0,0,0,NA,NA,NA
+"683","20FHB000683",2749,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_249_CPG2749_Bacup","resistant check","spring wheat","2020-10-22","SW",5,49,0,0,0,0,0,"sw_check",1.1,0
+"684","20FHB000684",2750,"3738","20SGH003738","C10_003738","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_250_CPG2750_3738","experimental","C10","2020-10-22","SW",5,50,0,0,0,0,0,NA,1.3,0.3
+"685","20FHB000685",2751,"3350","20SGH003350","C10_003350","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_251_CPG2751_3350","experimental","C10","2020-10-22","SW",6,50,0,0,0,0,0,NA,5.7,0
+"686","20FHB000686",2752,"C9-3370","19SGH003370","C9_003370","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_252_CPG2752_C9-3370","top10 R FHB","C9 replicate","2020-10-22","SW",6,49,0,0,0,0,0,"C9 replicate",NA,NA
+"687","20FHB000687",2753,"351","20SGH000351","C10_000351","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_253_CPG2753_351","experimental","C10","2020-10-22","SW",6,48,0,0,0,0,0,NA,NA,NA
+"688","20FHB000688",2754,"C9-369","19SGH000369","C9_000369","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_254_CPG2754_C9-369","top33 S FHB","C9 replicate","2020-10-22","SW",6,47,0,0,0,0,0,"C9 replicate",0.5,0
+"689","20FHB000689",2755,"2930","20SGH002930","C10_002930","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_255_CPG2755_2930","experimental","C10","2020-10-22","SW",6,46,0,0,0,0,0,NA,2.1,0
+"690","20FHB000690",2756,"828","20SGH000828","C10_000828","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_256_CPG2756_828","experimental","C10","2020-10-22","SW",6,45,0,0,0,0,0,NA,NA,NA
+"691","20FHB000691",2757,"1502","20SGH001502","C10_001502","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_257_CPG2757_1502","experimental","C10","2020-10-22","SW",6,44,0,0,0,0,0,NA,2.2,0
+"692","20FHB000692",2758,"3231","20SGH003231","C10_003231","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_258_CPG2758_3231","experimental","C10","2020-10-22","SW",6,43,0,0,0,0,0,NA,0,0
+"693","20FHB000693",2759,"139","20SGH000139","C10_000139","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_259_CPG2759_139","experimental","C10","2020-10-22","SW",6,42,0,0,0,0,0,NA,1.2,0
+"694","20FHB000694",2760,"C9-369","19SGH000369","C9_000369","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_260_CPG2760_C9-369","top33 S FHB","C9 replicate","2020-10-22","SW",6,41,0,0,0,0,0,"C9 replicate",NA,NA
+"695","20FHB000695",2761,"3158","20SGH003158","C10_003158","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_261_CPG2761_3158","experimental","C10","2020-10-22","SW",6,40,0,0,0,0,0,NA,8.4,0.7
+"696","20FHB000696",2762,"468","20SGH000468","C10_000468","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_262_CPG2762_468","experimental","C10","2020-10-22","SW",6,39,0,0,0,0,0,NA,6.1,0.7
+"697","20FHB000697",2763,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_263_CPG2763_Bacup","resistant check","spring wheat","2020-10-22","SW",6,38,0,0,0,0,0,"sw_check",14.6,0
+"698","20FHB000698",2764,"663","20SGH000663","C10_000663","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_264_CPG2764_663","experimental","C10","2020-10-22","SW",6,37,0,0,0,0,0,NA,1.3,1
+"699","20FHB000699",2765,"2280","20SGH002280","C10_002280","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_265_CPG2765_2280","experimental","C10","2020-10-22","SW",6,36,0,0,0,0,0,NA,1.7,0.2
+"700","20FHB000700",2766,"C9-3726","19SGH003726","C9_003726","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_266_CPG2766_C9-3726","top33 S FHB","C9 replicate","2020-10-22","SW",6,35,0,0,0,0,0,"C9 replicate",NA,NA
+"701","20FHB000701",2767,"3014","20SGH003014","C10_003014","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_267_CPG2767_3014","experimental","C10","2020-10-22","SW",6,34,0,0,0,0,0,NA,NA,NA
+"702","20FHB000702",2768,"92","20SGH000092","C10_000092","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_268_CPG2768_92","experimental","C10","2020-10-22","SW",6,33,0,0,0,0,0,NA,4.2,0.5
+"703","20FHB000703",2769,"3396","20SGH003396","C10_003396","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_269_CPG2769_3396","experimental","C10","2020-10-22","SW",6,32,0,0,0,0,0,NA,3.5,0
+"704","20FHB000704",2770,"399","20SGH000399","C10_000399","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_270_CPG2770_399","experimental","C10","2020-10-22","SW",6,31,0,0,0,0,0,NA,16.9,0.7
+"705","20FHB000705",2771,"C9-3726","19SGH003726","C9_003726","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_271_CPG2771_C9-3726","top33 S FHB","C9 replicate","2020-10-22","SW",6,30,0,0,0,0,0,"C9 replicate",NA,NA
+"706","20FHB000706",2772,"3473","20SGH003473","C10_003473","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_272_CPG2772_3473","experimental","C10","2020-10-22","SW",6,29,0,0,0,0,0,NA,2.5,0.5
+"707","20FHB000707",2773,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_273_CPG2773_Overley","susceptible check","winter wheat","2020-10-22","SW",6,28,0,0,0,0,0,"ww_check",21.3,2.6
+"708","20FHB000708",2774,"335","20SGH000335","C10_000335","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_274_CPG2774_335","experimental","C10","2020-10-22","SW",6,27,0,0,0,0,0,NA,13.2,0.9
+"709","20FHB000709",2775,"3053","20SGH003053","C10_003053","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_275_CPG2775_3053","experimental","C10","2020-10-22","SW",6,26,0,0,0,0,0,NA,5.9,0.1
+"710","20FHB000710",2776,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_276_CPG2776_Bacup","resistant check","spring wheat","2020-10-22","SW",6,25,0,0,0,0,0,"sw_check",NA,NA
+"711","20FHB000711",2777,"366","20SGH000366","C10_000366","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_277_CPG2777_366","experimental","C10","2020-10-22","SW",6,24,0,0,0,0,0,NA,2.6,0.4
+"712","20FHB000712",2778,"170","20SGH000170","C10_000170","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_278_CPG2778_170","experimental","C10","2020-10-22","SW",6,23,0,0,0,0,0,NA,25.9,0.8
+"713","20FHB000713",2779,"2331","20SGH002331","C10_002331","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_279_CPG2779_2331","experimental","C10","2020-10-22","SW",6,22,0,0,0,0,0,NA,5.8,0.3
+"714","20FHB000714",2780,"67","20SGH000067","C10_000067","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_280_CPG2780_67","experimental","C10","2020-10-22","SW",6,21,0,0,0,0,0,NA,3.7,0
+"715","20FHB000715",2781,"1695","20SGH001695","C10_001695","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_281_CPG2781_1695","experimental","C10","2020-10-22","SW",6,20,0,0,0,0,0,NA,22.5,0.4
+"716","20FHB000716",2782,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_282_CPG2782_Overley","susceptible check","winter wheat","2020-10-22","SW",6,19,0,0,0,0,0,"ww_check",74.6,45.8
+"717","20FHB000717",2783,"3304","20SGH003304","C10_003304","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_283_CPG2783_3304","experimental","C10","2020-10-22","SW",6,18,0,0,0,0,0,NA,2.7,1.9
+"718","20FHB000718",2784,"312","20SGH000312","C10_000312","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_284_CPG2784_312","experimental","C10","2020-10-22","SW",6,17,0,0,0,0,0,NA,NA,NA
+"719","20FHB000719",2785,"3118","20SGH003118","C10_003118","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_285_CPG2785_3118","experimental","C10","2020-10-22","SW",6,16,0,0,0,0,0,NA,NA,NA
+"720","20FHB000720",2786,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_286_CPG2786_Roblin","susceptible check","spring wheat","2020-10-22","SW",6,15,0,0,0,0,0,"sw_check",36.6,1.3
+"721","20FHB000721",2787,"158","20SGH000158","C10_000158","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_287_CPG2787_158","experimental","C10","2020-10-22","SW",6,14,0,0,0,0,0,NA,14.9,0.4
+"722","20FHB000722",2788,"1798","20SGH001798","C10_001798","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_288_CPG2788_1798","experimental","C10","2020-10-22","SW",6,13,0,0,0,0,0,NA,25.5,0.2
+"723","20FHB000723",2789,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_289_CPG2789_Everest","resistant check","winter wheat","2020-10-22","SW",6,12,0,0,0,0,0,"ww_check",34.7,69.1
+"724","20FHB000724",2790,"3515","20SGH003515","C10_003515","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_290_CPG2790_3515","experimental","C10","2020-10-22","SW",6,11,0,0,0,0,0,NA,0,0
+"725","20FHB000725",2791,"552","20SGH000552","C10_000552","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_291_CPG2791_552","experimental","C10","2020-10-22","SW",6,10,0,0,0,0,0,NA,NA,NA
+"726","20FHB000726",2792,"554","20SGH000554","C10_000554","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_292_CPG2792_554","experimental","C10","2020-10-22","SW",6,9,0,0,0,0,0,NA,10.2,0
+"727","20FHB000727",2793,"207","20SGH000207","C10_000207","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_293_CPG2793_207","experimental","C10","2020-10-22","SW",6,8,0,0,0,0,0,NA,27.5,0
+"728","20FHB000728",2794,"131","20SGH000131","C10_000131","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_294_CPG2794_131","experimental","C10","2020-10-22","SW",6,7,0,0,0,0,0,NA,NA,NA
+"729","20FHB000729",2795,"C9-3816","19SGH003816","C9_003816","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_295_CPG2795_C9-3816","top33 S FHB","C9 replicate","2020-10-22","SW",6,6,0,0,0,0,0,"C9 replicate",NA,NA
+"730","20FHB000730",2796,"2197","20SGH002197","C10_002197","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_296_CPG2796_2197","experimental","C10","2020-10-22","SW",6,5,0,0,0,0,0,NA,7.3,0.3
+"731","20FHB000731",2797,"3465","20SGH003465","C10_003465","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_297_CPG2797_3465","experimental","C10","2020-10-22","SW",6,4,0,0,0,0,0,NA,NA,NA
+"732","20FHB000732",2798,"651","20SGH000651","C10_000651","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_298_CPG2798_651","experimental","C10","2020-10-22","SW",6,3,0,0,0,0,0,NA,6.9,0.3
+"733","20FHB000733",2799,"3587","20SGH003587","C10_003587","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_299_CPG2799_3587","experimental","C10","2020-10-22","SW",6,2,0,0,0,0,0,NA,NA,NA
+"734","20FHB000734",2800,"2251","20SGH002251","C10_002251","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_300_CPG2800_2251","experimental","C10","2020-10-22","SW",6,1,0,0,0,0,0,NA,5,0.3
+"735","20FHB000735",2801,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_301_CPG2801_Roblin","susceptible check","spring wheat","2020-10-22","SW",7,1,0,0,0,0,0,"sw_check",58.1,10
+"736","20FHB000736",2802,"1299","20SGH001299","C10_001299","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_302_CPG2802_1299","experimental","C10","2020-10-22","SW",7,2,0,0,0,0,0,NA,10.8,0.5
+"737","20FHB000737",2803,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_303_CPG2803_Overley","susceptible check","winter wheat","2020-10-22","SW",7,3,0,0,0,0,0,"ww_check",28.3,3.3
+"738","20FHB000738",2804,"2861","20SGH002861","C10_002861","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_304_CPG2804_2861","experimental","C10","2020-10-22","SW",7,4,0,0,0,0,0,NA,9.4,0.9
+"739","20FHB000739",2805,"3563","20SGH003563","C10_003563","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_305_CPG2805_3563","experimental","C10","2020-10-22","SW",7,5,0,0,0,0,0,NA,6.2,0
+"740","20FHB000740",2806,"3051","20SGH003051","C10_003051","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_306_CPG2806_3051","experimental","C10","2020-10-22","SW",7,6,0,0,0,0,0,NA,4.3,0
+"741","20FHB000741",2807,"472","20SGH000472","C10_000472","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_307_CPG2807_472","experimental","C10","2020-10-22","SW",7,7,0,0,0,0,0,NA,4.5,0.2
+"742","20FHB000742",2808,"1741","20SGH001741","C10_001741","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_308_CPG2808_1741","experimental","C10","2020-10-22","SW",7,8,0,0,0,0,0,NA,2.9,0.1
+"743","20FHB000743",2809,"C9-3816","19SGH003816","C9_003816","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_309_CPG2809_C9-3816","top33 S FHB","C9 replicate","2020-10-22","SW",7,9,0,0,0,0,0,"C9 replicate",5.5,0.3
+"744","20FHB000744",2810,"413","20SGH000413","C10_000413","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_310_CPG2810_413","experimental","C10","2020-10-22","SW",7,10,0,0,0,0,0,NA,14.6,0
+"745","20FHB000745",2811,"C9-4077","19SGH004077","C9_004077","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_311_CPG2811_C9-4077","top33 S FHB","C9 replicate","2020-10-22","SW",7,11,0,0,0,0,0,"C9 replicate",10.5,0
+"746","20FHB000746",2812,"1538","20SGH001538","C10_001538","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_312_CPG2812_1538","experimental","C10","2020-10-22","SW",7,12,0,0,0,0,0,NA,9.3,0.2
+"747","20FHB000747",2813,"66","20SGH000066","C10_000066","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_313_CPG2813_66","experimental","C10","2020-10-22","SW",7,13,0,0,0,0,0,NA,12.1,1.1
+"748","20FHB000748",2814,"225","20SGH000225","C10_000225","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_314_CPG2814_225","experimental","C10","2020-10-22","SW",7,14,0,0,0,0,0,NA,4.2,0
+"749","20FHB000749",2815,"C9-4077","19SGH004077","C9_004077","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_315_CPG2815_C9-4077","top33 S FHB","C9 replicate","2020-10-22","SW",7,15,0,0,0,0,0,"C9 replicate",2.1,0.1
+"750","20FHB000750",2816,"2061","20SGH002061","C10_002061","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_316_CPG2816_2061","experimental","C10","2020-10-22","SW",7,16,0,0,0,0,0,NA,7.4,0.8
+"751","20FHB000751",2817,"227","20SGH000227","C10_000227","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_317_CPG2817_227","experimental","C10","2020-10-22","SW",7,17,0,0,0,0,0,NA,20.9,1
+"752","20FHB000752",2818,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_318_CPG2818_Everest","resistant check","winter wheat","2020-10-22","SW",7,18,0,0,0,0,0,"ww_check",21.4,14.4
+"753","20FHB000753",2819,"254","20SGH000254","C10_000254","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_319_CPG2819_254","experimental","C10","2020-10-22","SW",7,19,0,0,0,0,0,NA,8.4,1.4
+"754","20FHB000754",2820,"271","20SGH000271","C10_000271","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_320_CPG2820_271","experimental","C10","2020-10-22","SW",7,20,0,0,0,0,0,NA,1.4,0.2
+"755","20FHB000755",2821,"2801","20SGH002801","C10_002801","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_321_CPG2821_2801","experimental","C10","2020-10-22","SW",7,21,0,0,0,0,0,NA,5.4,0
+"756","20FHB000756",2822,"2187","20SGH002187","C10_002187","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_322_CPG2822_2187","experimental","C10","2020-10-22","SW",7,22,0,0,0,0,0,NA,5.7,0.1
+"757","20FHB000757",2823,"2098","20SGH002098","C10_002098","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_323_CPG2823_2098","experimental","C10","2020-10-22","SW",7,23,0,0,0,0,0,NA,5.5,0.6
+"758","20FHB000758",2824,"2910","20SGH002910","C10_002910","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_324_CPG2824_2910","experimental","C10","2020-10-22","SW",7,24,0,0,0,0,0,NA,11.3,1.3
+"759","20FHB000759",2825,"835","20SGH000835","C10_000835","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_325_CPG2825_835","experimental","C10","2020-10-22","SW",7,25,0,0,0,0,0,NA,11,0.9
+"760","20FHB000760",2826,"2954","20SGH002954","C10_002954","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_326_CPG2826_2954","experimental","C10","2020-10-22","SW",7,26,0,0,0,0,0,NA,21,1
+"761","20FHB000761",2827,"3868","20SGH003868","C10_003868","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_327_CPG2827_3868","experimental","C10","2020-10-22","SW",7,27,0,0,0,0,0,NA,NA,NA
+"762","20FHB000762",2828,"1087","20SGH001087","C10_001087","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_328_CPG2828_1087","experimental","C10","2020-10-22","SW",7,28,0,0,0,0,0,NA,19.1,1.1
+"763","20FHB000763",2829,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_329_CPG2829_Roblin","susceptible check","spring wheat","2020-10-22","SW",7,29,0,0,0,0,0,"sw_check",28.8,1.3
+"764","20FHB000764",2830,"1424","20SGH001424","C10_001424","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_330_CPG2830_1424","experimental","C10","2020-10-22","SW",7,30,0,0,0,0,0,NA,6.4,0.8
+"765","20FHB000765",2831,"1434","20SGH001434","C10_001434","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_331_CPG2831_1434","experimental","C10","2020-10-22","SW",7,31,0,0,0,0,0,NA,7.2,0.8
+"766","20FHB000766",2832,"627","20SGH000627","C10_000627","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_332_CPG2832_627","experimental","C10","2020-10-22","SW",7,32,0,0,0,0,0,NA,13.4,0.7
+"767","20FHB000767",2833,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_333_CPG2833_Bacup","resistant check","spring wheat","2020-10-22","SW",7,33,0,0,0,0,0,"sw_check",7.1,0.5
+"768","20FHB000768",2834,"214","20SGH000214","C10_000214","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_334_CPG2834_214","experimental","C10","2020-10-22","SW",7,34,0,0,0,0,0,NA,14.1,0
+"769","20FHB000769",2835,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_335_CPG2835_Overley","susceptible check","winter wheat","2020-10-22","SW",7,35,0,0,0,0,0,"ww_check",NA,NA
+"770","20FHB000770",2836,"1051","20SGH001051","C10_001051","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_336_CPG2836_1051","experimental","C10","2020-10-22","SW",7,36,0,0,0,0,0,NA,3.2,0.4
+"771","20FHB000771",2837,"3247","20SGH003247","C10_003247","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_337_CPG2837_3247","experimental","C10","2020-10-22","SW",7,37,0,0,0,0,0,NA,NA,NA
+"772","20FHB000772",2838,"997","20SGH000997","C10_000997","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_338_CPG2838_997","experimental","C10","2020-10-22","SW",7,38,0,0,0,0,0,NA,NA,NA
+"773","20FHB000773",2839,"462","20SGH000462","C10_000462","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_339_CPG2839_462","experimental","C10","2020-10-22","SW",7,39,0,0,0,0,0,NA,6.4,0.9
+"774","20FHB000774",2840,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_340_CPG2840_Overley","susceptible check","winter wheat","2020-10-22","SW",7,40,0,0,0,0,0,"ww_check",NA,NA
+"775","20FHB000775",2841,"2998","20SGH002998","C10_002998","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_341_CPG2841_2998","experimental","C10","2020-10-22","SW",7,41,0,0,0,0,0,NA,NA,NA
+"776","20FHB000776",2842,"2194","20SGH002194","C10_002194","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_342_CPG2842_2194","experimental","C10","2020-10-22","SW",7,42,0,0,0,0,0,NA,7.6,0.2
+"777","20FHB000777",2843,"55","20SGH000055","C10_000055","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_343_CPG2843_55","experimental","C10","2020-10-22","SW",7,43,0,0,0,0,0,NA,4,0
+"778","20FHB000778",2844,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_344_CPG2844_Bacup","resistant check","spring wheat","2020-10-22","SW",7,44,0,0,0,0,0,"sw_check",1.7,0
+"779","20FHB000779",2845,"1245","20SGH001245","C10_001245","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_345_CPG2845_1245","experimental","C10","2020-10-22","SW",7,45,0,0,0,0,0,NA,3.8,0
+"780","20FHB000780",2846,"3347","20SGH003347","C10_003347","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_346_CPG2846_3347","experimental","C10","2020-10-22","SW",7,46,0,0,0,0,0,NA,NA,NA
+"781","20FHB000781",2847,"3902","20SGH003902","C10_003902","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_347_CPG2847_3902","experimental","C10","2020-10-22","SW",7,47,0,0,0,0,0,NA,2.5,0
+"782","20FHB000782",2848,"2798","20SGH002798","C10_002798","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_348_CPG2848_2798","experimental","C10","2020-10-22","SW",7,48,0,0,0,0,0,NA,NA,NA
+"783","20FHB000783",2849,"3811","20SGH003811","C10_003811","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_349_CPG2849_3811","experimental","C10","2020-10-22","SW",7,49,0,0,0,0,0,NA,1.6,0
+"784","20FHB000784",2850,"3054","20SGH003054","C10_003054","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_350_CPG2850_3054","experimental","C10","2020-10-22","SW",7,50,0,0,0,0,0,NA,NA,NA
+"785","20FHB000785",2851,"1139","20SGH001139","C10_001139","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_351_CPG2851_1139","experimental","C10","2020-10-22","SW",8,50,0,0,0,0,0,NA,3,0
+"786","20FHB000786",2852,"3769","20SGH003769","C10_003769","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_352_CPG2852_3769","experimental","C10","2020-10-22","SW",8,49,0,0,0,0,0,NA,NA,NA
+"787","20FHB000787",2853,"3410","20SGH003410","C10_003410","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_353_CPG2853_3410","experimental","C10","2020-10-22","SW",8,48,0,0,0,0,0,NA,NA,NA
+"788","20FHB000788",2854,"1789","20SGH001789","C10_001789","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_354_CPG2854_1789","experimental","C10","2020-10-22","SW",8,47,0,0,0,0,0,NA,9.9,0.1
+"789","20FHB000789",2855,"417","20SGH000417","C10_000417","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_355_CPG2855_417","experimental","C10","2020-10-22","SW",8,46,0,0,0,0,0,NA,7.7,0
+"790","20FHB000790",2856,"3098","20SGH003098","C10_003098","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_356_CPG2856_3098","experimental","C10","2020-10-22","SW",8,45,0,0,0,0,0,NA,0.6,0.5
+"791","20FHB000791",2857,"C9-4136","19SGH004136","C9_004136","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_357_CPG2857_C9-4136","top10 R FHB","C9 replicate","2020-10-22","SW",8,44,0,0,0,0,0,"C9 replicate",NA,NA
+"792","20FHB000792",2858,"2357","20SGH002357","C10_002357","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_358_CPG2858_2357","experimental","C10","2020-10-22","SW",8,43,0,0,0,0,0,NA,1.5,0
+"793","20FHB000793",2859,"3412","20SGH003412","C10_003412","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_359_CPG2859_3412","experimental","C10","2020-10-22","SW",8,42,0,0,0,0,0,NA,NA,NA
+"794","20FHB000794",2860,"2831","20SGH002831","C10_002831","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_360_CPG2860_2831","experimental","C10","2020-10-22","SW",8,41,0,0,0,0,0,NA,2.6,0
+"795","20FHB000795",2861,"892","20SGH000892","C10_000892","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_361_CPG2861_892","experimental","C10","2020-10-22","SW",8,40,0,0,0,0,0,NA,7.8,0.2
+"796","20FHB000796",2862,"460","20SGH000460","C10_000460","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_362_CPG2862_460","experimental","C10","2020-10-22","SW",8,39,0,0,0,0,0,NA,3.3,0
+"797","20FHB000797",2863,"935","20SGH000935","C10_000935","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_363_CPG2863_935","experimental","C10","2020-10-22","SW",8,38,0,0,0,0,0,NA,5.3,3.2
+"798","20FHB000798",2864,"3062","20SGH003062","C10_003062","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_364_CPG2864_3062","experimental","C10","2020-10-22","SW",8,37,0,0,0,0,0,NA,3.3,0.2
+"799","20FHB000799",2865,"1731","20SGH001731","C10_001731","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_365_CPG2865_1731","experimental","C10","2020-10-22","SW",8,36,0,0,0,0,0,NA,2.3,0.2
+"800","20FHB000800",2866,"197","20SGH000197","C10_000197","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_366_CPG2866_197","experimental","C10","2020-10-22","SW",8,35,0,0,0,0,0,NA,2,0
+"801","20FHB000801",2867,"2931","20SGH002931","C10_002931","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_367_CPG2867_2931","experimental","C10","2020-10-22","SW",8,34,0,0,0,0,0,NA,NA,NA
+"802","20FHB000802",2868,"3159","20SGH003159","C10_003159","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_368_CPG2868_3159","experimental","C10","2020-10-22","SW",8,33,0,0,0,0,0,NA,NA,NA
+"803","20FHB000803",2869,"3124","20SGH003124","C10_003124","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_369_CPG2869_3124","experimental","C10","2020-10-22","SW",8,32,0,0,0,0,0,NA,0,0
+"804","20FHB000804",2870,"3219","20SGH003219","C10_003219","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_370_CPG2870_3219","experimental","C10","2020-10-22","SW",8,31,0,0,0,0,0,NA,4.3,0.1
+"805","20FHB000805",2871,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_371_CPG2871_Everest","resistant check","winter wheat","2020-10-22","SW",8,30,0,0,0,0,0,"ww_check",0.4,0
+"806","20FHB000806",2872,"479","20SGH000479","C10_000479","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_372_CPG2872_479","experimental","C10","2020-10-22","SW",8,29,0,0,0,0,0,NA,5.3,0
+"807","20FHB000807",2873,"C9-512","19SGH000512","C9_000512","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_373_CPG2873_C9-512","top 1 Inc2 R","C9 replicate","2020-10-22","SW",8,28,0,0,0,0,0,"C9 replicate",7.3,0.5
+"808","20FHB000808",2874,"2402","20SGH002402","C10_002402","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_374_CPG2874_2402","experimental","C10","2020-10-22","SW",8,27,0,0,0,0,0,NA,22.9,1
+"809","20FHB000809",2875,"1192","20SGH001192","C10_001192","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_375_CPG2875_1192","experimental","C10","2020-10-22","SW",8,26,0,0,0,0,0,NA,11.3,0
+"810","20FHB000810",2876,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_376_CPG2876_Bacup","resistant check","spring wheat","2020-10-22","SW",8,25,0,0,0,0,0,"sw_check",13.6,0.4
+"811","20FHB000811",2877,"3638","20SGH003638","C10_003638","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_377_CPG2877_3638","experimental","C10","2020-10-22","SW",8,24,0,0,0,0,0,NA,24.4,0
+"812","20FHB000812",2878,"1388","20SGH001388","C10_001388","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_378_CPG2878_1388","experimental","C10","2020-10-22","SW",8,23,0,0,0,0,0,NA,11.3,0
+"813","20FHB000813",2879,"582","20SGH000582","C10_000582","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_379_CPG2879_582","experimental","C10","2020-10-22","SW",8,22,0,0,0,0,0,NA,10.8,0
+"814","20FHB000814",2880,"2893","20SGH002893","C10_002893","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_380_CPG2880_2893","experimental","C10","2020-10-22","SW",8,21,0,0,0,0,0,NA,11.1,1.1
+"815","20FHB000815",2881,"2754","20SGH002754","C10_002754","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_381_CPG2881_2754","experimental","C10","2020-10-22","SW",8,20,0,0,0,0,0,NA,31,0.3
+"816","20FHB000816",2882,"388","20SGH000388","C10_000388","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_382_CPG2882_388","experimental","C10","2020-10-22","SW",8,19,0,0,0,0,0,NA,4.4,0
+"817","20FHB000817",2883,"1357","20SGH001357","C10_001357","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_383_CPG2883_1357","experimental","C10","2020-10-22","SW",8,18,0,0,0,0,0,NA,NA,NA
+"818","20FHB000818",2884,"2394","20SGH002394","C10_002394","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_384_CPG2884_2394","experimental","C10","2020-10-22","SW",8,17,0,0,0,0,0,NA,2.4,0.2
+"819","20FHB000819",2885,"1491","20SGH001491","C10_001491","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_385_CPG2885_1491","experimental","C10","2020-10-22","SW",8,16,0,0,0,0,0,NA,6.5,0.1
+"820","20FHB000820",2886,"2295","20SGH002295","C10_002295","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_386_CPG2886_2295","experimental","C10","2020-10-22","SW",8,15,0,0,0,0,0,NA,22.8,0.7
+"821","20FHB000821",2887,"1120","20SGH001120","C10_001120","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_387_CPG2887_1120","experimental","C10","2020-10-22","SW",8,14,0,0,0,0,0,NA,4.1,0
+"822","20FHB000822",2888,"3536","20SGH003536","C10_003536","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_388_CPG2888_3536","experimental","C10","2020-10-22","SW",8,13,0,0,0,0,0,NA,3.1,0
+"823","20FHB000823",2889,"3461","20SGH003461","C10_003461","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_389_CPG2889_3461","experimental","C10","2020-10-22","SW",8,12,0,0,0,0,0,NA,7.4,0.2
+"824","20FHB000824",2890,"1439","20SGH001439","C10_001439","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_390_CPG2890_1439","experimental","C10","2020-10-22","SW",8,11,0,0,0,0,0,NA,8.8,0.5
+"825","20FHB000825",2891,"1971","20SGH001971","C10_001971","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_391_CPG2891_1971","experimental","C10","2020-10-22","SW",8,10,0,0,0,0,0,NA,22.6,0
+"826","20FHB000826",2892,"496","20SGH000496","C10_000496","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_392_CPG2892_496","experimental","C10","2020-10-22","SW",8,9,0,0,0,0,0,NA,0.7,0
+"827","20FHB000827",2893,"3310","20SGH003310","C10_003310","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_393_CPG2893_3310","experimental","C10","2020-10-22","SW",8,8,0,0,0,0,0,NA,NA,NA
+"828","20FHB000828",2894,"2620","20SGH002620","C10_002620","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_394_CPG2894_2620","experimental","C10","2020-10-22","SW",8,7,0,0,0,0,0,NA,0,0
+"829","20FHB000829",2895,"2989","20SGH002989","C10_002989","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_395_CPG2895_2989","experimental","C10","2020-10-22","SW",8,6,0,0,0,0,0,NA,13.2,2.8
+"830","20FHB000830",2896,"1059","20SGH001059","C10_001059","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_396_CPG2896_1059","experimental","C10","2020-10-22","SW",8,5,0,0,0,0,0,NA,16,0.5
+"831","20FHB000831",2897,"3920","20SGH003920","C10_003920","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_397_CPG2897_3920","experimental","C10","2020-10-22","SW",8,4,0,0,0,0,0,NA,8.3,0.4
+"832","20FHB000832",2898,"586","20SGH000586","C10_000586","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_398_CPG2898_586","experimental","C10","2020-10-22","SW",8,3,0,0,0,0,0,NA,4.9,0
+"833","20FHB000833",2899,"1440","20SGH001440","C10_001440","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_399_CPG2899_1440","experimental","C10","2020-10-22","SW",8,2,0,0,0,0,0,NA,NA,NA
+"834","20FHB000834",2900,"3280","20SGH003280","C10_003280","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_400_CPG2900_3280","experimental","C10","2020-10-22","SW",8,1,0,0,0,0,0,NA,NA,NA
+"835","20FHB000835",2901,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_401_CPG2901_Roblin","susceptible check","spring wheat","2020-10-22","SW",9,1,0,0,0,0,0,"sw_check",19.2,0.6
+"836","20FHB000836",2902,"2419","20SGH002419","C10_002419","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_402_CPG2902_2419","experimental","C10","2020-10-22","SW",9,2,0,0,0,0,0,NA,6.3,0
+"837","20FHB000837",2903,"2334","20SGH002334","C10_002334","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_403_CPG2903_2334","experimental","C10","2020-10-22","SW",9,3,0,0,0,0,0,NA,NA,NA
+"838","20FHB000838",2904,"2238","20SGH002238","C10_002238","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_404_CPG2904_2238","experimental","C10","2020-10-22","SW",9,4,0,0,0,0,0,NA,14.4,0.4
+"839","20FHB000839",2905,"2156","20SGH002156","C10_002156","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_405_CPG2905_2156","experimental","C10","2020-10-22","SW",9,5,0,0,0,0,0,NA,3.1,0
+"840","20FHB000840",2906,"3851","20SGH003851","C10_003851","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_406_CPG2906_3851","experimental","C10","2020-10-22","SW",9,6,0,0,0,0,0,NA,16.3,0
+"841","20FHB000841",2907,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_407_CPG2907_Overley","susceptible check","winter wheat","2020-10-22","SW",9,7,0,0,0,0,0,"ww_check",60,20.4
+"842","20FHB000842",2908,"790","20SGH000790","C10_000790","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_408_CPG2908_790","experimental","C10","2020-10-22","SW",9,8,0,0,0,0,0,NA,10.8,1.6
+"843","20FHB000843",2909,"2338","20SGH002338","C10_002338","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_409_CPG2909_2338","experimental","C10","2020-10-22","SW",9,9,0,0,0,0,0,NA,15.4,0.1
+"844","20FHB000844",2910,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_410_CPG2910_Roblin","susceptible check","spring wheat","2020-10-22","SW",9,10,0,0,0,0,0,"sw_check",49.1,7.4
+"845","20FHB000845",2911,"33","20SGH000033","C10_000033","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_411_CPG2911_33","experimental","C10","2020-10-22","SW",9,11,0,0,0,0,0,NA,19.7,2
+"846","20FHB000846",2912,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_412_CPG2912_Everest","resistant check","winter wheat","2020-10-22","SW",9,12,0,0,0,0,0,"ww_check",28.5,12.4
+"847","20FHB000847",2913,"2149","20SGH002149","C10_002149","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_413_CPG2913_2149","experimental","C10","2020-10-22","SW",9,13,0,0,0,0,0,NA,1.7,0.2
+"848","20FHB000848",2914,"614","20SGH000614","C10_000614","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_414_CPG2914_614","experimental","C10","2020-10-22","SW",9,14,0,0,0,0,0,NA,6.7,0
+"849","20FHB000849",2915,"3432","20SGH003432","C10_003432","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_415_CPG2915_3432","experimental","C10","2020-10-22","SW",9,15,0,0,0,0,0,NA,NA,NA
+"850","20FHB000850",2916,"519","20SGH000519","C10_000519","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_416_CPG2916_519","experimental","C10","2020-10-22","SW",9,16,0,0,0,0,0,NA,11.3,1
+"851","20FHB000851",2917,"C9-512","19SGH000512","C9_000512","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_417_CPG2917_C9-512","top 1 Inc2 R","C9 replicate","2020-10-22","SW",9,17,0,0,0,0,0,"C9 replicate",NA,NA
+"852","20FHB000852",2918,"3696","20SGH003696","C10_003696","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_418_CPG2918_3696","experimental","C10","2020-10-22","SW",9,18,0,0,0,0,0,NA,NA,NA
+"853","20FHB000853",2919,"500","20SGH000500","C10_000500","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_419_CPG2919_500","experimental","C10","2020-10-22","SW",9,19,0,0,0,0,0,NA,NA,NA
+"854","20FHB000854",2920,"3453","20SGH003453","C10_003453","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_420_CPG2920_3453","experimental","C10","2020-10-22","SW",9,20,0,0,0,0,0,NA,9,0
+"855","20FHB000855",2921,"2137","20SGH002137","C10_002137","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_421_CPG2921_2137","experimental","C10","2020-10-22","SW",9,21,0,0,0,0,0,NA,18.4,0.5
+"856","20FHB000856",2922,"1270","20SGH001270","C10_001270","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_422_CPG2922_1270","experimental","C10","2020-10-22","SW",9,22,0,0,0,0,0,NA,9.3,0.2
+"857","20FHB000857",2923,"1699","20SGH001699","C10_001699","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_423_CPG2923_1699","experimental","C10","2020-10-22","SW",9,23,0,0,0,0,0,NA,12.5,0.5
+"858","20FHB000858",2924,"1666","20SGH001666","C10_001666","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_424_CPG2924_1666","experimental","C10","2020-10-22","SW",9,24,0,0,0,0,0,NA,12.9,0.6
+"859","20FHB000859",2925,"1392","20SGH001392","C10_001392","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_425_CPG2925_1392","experimental","C10","2020-10-22","SW",9,25,0,0,0,0,0,NA,0,0
+"860","20FHB000860",2926,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_426_CPG2926_Overley","susceptible check","winter wheat","2020-10-22","SW",9,26,0,0,0,0,0,"ww_check",92.4,42.5
+"861","20FHB000861",2927,"1477","20SGH001477","C10_001477","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_427_CPG2927_1477","experimental","C10","2020-10-22","SW",9,27,0,0,0,0,0,NA,NA,NA
+"862","20FHB000862",2928,"2856","20SGH002856","C10_002856","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_428_CPG2928_2856","experimental","C10","2020-10-22","SW",9,28,0,0,0,0,0,NA,11.3,10.1
+"863","20FHB000863",2929,"1395","20SGH001395","C10_001395","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_429_CPG2929_1395","experimental","C10","2020-10-22","SW",9,29,0,0,0,0,0,NA,18.9,0
+"864","20FHB000864",2930,"1420","20SGH001420","C10_001420","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_430_CPG2930_1420","experimental","C10","2020-10-22","SW",9,30,0,0,0,0,0,NA,4.8,0
+"865","20FHB000865",2931,"3820","20SGH003820","C10_003820","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_431_CPG2931_3820","experimental","C10","2020-10-22","SW",9,31,0,0,0,0,0,NA,3.8,0
+"866","20FHB000866",2932,"Overley",NA,"Overley","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_432_CPG2932_Overley","susceptible check","winter wheat","2020-10-22","SW",9,32,0,0,0,0,0,"ww_check",41.3,4.9
+"867","20FHB000867",2933,"1320","20SGH001320","C10_001320","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_433_CPG2933_1320","experimental","C10","2020-10-22","SW",9,33,0,0,0,0,0,NA,10.1,0.3
+"868","20FHB000868",2934,"837","20SGH000837","C10_000837","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_434_CPG2934_837","experimental","C10","2020-10-22","SW",9,34,0,0,0,0,0,NA,NA,NA
+"869","20FHB000869",2935,"1360","20SGH001360","C10_001360","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_435_CPG2935_1360","experimental","C10","2020-10-22","SW",9,35,0,0,0,0,0,NA,NA,NA
+"870","20FHB000870",2936,"3091","20SGH003091","C10_003091","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_436_CPG2936_3091","experimental","C10","2020-10-22","SW",9,36,0,0,0,0,0,NA,NA,NA
+"871","20FHB000871",2937,"2227","20SGH002227","C10_002227","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_437_CPG2937_2227","experimental","C10","2020-10-22","SW",9,37,0,0,0,0,0,NA,4.7,0
+"872","20FHB000872",2938,"755","20SGH000755","C10_000755","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_438_CPG2938_755","experimental","C10","2020-10-22","SW",9,38,0,0,0,0,0,NA,3.2,0
+"873","20FHB000873",2939,"C9-932","19SGH00932","C9_000932","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_439_CPG2939_C9-932","top 1 Inc3 R","C9 replicate","2020-10-22","SW",9,39,0,0,0,0,0,"C9 replicate",1,0
+"874","20FHB000874",2940,"1504","20SGH001504","C10_001504","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_440_CPG2940_1504","experimental","C10","2020-10-22","SW",9,40,0,0,0,0,0,NA,2.9,0
+"875","20FHB000875",2941,"710","20SGH000710","C10_000710","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_441_CPG2941_710","experimental","C10","2020-10-22","SW",9,41,0,0,0,0,0,NA,7.2,0.2
+"876","20FHB000876",2942,"Roblin",NA,"Roblin","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_442_CPG2942_Roblin","susceptible check","spring wheat","2020-10-22","SW",9,42,0,0,0,0,0,"sw_check",19.7,0.3
+"877","20FHB000877",2943,"3169","20SGH003169","C10_003169","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_443_CPG2943_3169","experimental","C10","2020-10-22","SW",9,43,0,0,0,0,0,NA,12.1,0.2
+"878","20FHB000878",2944,"3854","20SGH003854","C10_003854","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_444_CPG2944_3854","experimental","C10","2020-10-22","SW",9,44,0,0,0,0,0,NA,11.4,0.5
+"879","20FHB000879",2945,"Everest",NA,"Everest","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_445_CPG2945_Everest","resistant check","winter wheat","2020-10-22","SW",9,45,0,0,0,0,0,"ww_check",NA,NA
+"880","20FHB000880",2946,"3369","20SGH003369","C10_003369","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_446_CPG2946_3369","experimental","C10","2020-10-22","SW",9,46,0,0,0,0,0,NA,NA,NA
+"881","20FHB000881",2947,"Bacup",NA,"Bacup","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_447_CPG2947_Bacup","resistant check","spring wheat","2020-10-22","SW",9,47,0,0,0,0,0,"sw_check",NA,NA
+"882","20FHB000882",2948,"2044","20SGH002044","C10_002044","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_448_CPG2948_2044","experimental","C10","2020-10-22","SW",9,48,0,0,0,0,0,NA,2.8,0
+"883","20FHB000883",2949,"3506","20SGH003506","C10_003506","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_449_CPG2949_3506","experimental","C10","2020-10-22","SW",9,49,0,0,0,0,0,NA,0.4,0
+"884","20FHB000884",2950,"C9-932","19SGH000932","C9_000932","20_OLA_FusariumCycle10Training","F2021_Olathe_FHB_Iwg_450_CPG2950_C9-932","top 1 Inc3 R","C9 replicate","2020-10-22","SW",9,50,0,0,0,0,0,"C9 replicate",2.5,0

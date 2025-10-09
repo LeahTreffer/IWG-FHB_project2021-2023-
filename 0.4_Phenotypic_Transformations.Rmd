@@ -1,0 +1,224 @@
+---
+title: "Phenotypic_Transformations"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r include=FALSE}
+library(ggplot2)
+install.packages("gridExtra")
+library(gridExtra)
+library(stringr)
+library(dplyr)
+library(psych)
+library(tibble)
+library("car")
+install.packages("textshape")
+library(textshape)
+#load in functions
+source('scripts/figure_functions.R')
+source('~/Downloads/rowr/R/rowr.R')
+install.packages("errorist")
+library(errorist)
+```
+
+#Objective
+
+try transforming the data to see if could achieve more normal distribution
+
+# square root[(infection type + 0.25) / 10]
+# severity{arcsine[square root(1-(severity + 0.25) / 100)]}
+# (leaf_rust + 0.0001) / 100
+# 1/sqrt
+
+```{r data}
+#load in phenotype tables
+pheno <- read.csv("/Volumes/Backup_Plus/AM/mySQL/plants.csv", head=TRUE) #read in file with all cycles and years and locations
+#create separate tables for each cycle
+C7 <- pheno[str_detect(pheno$germplasm_id, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$germplasm_id, "C10"),] #keep only data from C10 population
+
+#bind back into one table
+phen <- rbind(C7, C10)
+phen$Cycle = gsub('_.*$', '', phen$germplasm_id) #extract cycle from the taxa name
+phen$Site = gsub('.*_(.*)_.*', '\\1', phen$experiment_id) #extract site from the experiment id
+
+phen$Time = phen$phenotype_year
+phen$Time[phen$Time=="2018"]<-1
+phen$Time[phen$Time=="2019"]<-2
+phen$Time[phen$Time=="2020"]<-3
+phen$Time[phen$Time=="2021"]<-4
+phen$Time[phen$Time=="2022"]<-5
+
+phen$phenotype_value <- as.numeric(phen$phenotype_value) #make column numeric format
+
+PHEN <- phen #make copy of original
+#transformation of phenotype values
+#Done for combined years and individual years
+phen <- PHEN
+
+phen <- PHEN[str_detect(PHEN$phenotype_year, "2021"),] #keep only data from one year (2018,2019,2020,2021,2022)
+
+phen <- phen[str_detect(phen$Site, "OLA"),] #for C10, keep only data from one site (SAL, OLA)
+
+phen<-phen[!(phen$trait_id=="FHBD3G" | phen$trait_id=="FHBD3G:DON"),] #remove in 2020
+
+phen$Trnfm1 <- sqrt((phen$phenotype_value+0.25)/10)
+phen$Trnfm2 <- phen$phenotype_value*(asin(sqrt(1-(phen$phenotype_value+0.25)/100)))
+phen$Trnfm3 <- (phen$phenotype_value+0.0001)/100
+phen$Trnfm4 <- (1/(sqrt(phen$phenotype_value)))
+
+#reformat 
+original <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "phenotype_value", "serpentine")]) #tibble table
+original <- distinct(original, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+original <- original %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+
+Trnfm1 <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "Trnfm1", "serpentine")]) #tibble table
+Trnfm1 <- distinct(Trnfm1, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+Trnfm1 <- Trnfm1 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = Trnfm1
+  )
+
+
+Trnfm2 <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "Trnfm2", "serpentine")]) #tibble table
+Trnfm2 <- distinct(Trnfm2, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+Trnfm2 <- Trnfm2 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = Trnfm2
+  )
+
+
+Trnfm3 <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "Trnfm3", "serpentine")]) #tibble table
+Trnfm3 <- distinct(Trnfm3, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+Trnfm3 <- Trnfm3 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = Trnfm3
+  )
+
+Trnfm4 <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "Trnfm4", "serpentine")]) #tibble table
+Trnfm4 <- distinct(Trnfm4, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+Trnfm4$Trnfm4[Trnfm4$Trnfm4=="Inf"] = NA 
+
+Trnfm4 <- Trnfm4 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = Trnfm4
+  )
+
+
+
+# Normality Test
+#Shapiro-Wilk Test
+#If the p-value of the test is greater than α = .05, then the data is assumed to be normally distributed
+# original, Trnfm1, Trnfm2, Trnfm3
+# FHBDON, FHBD3G, `FHBD3G:DON`, FHBDISIND, FHBSPKINC, PTHT, SPTHT, STMANG, STMCLP, ZDK, GLBLSEV, BLSSEV, HSATIVLSEV, ERGSEV, SPKHD, HDANG, SPKLNG, SDHD, SPKYLD, SPKDEN
+
+#get just columns with trait data
+orgnl <- original[,c(7:ncol(original))]
+tr1 <- Trnfm1[,c(7:ncol(Trnfm1))]
+tr2 <- Trnfm2[,c(7:ncol(Trnfm2))]
+tr3 <- Trnfm3[,c(7:ncol(Trnfm3))]
+tr4 <- Trnfm4[,c(7:ncol(Trnfm4))]
+# adding prefix using the paste function so each transformation of the trait has unique column name
+original_cols <- colnames(orgnl)
+colnames(orgnl) <- paste("Original",original_cols,sep="-")
+original_cols <- colnames(tr1)
+colnames(tr1) <- paste("T1",original_cols,sep="-")
+original_cols <- colnames(tr2)
+colnames(tr2) <- paste("T2",original_cols,sep="-")
+original_cols <- colnames(tr3)
+colnames(tr3) <- paste("T3",original_cols,sep="-")
+original_cols <- colnames(tr4)
+colnames(tr4) <- paste("T4",original_cols,sep="-")
+
+#bind all values for original and transformation into one table
+all <- cbind(orgnl, tr1)
+all <- cbind(all, tr2)
+all <- cbind(all, tr3)
+all <- cbind(all, tr4)
+nama= colnames(all)
+
+#print which tests made data normally distributed
+for (f in nama){
+  h <- shapiro.test(all[[f]])
+  k <- h$p.value
+ 
+  s <- paste0(paste(f), "=Normal")
+
+   if (k > 0.05){
+    print(paste0(s))
+  } 
+}
+
+#Figures
+
+#Quantile-Quantile QQ Plots
+# when all the points fall approximately along this reference line, we can assume normality.
+
+shapiro.test(all$`T4-FHBSPKINC`)
+qqPlot(all$`T3-FHBDISIND`) 
+hist(all$`T2-ZDK`, breaks=40)
+
+bestfits_18 <- merge(Trnfm1[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "FHBDISIND", "FHBSPKINC")], Trnfm3[,c("source_id", "STMANG", "PTHT", "SPTHT")], by="source_id")
+  bestfits_18 <- merge(bestfits_18, Trnfm4[,c("source_id", "SPKDEN", "FHBD3G:DON", "SPKYLD","STMCLP", "ERGSEV", "FHBDON", "HDANG", "FHBD3G")], by="source_id")
+  
+bestfits_19 <- merge(original[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "ERGSEV")], Trnfm1[,c("source_id", "FHBDISIND")], by="source_id")
+  bestfits_19 <- merge(bestfits_19, Trnfm2[,c("source_id", "PTHT", "FHBSPKINC", "BLSSEV", "HDANG")], by="source_id")
+  bestfits_19 <- merge(bestfits_19, Trnfm3[,c("source_id", "ZDK", "SPKYLD")], by="source_id")
+  bestfits_19 <- merge(bestfits_19, Trnfm4[,c("source_id", "FHBDON", "HSATIVLSEV", "SPKDEN", "FHBD3G", "FHBD3G:DON", "GLBLSEV")], by="source_id")
+  
+bestfits_20 <- merge(Trnfm1[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "BLSSEV", "SDHD", "SPKYLD", "HDANG")], Trnfm2[,c("source_id", "PTHT", "SPKHD", "SPKLNG", "FHBSPKINC", "ZDK")], by="source_id")
+  bestfits_20 <- merge(bestfits_20, Trnfm3[,c("source_id","FHBDISIND")], by="source_id")
+  bestfits_20 <- merge(bestfits_20, Trnfm4[,c("source_id","FHBDON", "GLBLSEV", "ERGSEV", "STMANG", "HSATIVLSEV", "SPKDEN")], by="source_id")
+  
+bestfits_21_SAL <- merge(original[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "PTHT", "FHBSPKINC")], Trnfm1[,c("source_id", "FHBDISIND", "BLSSEV", "FHBDON")], by="source_id")
+  bestfits_21_SAL <- merge(bestfits_21_SAL, Trnfm4[,c("source_id", "FHBD3G", "FHBD3G:DON", "GLBLSEV", "HSATIVLSEV", "ZDK")], by="source_id")
+
+bestfits_21_OLA <- merge(Trnfm1[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "FHBD3G", "FHBD3G:DON", "ZDK", "BLSSEV", "HSATIVLSEV")], Trnfm2[,c("source_id", "FHBSPKINC")], by="source_id")
+  bestfits_21_OLA <- merge(bestfits_21_OLA, Trnfm3[,c("source_id", "FHBDISIND", "PTHT")], by="source_id")
+  bestfits_21_OLA <- merge(bestfits_21_OLA, Trnfm3[,c("source_id", "FHBDON")], by="source_id")
+  
+bestfits_22_SAL <- merge(Trnfm1[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "BLSSEV", "ZDK")], Trnfm2[,c("source_id", "PTHT", "FHBSPKINC")], by="source_id")
+  bestfits_22_SAL <- merge(bestfits_22_SAL, Trnfm3[,c("source_id", "FHBDISIND")], by="source_id")
+  bestfits_22_SAL <- merge(bestfits_22_SAL, Trnfm4[,c("source_id", "HSATIVLSEV")], by="source_id")
+  
+bestfits_22_OLA <- merge(Trnfm1[,c("phenotype_year", "source_id", "Cycle", "Site", "Time", "serpentine", "BLSSEV", "HSATIVLSEV")], Trnfm2[,c("source_id", "PTHT", "FHBDISIND", "FHBSPKINC")], by="source_id")
+  bestfits_22_OLA <- merge(bestfits_22_OLA, Trnfm4[,c("source_id", "ZDK")], by="source_id")
+```
+
+```{r}
+write.table(bestfits_18, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C7_2018_SAL_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_19, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C7_2019_SAL_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_20, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C7_2020_SAL_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_21_SAL, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C10_2021_SAL_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_21_OLA, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C10_2021_OLA_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_22_SAL, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C10_2022__SAL_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(bestfits_22_OLA, file = '/Volumes/Backup_Plus/AM/New_GWAS/data/C10_2022_OLA_Pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+```

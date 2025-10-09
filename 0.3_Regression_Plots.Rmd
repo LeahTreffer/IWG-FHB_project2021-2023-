@@ -1,0 +1,584 @@
+---
+title: "Regression_Plots"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Objective
+
+# Make regression plots for:
+# -	C7 Grain yield with Fhb incidence, index, glume blotch (2018, 2019, 2020)
+# -	C7 Plant height DON (2019) and incidence (2018)  
+# -	C7 Maturity with Fhb incidence and index (2019 and 2020, not sure where 2018 data - different trait name than zadok’s??)
+
+# Redoing Aug 2023 to format for the paper (keep only some traits, make into pannel figure)
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r include=FALSE}
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(graphics)
+library(stats)
+library(ggpubr)
+library(janitor)
+library(data.table)
+library(car)
+library(tidyverse)
+library(lmerTest)
+library(knitr)
+library(broom)
+library(AICcmodavg)
+library(gapminder)
+library(cowplot); library(ggpubr)
+source('scripts/model_test_functions.R')
+#install.packages("errorist")
+#library(errorist)
+```
+
+```{r function}
+ggplotRegression <- function (fit) {
+
+require(ggplot2)
+
+ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") +
+  labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                     "Intercept =",signif(fit$coef[[1]],5 ),
+                     " Slope =",signif(fit$coef[[2]], 5),
+                     " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+```
+
+#data
+```{r data}
+data <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide.txt")
+```
+
+#examples to practice
+```{r base_r_example}
+height <- c(176, 154, 138, 196, 132, 176, 181, 169, 150, 175)
+bodymass <- c(82, 49, 53, 112, 47, 69, 77, 71, 62, 78)
+plot(bodymass, height)
+plot(bodymass, height, pch = 16, cex = 1.3, col = "blue", main = "HEIGHT PLOTTED AGAINST BODY MASS", xlab = "BODY MASS (kg)", ylab = "HEIGHT (cm)")
+lm(height ~ bodymass)
+abline(98.0054, 0.9528)
+
+abline(lm(height ~ bodymass))
+
+```
+
+```{r ggplot_example}
+library(ggplot2)
+
+data(iris)
+head(iris)
+fit1 <- lm(Sepal.Length ~ Petal.Width, data = iris)
+summary(fit1)
+plot(Sepal.Length ~ Petal.Width, data = iris)
+abline(fit1)
+
+ggplot(iris, aes(x = Petal.Width, y = Sepal.Length)) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red")
+
+fit1 <- lm(Sepal.Length ~ Petal.Width, data = iris)
+ggplotRegression(fit1)
+#or 
+ggplotRegression(lm(Sepal.Length ~ Petal.Width, data = iris))
+```
+
+# My data
+```{r ggplot_data}
+C07 <- data[str_detect(data$Cycle, "C07"),] #keep only data from C7 population
+C07$logFHBSPKINC <- log(C07$FHBSPKINC)
+C07$logFHBSPKINC[is.na(C07$logFHBSPKINC) | C07$logFHBSPKINC=="-Inf"] = NA
+C07$logFHBDISIND <- log(C07$FHBDISIND)
+C07$logFHBDISIND[is.na(C07$logFHBDISIND) | C07$logFHBDISIND=="-Inf"] = NA
+C07$logGLBLSEV <- log(C07$GLBLSEV)
+C07$logGLBLSEV[is.na(C07$logGLBLSEV) | C07$logGLBLSEV=="-Inf"] = NA
+C07$logFHBDON <- log(C07$FHBDON)
+C07$logFHBDON[is.na(C07$logFHBDON) | C07$logFHBDON=="-Inf"] = NA
+
+C07_2018_SAL <- C07[str_detect(C07$phenotype_year, "2018"),]
+C07_2019_SAL <- C07[str_detect(C07$phenotype_year, "2019"),]
+C07_2020_SAL <- C07[str_detect(C07$phenotype_year, "2020"),]
+```
+
+```{r test}
+
+fit1 <- lm(FHBSPKINC ~ SPKYLD, data = C07_2018_SAL)
+summary(fit1)
+plot(FHBSPKINC ~ SPKYLD, data = C07_2018_SAL)
+abline(fit1)
+
+ggplotRegression <- function (fit) {
+
+require(ggplot2)
+
+ggplot(fit$model, aes_string(x = names(fit$model)[2], y = names(fit$model)[1])) + 
+  geom_point() +
+  stat_smooth(method = "lm", col = "red") +
+  labs(title = paste("Adj R2 = ",signif(summary(fit)$adj.r.squared, 5),
+                     "Intercept =",signif(fit$coef[[1]],5 ),
+                     " Slope =",signif(fit$coef[[2]], 5),
+                     " P =",signif(summary(fit)$coef[2,4], 5)))
+}
+
+ggplotRegression(lm(FHBSPKINC ~ SPKYLD, data = C07_2018_SAL))
+```
+
+```{r grain_yield}
+
+# C7 Grain yield with Fhb incidence, index, glume blotch (2018, 2019, 2020)
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ SPKYLD, data = C07_2018_SAL))
+plot_list$FHBSPKINC = plot
+rm(plot)
+one <- C07_2018_SAL[,c("logFHBSPKINC", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ SPKYLD, data = one))
+plot_list$logFHBSPKINC = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(FHBDISIND ~ SPKYLD, data = C07_2018_SAL))
+plot_list$FHBDISIND = plot
+rm(plot)
+one <- C07_2018_SAL[,c("logFHBDISIND", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDISIND ~ SPKYLD, data = one))
+plot_list$logFHBDISIND = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_SPKYLD_C07_2018_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ SPKYLD, data = C07_2019_SAL))
+plot_list$FHBSPKINC = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logFHBSPKINC", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ SPKYLD, data = one))
+plot_list$logFHBSPKINC = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(FHBDISIND ~ SPKYLD, data = C07_2019_SAL))
+plot_list$FHBDISIND = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logFHBDISIND", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDISIND ~ SPKYLD, data = one))
+plot_list$logFHBDISIND = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(GLBLSEV ~ SPKYLD, data = C07_2019_SAL))
+plot_list$GLBLSEV = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logGLBLSEV", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logGLBLSEV ~ SPKYLD, data = one))
+plot_list$logGLBLSEV = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_SPKYLD_C07_2019_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ SPKYLD, data = C07_2020_SAL))
+plot_list$FHBSPKINC = plot
+rm(plot)
+one <- C07_2020_SAL[,c("logFHBSPKINC", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ SPKYLD, data = one))
+plot_list$logFHBSPKINC = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(FHBDISIND ~ SPKYLD, data = C07_2020_SAL))
+plot_list$FHBDISIND = plot
+rm(plot)
+one <- C07_2020_SAL[,c("logFHBDISIND", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDISIND ~ SPKYLD, data = one))
+plot_list$logFHBDISIND = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(GLBLSEV ~ SPKYLD, data = C07_2020_SAL))
+plot_list$GLBLSEV = plot
+rm(plot)
+one <- C07_2020_SAL[,c("logGLBLSEV", "SPKYLD")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logGLBLSEV ~ SPKYLD, data = one))
+plot_list$logGLBLSEV = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_SPKYLD_C07_2020_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+```
+
+```{r plant_height}
+# -	C7 Plant height DON (2019) and incidence (2018)  
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBDON ~ PTHT, data = C07_2019_SAL))
+plot_list$FHBDON = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logFHBDON", "PTHT")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDON ~ PTHT, data = one))
+plot_list$logFHBDON = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_PTHT_C07_2019_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ PTHT, data = C07_2018_SAL))
+plot_list$GLBLSEV = plot
+rm(plot)
+one <- C07_2018_SAL[,c("logFHBSPKINC", "PTHT")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ PTHT, data = one))
+plot_list$logFHBDON = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_PTHT_C07_2018_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+```
+
+```{r zdk}
+# -	C7 Maturity with Fhb incidence and index (2019 and 2020, not sure where 2018 data - different trait name than zadok’s??)
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ ZDK, data = C07_2019_SAL))
+plot_list$FHBSPKINC = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logFHBSPKINC", "ZDK")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ ZDK, data = one))
+plot_list$logFHBSPKINC = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(FHBDISIND ~ ZDK, data = C07_2019_SAL))
+plot_list$FHBDISIND = plot
+rm(plot)
+one <- C07_2019_SAL[,c("logFHBDISIND", "ZDK")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDISIND ~ ZDK, data = one))
+plot_list$logFHBDISIND = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_ZDK_C07_2019_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+plot_list = list()
+plot <- ggplotRegression(lm(FHBSPKINC ~ ZDK, data = C07_2020_SAL))
+plot_list$FHBSPKINC = plot
+rm(plot)
+one <- C07_2020_SAL[,c("logFHBSPKINC", "ZDK")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBSPKINC ~ ZDK, data = one))
+plot_list$logFHBSPKINC = plot
+rm(plot,one)
+plot <- ggplotRegression(lm(FHBDISIND ~ ZDK, data = C07_2020_SAL))
+plot_list$FHBDISIND = plot
+rm(plot)
+one <- C07_2020_SAL[,c("logFHBDISIND", "ZDK")]
+one <- na.omit(one)
+plot <- ggplotRegression(lm(logFHBDISIND ~ ZDK, data = one))
+plot_list$logFHBDISIND = plot
+rm(plot,one)
+trait_list <- names(plot_list)
+pdf('data/Figures/regression_ZDK_C07_2020_S.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+```
+
+```{r more}
+# Make regression plots for:
+# -	C7 Grain yield with Fhb incidence, index, glume blotch (2018, 2019, 2020)
+# -	C7 Plant height DON (2019) and incidence (2018)  
+# -	C7 Maturity with Fhb incidence and index (2019 and 2020, not sure where 2018 data - different trait name than zadok’s??)
+
+library(ggplot2)
+library(ggpubr)
+C07$phenotype_year <- as.factor(C07$phenotype_year)
+
+plot_list = list()
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$one = p
+rm(p)
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "FHBDISIND",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 5) +
+  stat_regline_equation(label.y = 4.5)
+plot_list$two = p
+rm(p)
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "GLBLSEV",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 30) +
+  stat_regline_equation(label.y = 28)
+plot_list$three = p
+rm(p)
+p <- ggscatter(
+  C07, x = "PTHT", y = "FHBDON",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 30) +
+  stat_regline_equation(label.y = 28)
+plot_list$four = p
+rm(p)
+p <- ggscatter(
+  C07, x = "PTHT", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$five = p
+rm(p)
+p <- ggscatter(
+  C07, x = "ZDK", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$six = p
+rm(p)
+p <- ggscatter(
+  C07, x = "ZDK", y = "FHBDISIND",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 4) +
+  stat_regline_equation(label.y = 3.5)
+plot_list$seven = p
+rm(p)
+
+trait_list <- names(plot_list)
+pdf('data/Figures/regressions.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+```
+
+#re doing !
+
+```{r, for_paper}
+# run My Data chunk to get data table
+
+# Make regression plots for:
+# -	C7 Grain yield with plant height, stem angle, head angle, Fhb incidence, index (2018-2020)
+# -	C7 Plant height FHBDISIND, FHBSPKINC, DON 2018-2020
+
+library(ggplot2)
+library(ggpubr)
+C07$phenotype_year <- as.factor(C07$phenotype_year)
+
+plot_list = list()
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$one = p
+rm(p)
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "FHBDISIND",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 5) +
+  stat_regline_equation(label.y = 4.5)
+plot_list$two = p
+rm(p)
+p <- ggscatter(
+  C07, x = "SPKYLD", y = "GLBLSEV",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 30) +
+  stat_regline_equation(label.y = 28)
+plot_list$three = p
+rm(p)
+p <- ggscatter(
+  C07, x = "PTHT", y = "FHBDON",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 30) +
+  stat_regline_equation(label.y = 28)
+plot_list$four = p
+rm(p)
+p <- ggscatter(
+  C07, x = "PTHT", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$five = p
+rm(p)
+p <- ggscatter(
+  C07, x = "ZDK", y = "FHBSPKINC",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 100) +
+  stat_regline_equation(label.y = 95)
+plot_list$six = p
+rm(p)
+p <- ggscatter(
+  C07, x = "ZDK", y = "FHBDISIND",
+  color = "phenotype_year", palette = "jco",
+  add = "reg.line"
+  ) +
+  facet_wrap(~phenotype_year) +
+  stat_cor(label.y = 4) +
+  stat_regline_equation(label.y = 3.5)
+plot_list$seven = p
+rm(p)
+
+trait_list <- names(plot_list)
+pdf('data/Figures/regressions.pdf')
+for (k in trait_list) {
+print(plot_list[[k]])
+}
+dev.off()
+
+```
+
+# re doing again! 2023/09/11
+
+```{r}
+# run My Data chunk to get data table
+
+# Make paneled regression plots for:
+# -	C7 FHBSPKINC : grain yield, plant height,  (2018-2020)
+# -	C7 FHBDISIND : grain yield, plant height,  (2018-2020)
+
+library(ggplot2)
+library(ggpubr)
+C07$phenotype_year <- as.factor(C07$phenotype_year)
+
+parameter <- par(mfrow=c(1,3)) #set up the plotting space
+fit1 <- lm(FHBSPKINC ~ SPKYLD, data = C07_2018_SAL)
+summary(fit1)
+p1 <- plot(C07_2018_SAL$FHBSPKINC ~ C07_2018_SAL$SPKYLD,
+     main="2018", 
+     xlab="Yield",
+     ylab="FHBSPKINC",
+     )
+p1+abline(fit1)
+fit2 <- lm(FHBSPKINC ~ SPKYLD, data = C07_2019_SAL)
+summary(fit2)
+p2<-plot(C07_2019_SAL$FHBSPKINC ~ C07_2019_SAL$SPKYLD,
+     main="2019", 
+     xlab="Yield",
+     ylab="FHBSPKINC",
+     )
+p2+abline(fit2)
+fit3 <- lm(FHBSPKINC ~ SPKYLD, data = C07_2020_SAL)
+summary(fit3)
+p3 <- plot(C07_2020_SAL$FHBSPKINC ~ C07_2020_SAL$SPKYLD,
+     main="2020", 
+     xlab="Yield",
+     ylab="FHBSPKINC",
+     )
+p3 + abline(fit3)
+
+
+multi <- (p1 + p2 + p3) + 
+  plot_layout(widths = c(3,2,1))
+multi #view multi-panel figure 
+
+multi_plot <- ggarrange(p1,p2,p3, #plots that are going to be included in this multipanel figure
+                       #labels = c("2018", "2019", "2020"), #labels given each panel 
+                       ncol = 3, nrow = 1) #adjust plot space 
+                       #common.legend = T) #does the plot have a common legend
+
+
+parameter <- par(mfrow=c(1,3)) #set up the plotting space
+parameter <- plot(C07_2018_SAL$FHBSPKINC, C07_2018_SAL$PTHT, 
+     #col= C07$plant_id,
+     #pch=16,
+     xlab="FHBSPKINC", #label for x-axis
+     ylab="PTHT", #label for y-axis
+     main="2018") #plot title
+parameter <- plot(C07$FHBSPKINC, C07$PTHT, 
+     #col= C07$plant_id,
+     pch=16,
+     xlab="FHBSPKINC", #label for x-axis
+     ylab="PTHT", #label for y-axis
+     main="2019") #plot title
+parameter <- plot(C07$FHBSPKINC, C07$PTHT, 
+     #col= C07$plant_id,
+     pch=16,
+     xlab="FHBSPKINC", #label for x-axis
+     ylab="PTHT", #label for y-axis
+     main="2020") #plot title
+
+
+
+```

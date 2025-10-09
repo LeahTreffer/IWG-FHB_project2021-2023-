@@ -1,0 +1,122 @@
+---
+title: "GWAS_PVE"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+#Make list and positions of significant SNPs 
+
+#Use expanded position range to download sequences from Phytozome (https://phytozome-next.jgi.doe.gov/jbprivate/index.html?data=genomes%2FTintermediumv3_1&loc=V01%3A504888459..505003458&tracks=Transcripts%2CAlt_Transcripts%2CBlastx_Exonerate%2Cpasa_align_assembly&highlight=)
+
+#Use NCBI nBLAST to identify hits of these sequences to wheat and barley (https://blast.ncbi.nlm.nih.gov/Blast.cgi?PROGRAM=blastn&BLAST_SPEC=GeoBlast&PAGE_TYPE=BlastSearch)
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r packages, include=FALSE}
+library(readr)
+library(readxl)
+library(dplyr)
+library(data.table)
+library(reshape2)
+library(sjmisc)
+source('~/Downloads/rowr/R/rowr.R')
+#install.packages("errorist")
+#library(errorist)
+install.packages("searcher")
+library(searcher)
+```
+
+``` {r data}
+#C07_SAL_2018, C07_SAL_2019, C07_SAL_2020, C10_SAL_2021, C10_SAL_2022, C10_OLA_2021, C10_OLA_2022: 
+Sig_Rslt <- read.csv("output/FarmCPU/C10_OLA_2022/GAPIT.Association.Filter_GWAS_results.csv") # list of SNP hits from each traits
+traits <- Sig_Rslt$traits #make table of traits
+traits <- unique(traits) #make sure trait names are unique  
+```
+
+```{r position_range}
+# Region Example V01:504888459..505003458 
+Sig_Rslt$LPos <- Sig_Rslt$Pos - 100
+Sig_Rslt$HPos <- Sig_Rslt$Pos + 100
+
+Sig_Rslt$Phytozome <- paste(Sig_Rslt$Chr,":",Sig_Rslt$LPos,"..",Sig_Rslt$HPos)
+```
+
+In Phytozome: 
+Add Reference Sequence Track
+Copy position from Sig_Rslt$Phytozome
+Reference Sequence > Save track data>Save
+  This saves to downloads, move to NCBInBLAST///Sequences 
+
+As I go through the Sig_Rslt$Phytozome list, I add the gene Id for any of the markers that how a gene transcript in that region according to the reference sequence:
+```{r IWG_gene}
+Sig_Rslt$T.inter_Genes <- c("NA","NA","NA","NA","NA")
+
+Sig_Rslt$T.inter_Description <- c("NA","NA","NA","NA","NA")
+```
+In NCBI BLAST:
+Enter Query Sequence>Choose File
+Choose Search Set>Add organism 
+  SPECIES:                              ORGANISM:             TAXID:
+  Triticum aestivum                     wheat                 4565
+  Triticum dicoccoides                  wild emmer            85692
+  Triticum tuurgidum subsp. durum       durum                 4567
+  Hordeum vulgare subsp. vlugare        domesticated barley   112509
+  Hordeum vulgare                       barley                4513
+  Hordeuum vulgare subsp. spontaneum    wild barley           77009
+  Thinopyrum elongatum                  wheatgrass            4588
+Program Selection>Optimize for: Highly similar sequences (megablast) (can change to More dissimilar sequences (discontinuous megablast) if not hits)
+BLAST + show results in new window
+Ignore results if Query Cover < 70%
+If Query Cover >70% then: Download>Description Table (CSV)
+  This saves to downloads, move to NCBInBLAST///Alignment_Descriptions directory
+```{r BLAST}
+Sig_Rslt$NCBI_Description <- c("NA","NA","receptor kinase-like protien","NA","NA")
+
+Sig_Rslt$NCBI_Species <- c("NA","NA","T.aestivum","NA","NA")
+
+Sig_Rslt$Query <- c("NA","NA","100%","NA","NA")
+
+Sig_Rslt$Per.Ident <- c("NA","NA","97.01%","NA","NA")
+```
+
+```{r save}
+# save output table
+write.table(Sig_Rslt, "NCBInBLAST/C10_O_2022/marker_table.txt")
+```
+
+```{r combine_tables}
+C07_S_2018 <- read.table('NCBInBLAST/C07_S_2018/marker_table.txt')
+C07_S_2018$Plot <- "C07_SAL_2018"
+C07_S_2019 <- read.table('NCBInBLAST/C07_S_2019/marker_table.txt')
+C07_S_2019$Plot <- "C07_SAL_2019"
+C07_S_2020 <- read.table('NCBInBLAST/C07_S_2020/marker_table.txt')
+C07_S_2020$Plot <- "C07_SAL_2020"
+C10_S_2021 <- read.table('NCBInBLAST/C10_S_2021/marker_table.txt')
+C10_S_2021$Plot <- "C10_SAL_2021"
+C10_S_2022 <- read.table('NCBInBLAST/C10_S_2022/marker_table.txt')
+C10_S_2022$Plot <- "C10_SAL_2022"
+C10_O_2021 <- read.table('NCBInBLAST/C10_O_2021/marker_table.txt')
+C10_O_2021$Plot <- "C10_OLA_2021"
+C10_O_2022 <- read.table('NCBInBLAST/C10_O_2022/marker_table.txt')
+C10_O_2022$Plot <- "C10_OLA_2022"
+
+Full_Table <- rbind(C07_S_2018,C07_S_2019,C07_S_2020,C10_O_2021,C10_O_2022,C10_S_2021,C10_S_2022)
+Full_Table <- Full_Table[,c(1,2,3,6,16,4,5,7:15)]
+
+write.csv(Full_Table, 'data/Final_Files/Blast_Results.csv', row.names = FALSE)
+```
+

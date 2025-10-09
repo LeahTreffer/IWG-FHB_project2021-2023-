@@ -1,0 +1,111 @@
+---
+title: "1.0 Retrieve Data"
+author: "Jared Crain"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+#Objective
+
+Retrieve data for the 17_SAL_FusariumCycle7Training experiment.  Phenotypic, plant information, and germplasm data was retrieved from the database and organized for phenotypic analysis.  The phenotypic analysis will be used to generate GS models to predict FHB.
+
+```{r setup, eval=TRUE}
+knitr::opts_knit$set(root.dir = '/Users/jcrain/Documents/IWG_ANALYSIS/IWG_PHENOTYPIC_ANALYSIS/17_SAL_Fusarium/')
+setwd('/Users/jcrain/Documents/IWG_ANALYSIS/IWG_PHENOTYPIC_ANALYSIS/17_SAL_Fusarium/')
+options(digits = 10) #set options to include lots of digits
+#Git directory
+#ssh://git@gitlab-ssh.beocat.ksu.edu:2220/jcrain/17_SAL_Fusarium.git
+#https://gitlab.beocat.ksu.edu/jcrain/17_SAL_Fusarium.git
+```
+
+```{r get_functions}
+source('./scripts/Functions.r') #source functions
+```
+
+#Retrieve Data
+```{r retrieve_data, eval=FALSE}
+log_detail <- getLoginDetails() #fill in username and password in popup box
+
+require(RMySQL) #load required packages may need to install.packages("RMySQL") dependicies are DBI packaage as well
+
+#Make a MySQL connection to beocat and intermediate_wheatgrass database
+iwg <- dbConnect(MySQL(),user = log_detail[1], dbname = 'intermediate_wheatgrass', host = 'beocat.cis.ksu.edu', password = log_detail[2], port = 6306) #run this line to connect to the database
+
+plant_query <- 'SELECT plant.* FROM plant WHERE plant.experiment_id = "17_SAL_FusariumCycle7Training"'
+
+plant <- dbGetQuery(iwg, plant_query)
+
+#get phenotype data
+phen_query <- 'SELECT phenotype.* FROM phenotype WHERE phenotype.entity_id in (SELECT plant.plant_id FROM plant WHERE plant.experiment_id = "17_SAL_FusariumCycle7Training")'
+
+phen <- dbGetQuery(iwg, phen_query)
+
+#get germplasm information
+germ_query <- 'SELECT germplasm.* FROM germplasm' #just download entire table
+
+germ <- dbGetQuery(iwg, germ_query)
+
+dbDisconnect(iwg) #disconnect from database
+
+#write out original queried data
+write.table(plant, file = './data/Original_Data/FHB_Plant.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(phen, file = './data/Original_Data/FHB_Phenotype_2018.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(germ, file = './data/Original_Data/Germplams_Information.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+#clean up
+rm(iwg, log_detail, phen, phen_query, plant, plant_query, germ_query, germ)
+
+```
+
+#Format data
+
+Remove unneeded column, format data to analyze with ASREML.
+
+```{r format_data}
+germ <- read.delim(file = './data/Original_Data/Germplams_Information.txt', header = TRUE, stringsAsFactors = FALSE) #load germplasm information
+
+germ$male_parent <- ifelse(is.na(germ$male_parent), germ$genetic_male_parent, germ$male_parent) #if male parent is NA replace with genetic male parent
+
+#load plant data
+plant <- read.delim(file = './data/Original_Data/FHB_Plant.txt', header = TRUE, stringsAsFactors = FALSE) #laod plant data
+
+#get selection to prune pedigree file
+selections <- unique(plant$germplasm_id) #get all unique germplasm_id
+
+pedigree <- prune_pedigree(selections, germ) #prune the pedigree file to just the germplasm needed to set up the model.
+
+pedigree <- pedigree[, c()] #select only germplasm_id, male and female file to make peidgree matrix
+
+write.table(pedigree, file = './data/Intermediate_File/FHB_Pedigree.txt', sep = '\t', quote = FALSE, row.names =FALSE)
+
+#join plant and phenotype information for analysis
+phen <- read.table(file = './data/Original_Data/FHB_Phenotype_2018.txt', header = TRUE, stringsAsFactors = FALSE) #load phenotype data
+
+#remove unneeded columns
+phen <- phen[, c()] #keep entity_id, trait_id, and phenotype_value
+
+colnames(phen)[1] <- 'plant_id' #rename entity_id to phenotype_id
+
+#select columns of plant
+plant <- plant[, c()]
+
+#merge with phenotype_data
+fhb <- merge(plant, phen, by = 'plant_id') #makes wide format for each trait with trial information
+
+#save file
+write.table(fhb, file = './data/Intermediate_File/FHB_Data.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+#clean up
+rm(germ, plant, selections, pedigree, phen, fhb)
+
+```
+
+#Get Genotypic Data?
+
+
+#Session Information
+
+```{r sessionInformation}
+sessionInfo()
+```

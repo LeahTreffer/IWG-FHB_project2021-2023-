@@ -1,0 +1,672 @@
+---
+title: "Phenotypic_Distribution"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#Objective: Create Histograms of Disease Traits for Annual Wheat Checks
+#Visually compare high levels of disease severity in wheat to relativly lower levels in IWG
+
+# A redo is done later in script
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r include=FALSE}
+library(ggplot2)
+install.packages("gridExtra")
+library(gridExtra)
+library(stringr)
+library(dplyr)
+library(psych)
+library(tibble)
+library(tidyr)
+library("car")
+install.packages("textshape")
+library(textshape)
+library(openxlsx)
+library(readxl)
+library(magrittr)
+library(shiny)
+library(rstatix)
+#load in functions
+source('scripts/figure_functions.R')
+source('scripts/paste_na.R')
+source('~/Downloads/rowr/R/rowr.R')
+```
+
+#data
+
+```{r}
+#load in phenotype tables
+pheno_all <- read.csv('data/Original_Files/plants.csv')
+pheno_all$Site <- gsub("_Fusarium.*", "", pheno_all$experiment_id) #Remove characters after first allele
+pheno_all$Site <- gsub(".*_","",pheno_all$Site) #Remove all before and up to "/"
+
+pheno <- read.csv('data/Original_Files/plants.csv')
+pheno$Site <- gsub("_Fusarium.*", "", pheno$experiment_id) #Remove characters after first allele
+pheno$Site <- gsub(".*_","",pheno$Site) #Remove all before and up to "/"
+
+# Remove plant_ID 17FHB000233
+pheno <- pheno[!str_detect(pheno$plant_id, "17FHB000233"),]
+pheno <- pheno[!str_detect(pheno$plant_id, "20FHB000009"),]
+pheno <- pheno[!str_detect(pheno$plant_id, "20FHB000385"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "Volunteer"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "volunteer"),]
+pheno <- pheno[!str_detect(pheno$notes, "barley"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C8"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C9"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C11"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "np"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "no_plant"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "No Plant"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "Looks like IWG"),]
+
+pheno$entry <- pheno$notes
+pheno$entry <- ifelse(pheno$notes == "ww_check", "Wheat", pheno$notes)
+pheno$entry <- ifelse(pheno$entry == "sw_check", "Wheat", pheno$entry)
+pheno$entry <- ifelse(pheno$entry == "iwg_check", "IWG", pheno$entry)
+pheno$entry <- ifelse(grepl("C10",pheno$entry), "IWG", 
+                      ifelse(grepl("C7", pheno$entry), "IWG", pheno$entry))
+pheno$entry <- ifelse(grepl("winter wheat",pheno$entry), "Wheat", 
+                      ifelse(grepl("spring wheat", pheno$entry), "Wheat", pheno$entry))
+pheno$entry[grepl("Original",pheno$entry)]<-"IWG"
+
+rownames(pheno) <- NULL
+pheno <- pheno[rowSums(is.na(pheno)) != ncol(pheno), ]
+
+#create separate tables for each cycle, year, location
+#Checks 
+overley <- pheno[str_detect(pheno$germplasm_id, "Overley"),] #
+bacup <- pheno[str_detect(pheno$germplasm_id, "Bacup"),] #
+roblin <- pheno[str_detect(pheno$germplasm_id, "Roblin"),] #
+everest <- pheno[str_detect(pheno$germplasm_id, "Everest"),] #
+checks <- pheno_all[str_detect(pheno_all$notes, "w_check"),] #
+rownames(checks) <- NULL
+#Year
+overley_2018 <- overley[str_detect(overley$phenotype_year, "2018"),]
+overley_2019 <- overley[str_detect(overley$phenotype_year, "2019"),]
+overley_2020 <- overley[str_detect(overley$phenotype_year, "2020"),]
+overley_2021 <- overley[str_detect(overley$phenotype_year, "2021"),]
+overley_2022 <- overley[str_detect(overley$phenotype_year, "2022"),]
+
+bacup_2018 <- bacup[str_detect(bacup$phenotype_year, "2018"),]
+bacup_2019 <- bacup[str_detect(bacup$phenotype_year, "2019"),]
+bacup_2020 <- bacup[str_detect(bacup$phenotype_year, "2020"),]
+bacup_2021 <- bacup[str_detect(bacup$phenotype_year, "2021"),]
+bacup_2022 <- bacup[str_detect(bacup$phenotype_year, "2022"),]
+
+roblin_2018 <- roblin[str_detect(roblin$phenotype_year, "2018"),]
+roblin_2019 <- roblin[str_detect(roblin$phenotype_year, "2019"),]
+roblin_2020 <- roblin[str_detect(roblin$phenotype_year, "2020"),]
+roblin_2021 <- roblin[str_detect(roblin$phenotype_year, "2021"),]
+roblin_2022 <- roblin[str_detect(roblin$phenotype_year, "2022"),]
+
+everest_2018 <- everest[str_detect(everest$phenotype_year, "2018"),]
+everest_2019 <- everest[str_detect(everest$phenotype_year, "2019"),]
+everest_2020 <- everest[str_detect(everest$phenotype_year, "2020"),]
+everest_2021 <- everest[str_detect(everest$phenotype_year, "2021"),]
+everest_2022 <- everest[str_detect(everest$phenotype_year, "2022"),]
+
+checks_2018 <- checks[str_detect(checks$phenotype_year, "2018"),]
+checks_2019 <- checks[str_detect(checks$phenotype_year, "2019"),]
+checks_2020 <- checks[str_detect(checks$phenotype_year, "2020"),]
+checks_2021 <- checks[str_detect(checks$phenotype_year, "2021"),]
+checks_2021 <- checks_2021[rowSums(is.na(checks_2021)) != ncol(checks_2021), ]
+checks_2022 <- checks[str_detect(checks$phenotype_year, "2022"),]
+checks_2022 <- checks_2022[rowSums(is.na(checks_2022)) != ncol(checks_2022), ]
+
+#Location
+overley_2018_S <- overley_2018[str_detect(overley_2018$Site, "SAL"),] #Salina
+overley_2019_S <- overley_2019[str_detect(overley_2019$Site, "SAL"),] #Salina
+overley_2020_S <- overley_2020[str_detect(overley_2020$Site, "SAL"),] #Salina
+overley_2021_O <- overley_2021[str_detect(overley_2021$Site, "OLA"),] #Olathe
+overley_2021_S <- overley_2021[str_detect(overley_2021$Site, "SAL"),] #Salina
+overley_2022_O <- overley_2022[str_detect(overley_2022$Site, "OLA"),] #Olathe
+overley_2022_S <- overley_2022[str_detect(overley_2022$Site, "SAL"),] #Salina
+
+bacup_2018_S <- bacup_2018[str_detect(bacup_2018$Site, "SAL"),] #Salina
+bacup_2019_S <- bacup_2019[str_detect(bacup_2019$Site, "SAL"),] #Salina
+bacup_2020_S <- bacup_2020[str_detect(bacup_2020$Site, "SAL"),] #Salina
+bacup_2021_O <- bacup_2021[str_detect(bacup_2021$Site, "OLA"),] #Olathe
+bacup_2021_S <- bacup_2021[str_detect(bacup_2021$Site, "SAL"),] #Salina
+bacup_2022_O <- bacup_2022[str_detect(bacup_2022$Site, "OLA"),] #Olathe
+bacup_2022_S <- bacup_2022[str_detect(bacup_2022$Site, "SAL"),] #Salina
+
+roblin_2018_S <- roblin_2018[str_detect(roblin_2018$Site, "SAL"),] #Salina
+roblin_2019_S <- roblin_2019[str_detect(roblin_2019$Site, "SAL"),] #Salina
+roblin_2020_S <- roblin_2020[str_detect(roblin_2020$Site, "SAL"),] #Salina
+roblin_2021_O <- roblin_2021[str_detect(roblin_2021$Site, "OLA"),] #Olathe
+roblin_2021_S <- roblin_2021[str_detect(roblin_2021$Site, "SAL"),] #Salina
+roblin_2022_O <- roblin_2022[str_detect(roblin_2022$Site, "OLA"),] #Olathe
+roblin_2022_S <- roblin_2022[str_detect(roblin_2022$Site, "SAL"),] #Salina
+
+everest_2018_S <- everest_2018[str_detect(everest_2018$Site, "SAL"),] #Salina
+everest_2019_S <- everest_2019[str_detect(everest_2019$Site, "SAL"),] #Salina
+everest_2020_S <- everest_2020[str_detect(everest_2020$Site, "SAL"),] #Salina
+everest_2021_O <- everest_2021[str_detect(everest_2021$Site, "OLA"),] #Olathe
+everest_2021_S <- everest_2021[str_detect(everest_2021$Site, "SAL"),] #Salina
+everest_2022_O <- everest_2022[str_detect(everest_2022$Site, "OLA"),] #Olathe
+everest_2022_S <- everest_2022[str_detect(everest_2022$Site, "SAL"),] #Salina
+
+checks_2018_S <- checks_2018[str_detect(checks_2018$Site, "SAL"),] #Salina
+checks_2019_S <- checks_2019[str_detect(checks_2019$Site, "SAL"),] #Salina
+checks_2020_S <- checks_2020[str_detect(checks_2020$Site, "SAL"),] #Salina
+checks_2021_O <- checks_2021[str_detect(checks_2021$Site, "OLA"),] #Olathe
+checks_2021_S <- checks_2021[str_detect(checks_2021$Site, "SAL"),] #Salina
+checks_2022_O <- checks_2022[str_detect(checks_2022$Site, "OLA"),] #Olathe
+checks_2022_S <- checks_2022[str_detect(checks_2022$Site, "SAL"),] #Salina
+
+checks_2018_S$entry <- "Wheat"
+checks_2019_S$entry <- "Wheat"
+checks_2020_S$entry <- "Wheat"
+checks_2021_O$entry <- "Wheat"
+checks_2021_S$entry <- "Wheat"
+checks_2022_O$entry <- "Wheat"
+checks_2022_S$entry <- "Wheat"
+
+checks_2018_S[checks_2018_S == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2019_S[checks_2019_S == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2020_S[checks_2020_S == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2021_S[checks_2021_S == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2021_O[checks_2021_O == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2022_S[checks_2022_S == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+checks_2022_O[checks_2022_O == "FHBD3G:DON"] <- "FHBD3G.DON" #replace
+
+
+
+#Pheno
+#Year
+Y2018 <- pheno[str_detect(pheno$phenotype_year, "2018"),]
+Y2019 <- pheno[str_detect(pheno$phenotype_year, "2019"),]
+Y2020 <- pheno[str_detect(pheno$phenotype_year, "2020"),]
+Y2021 <- pheno[str_detect(pheno$phenotype_year, "2021"),]
+Y2022 <- pheno[str_detect(pheno$phenotype_year, "2022"),]
+#Location
+Y2018_S <- Y2018[str_detect(Y2018$Site, "SAL"),] #Salina
+Y2019_S <- Y2019[str_detect(Y2019$Site, "SAL"),] #Salina
+Y2020_S <- Y2020[str_detect(Y2020$Site, "SAL"),] #Salina
+Y2021_S <- Y2021[str_detect(Y2021$Site, "SAL"),]
+Y2022_S <- Y2022[str_detect(Y2022$Site, "SAL"),]
+Y2021_O <- Y2021[str_detect(Y2021$Site, "OLA"),]
+Y2022_O <- Y2022[str_detect(Y2022$Site, "OLA"),]
+
+#CleanIWGpheno
+iwgpheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt')
+#iwgpheno <- read.csv('data/Original_Files/plants.csv')
+#iwgpheno$Site <- gsub("_Fusarium.*", "", iwgpheno$experiment_id) #Remove characters after
+#iwgpheno$Site <- gsub(".*_","",iwgpheno$Site) #Remove all before and up to "_"
+#iwgpheno$entry <- "IWG"
+iwgpheno$entry <- "IWG"
+
+#Cycle 
+C7 <- iwgpheno[str_detect(iwgpheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- iwgpheno[str_detect(iwgpheno$Cycle, "C10"),] #keep only data from C7
+#C7 <- iwgpheno[str_detect(iwgpheno$germplasm_id, "C7"),] #keep only data from C7 population
+#C10 <- iwgpheno[str_detect(iwgpheno$germplasm_id, "C10"),] #keep only data from C7 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),]
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),]
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),]
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),]
+
+# IWG with Wheat
+N2018_S <- rbind(C7_2018_S, Y2018_S)
+N2019_S <- rbind(C7_2019_S, Y2019_S)
+N2020_S <- rbind(C7_2020_S, Y2020_S)
+N2021_S <- rbind(C10_2021_S, Y2021_S)
+N2021_O <- rbind(C10_2021_O, Y2021_O)
+N2022_S <- rbind(C10_2022_S, Y2022_S)
+N2022_O <- rbind(C10_2022_O, Y2022_O)
+
+#IWG with Wheat t2
+checks_2018_S <- checks_2018_S[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2019_S <- checks_2019_S[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2020_S <- checks_2020_S[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2021_S <- checks_2021_S[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2021_O <- checks_2021_O[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2022_S <- checks_2022_S[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+checks_2022_O <- checks_2022_O[,c("phenotype_year", "germplasm_id", "Site", "trait_id", "phenotype_value", "entry")]
+colnames(checks_2018_S)[2] <- "plant_id"
+colnames(checks_2019_S)[2] <- "plant_id"
+colnames(checks_2020_S)[2] <- "plant_id"
+colnames(checks_2021_S)[2] <- "plant_id"
+colnames(checks_2021_O)[2] <- "plant_id"
+colnames(checks_2022_S)[2] <- "plant_id"
+colnames(checks_2022_O)[2] <- "plant_id"
+
+C7_2018_S <- C7_2018_S[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C7_2019_S <- C7_2019_S[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C7_2020_S <- C7_2020_S[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C10_2021_S <- C10_2021_S[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C10_2022_S <- C10_2022_S[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C10_2021_O <- C10_2021_O[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+C10_2022_O <- C10_2022_O[,c("phenotype_year", "plant_id", "Site", "trait_id", "phenotype_value", "entry")]
+
+N2018_S <- rbind(C7_2018_S, checks_2018_S)
+N2019_S <- rbind(C7_2019_S, checks_2019_S)
+N2020_S <- rbind(C7_2020_S, checks_2020_S)
+N2021_S <- rbind(C10_2021_S, checks_2021_S)
+N2021_O <- rbind(C10_2021_O, checks_2021_O)
+N2022_S <- rbind(C10_2022_S, checks_2022_S)
+N2022_O <- rbind(C10_2022_O, checks_2022_O)
+
+
+
+```
+
+#Histograms
+
+```{r histograms}
+#change for each table
+  #overley_2018_S, overley_2019_S, overley_2020_S, overley_2021_S, overley_2021_O, overley_2022_S,  overley_2022_O
+  #bacup_2018_S, bacup_2019_S, bacup_2020_S, bacup_2021_S, bacup_2021_O, bacup_2022_S,  bacup_2022_O
+  #roblin_2018_S, roblin_2019_S, roblin_2020_S, roblin_2021_S, roblin_2021_O, roblin_2022_S,  roblin_2022_O
+  #everest_2018_S, everest_2019_S, everest_2020_S, everest_2021_S, everest_2021_O, everest_2022_S,  everest_2022_O
+
+  #checks_2018_S, checks_2019_S, checks_2020_S, checks_2021_S, checks_2021_O, checks_2022_S,  checks_2022_O
+
+
+#reformat for Histogram 
+test <- as_tibble(Y2018_S[c("plant_id", "trait_id", "phenotype_value", "entry")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove columns with no data
+empty_columns <- colSums(is.na(test) | test == "") == nrow(test)
+test <- test[, !empty_columns]
+
+#input for functions
+phen <- test[,c(2:ncol(test))] #make pheno table for input into histogram function 
+list <- colnames(phen) #make list of traits for input into histogram function 
+
+#Histogram
+pdf("data/Figures/Wheat_Checks/checks_2018_S_Histograms.pdf", width=5, height=3.5)
+Histogram(list, phen)
+dev.off()
+
+#Histogram + Kernel Density
+path = "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures/Wheat_Checks/checks_2021_O_Histograms+KernelDensity.pdf" #path to save file
+Histogram_Kernel_Density(path, list, phen)
+
+rm(test,empty_columns,phen,list,path)
+
+```
+
+# Overlapped Histograms
+
+```{r}
+# N2018_S, N2019_S, N2020_S, N2021_S, N2021_O, N2022_S, N2022_O
+
+#reformat for Histogram 
+test <- as_tibble(N2022_S[c("plant_id", "trait_id", "phenotype_value", "entry")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove columns with no data
+empty_columns <- colSums(is.na(test) | test == "") == nrow(test)
+test <- test[, !empty_columns]
+
+#input for functions
+test <- as.data.frame(test)
+phen <- test[,c(2:ncol(test))] #make pheno table for input into histogram function 
+
+list <- colnames(phen[,c(2:ncol(phen))]) #make list of traits for input into histogram function 
+list <- c('FHBDON', 'FHBZEA', 'FHBDISIND', 'FHBSPKINC', 'BLSSEV', 'HSATIVLSEV') #alternativly, just use FHB traits that wheat checks have data for; 'FHBDON', 'FHBD3G', 'FHBD3G.DON', 'FHBZEA', 'FHBDISIND', 'FHBSPKINC', 'BLSSEV', 'GLBLSEV', 'HSATIVLSEV'
+
+
+#Histogram
+path = "data/Figures/Wheat_Checks/2022_S_Histograms.pdf"
+HistogramOverlap(path, list, phen)
+
+rm(test,empty_columns,phen,list)
+
+```
+
+# Re-doing Aug 6, 2023
+# original hisograms showed Roblin had higher FHB than Bacup, but that Bacup had higher DON than Roblin. Overly and Everest were not included. 
+# Need to find a year with all four checks present
+
+# taking parts from 0.2_Phenotypic_Distribution.Rmd that were used to create histogram with lines showing wheat check averages
+
+```{r}
+
+# IWG 
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C7 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$Cycle, "C10"),] #keep only data from C7 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),]
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),]
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),]
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),]
+
+#reformat for Histogram # change input every time
+test <- as_tibble(C7_2019_S[c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove columns with no data
+empty_columns <- colSums(is.na(test) | test == "") == nrow(test)
+test <- test[, !empty_columns]
+
+phen <- test[,c("plant_id", "FHBDON", "FHBDISIND", "GLBLSEV", "BLSSEV", "HSATIVLSEV")]
+colnames(phen)[2] <- "DON (ppm)"
+colnames(phen)[3] <- "FHB DISEASE INDEX"
+colnames(phen)[4] <- "GLUME BLOTCH SEVERITY"
+colnames(phen)[5] <- "BACTERIAL LEAF STREAK SEVERITY"
+colnames(phen)[6] <- "SPOT BLOTCH SEVERITY"
+
+long <- gather(phen, trait, value, `DON (ppm)`:`SPOT BLOTCH SEVERITY`, factor_key=TRUE)
+long20 <- gather(phen, trait, value, `DON (ppm)`:`SPOT BLOTCH SEVERITY`, factor_key=TRUE)
+long21 <- gather(phen, trait, value, `DON (ppm)`:`SPOT BLOTCH SEVERITY`, factor_key=TRUE)
+
+
+# wheat checks
+phenow <- read.csv('data/Original_Files/plants.csv')
+phenow$Site <- gsub("_Fusarium.*", "", phenow$experiment_id) #Remove characters after first allele
+phenow$Site <- gsub(".*_","",phenow$Site) #Remove all before and up to "/"
+
+overley <- phenow[str_detect(phenow$germplasm_id, "Overley"),] #
+bacup <- phenow[str_detect(phenow$germplasm_id, "Bacup"),] #
+roblin <- phenow[str_detect(phenow$germplasm_id, "Roblin"),] #
+everest <- phenow[str_detect(phenow$germplasm_id, "Everest"),] #
+
+#Year
+overley_2018 <- overley[str_detect(overley$phenotype_year, "2018"),]
+overley_2019 <- overley[str_detect(overley$phenotype_year, "2019"),]
+overley_2020 <- overley[str_detect(overley$phenotype_year, "2020"),]
+overley_2021 <- overley[str_detect(overley$phenotype_year, "2021"),]
+overley_2022 <- overley[str_detect(overley$phenotype_year, "2022"),]
+
+bacup_2018 <- bacup[str_detect(bacup$phenotype_year, "2018"),]
+bacup_2019 <- bacup[str_detect(bacup$phenotype_year, "2019"),]
+bacup_2020 <- bacup[str_detect(bacup$phenotype_year, "2020"),]
+bacup_2021 <- bacup[str_detect(bacup$phenotype_year, "2021"),]
+bacup_2022 <- bacup[str_detect(bacup$phenotype_year, "2022"),]
+
+roblin_2018 <- roblin[str_detect(roblin$phenotype_year, "2018"),]
+roblin_2019 <- roblin[str_detect(roblin$phenotype_year, "2019"),]
+roblin_2020 <- roblin[str_detect(roblin$phenotype_year, "2020"),]
+roblin_2021 <- roblin[str_detect(roblin$phenotype_year, "2021"),]
+roblin_2022 <- roblin[str_detect(roblin$phenotype_year, "2022"),]
+
+everest_2018 <- everest[str_detect(everest$phenotype_year, "2018"),]
+everest_2019 <- everest[str_detect(everest$phenotype_year, "2019"),]
+everest_2020 <- everest[str_detect(everest$phenotype_year, "2020"),]
+everest_2021 <- everest[str_detect(everest$phenotype_year, "2021"),]
+everest_2022 <- everest[str_detect(everest$phenotype_year, "2022"),]
+
+#Location
+overley_2018_S <- overley_2018[str_detect(overley_2018$Site, "SAL"),] #Salina
+overley_2019_S <- overley_2019[str_detect(overley_2019$Site, "SAL"),] #Salina
+overley_2020_S <- overley_2020[str_detect(overley_2020$Site, "SAL"),] #Salina
+overley_2021_O <- overley_2021[str_detect(overley_2021$Site, "OLA"),] #Olathe
+overley_2021_S <- overley_2021[str_detect(overley_2021$Site, "SAL"),] #Salina
+overley_2022_O <- overley_2022[str_detect(overley_2022$Site, "OLA"),] #Olathe
+overley_2022_S <- overley_2022[str_detect(overley_2022$Site, "SAL"),] #Salina
+
+bacup_2018_S <- bacup_2018[str_detect(bacup_2018$Site, "SAL"),] #Salina
+bacup_2019_S <- bacup_2019[str_detect(bacup_2019$Site, "SAL"),] #Salina
+bacup_2020_S <- bacup_2020[str_detect(bacup_2020$Site, "SAL"),] #Salina
+bacup_2021_O <- bacup_2021[str_detect(bacup_2021$Site, "OLA"),] #Olathe
+bacup_2021_S <- bacup_2021[str_detect(bacup_2021$Site, "SAL"),] #Salina
+bacup_2022_O <- bacup_2022[str_detect(bacup_2022$Site, "OLA"),] #Olathe
+bacup_2022_S <- bacup_2022[str_detect(bacup_2022$Site, "SAL"),] #Salina
+
+roblin_2018_S <- roblin_2018[str_detect(roblin_2018$Site, "SAL"),] #Salina
+roblin_2019_S <- roblin_2019[str_detect(roblin_2019$Site, "SAL"),] #Salina
+roblin_2020_S <- roblin_2020[str_detect(roblin_2020$Site, "SAL"),] #Salina
+roblin_2021_O <- roblin_2021[str_detect(roblin_2021$Site, "OLA"),] #Olathe
+roblin_2021_S <- roblin_2021[str_detect(roblin_2021$Site, "SAL"),] #Salina
+roblin_2022_O <- roblin_2022[str_detect(roblin_2022$Site, "OLA"),] #Olathe
+roblin_2022_S <- roblin_2022[str_detect(roblin_2022$Site, "SAL"),] #Salina
+
+everest_2018_S <- everest_2018[str_detect(everest_2018$Site, "SAL"),] #Salina
+everest_2019_S <- everest_2019[str_detect(everest_2019$Site, "SAL"),] #Salina
+everest_2020_S <- everest_2020[str_detect(everest_2020$Site, "SAL"),] #Salina
+everest_2021_O <- everest_2021[str_detect(everest_2021$Site, "OLA"),] #Olathe
+everest_2021_S <- everest_2021[str_detect(everest_2021$Site, "SAL"),] #Salina
+everest_2022_O <- everest_2022[str_detect(everest_2022$Site, "OLA"),] #Olathe
+everest_2022_S <- everest_2022[str_detect(everest_2022$Site, "SAL"),] #Salina
+
+overley_2019_S$phenotype_value <- as.numeric(overley_2019_S$phenotype_value)
+bacup_2019_S$phenotype_value <- as.numeric(bacup_2019_S$phenotype_value)
+roblin_2019_S$phenotype_value <- as.numeric(roblin_2019_S$phenotype_value)
+everest_2019_S$phenotype_value <- as.numeric(everest_2019_S$phenotype_value)
+
+overley_2021_S$phenotype_value <- as.numeric(overley_2021_S$phenotype_value)
+bacup_2021_S$phenotype_value <- as.numeric(bacup_2021_S$phenotype_value)
+roblin_2021_S$phenotype_value <- as.numeric(roblin_2021_S$phenotype_value)
+everest_2021_S$phenotype_value <- as.numeric(everest_2021_S$phenotype_value)
+
+overley_2022_S$phenotype_value <- as.numeric(overley_2022_S$phenotype_value)
+bacup_2022_S$phenotype_value <- as.numeric(bacup_2022_S$phenotype_value)
+roblin_2022_S$phenotype_value <- as.numeric(roblin_2022_S$phenotype_value)
+everest_2022_S$phenotype_value <- as.numeric(everest_2022_S$phenotype_value)
+
+# change these inputs for every year
+STATS_overley<- overley_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_bacup<- bacup_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_roblin<- roblin_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_everest<- everest_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+
+STATS_overley<- overley_2021_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_bacup<- bacup_2021_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_roblin<- roblin_2021_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_everest<- everest_2021_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+
+STATS_overley<- overley_2022_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_bacup<- bacup_2022_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_roblin<- roblin_2022_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_everest<- everest_2022_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+
+
+# rename traits for tables
+STATS_overley[4,1] <- "FHB DISEASE INDEX"
+STATS_overley[5,1] <- "DON (ppm)"
+stats_overley <- as.data.frame(STATS_overley[c(4,5),]) #keep only FHB traits
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA") # create empty rows of other traits so histogram function is happy
+stats_overley <- rbind(stats_overley, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_overley <- rbind(stats_overley, row)
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_overley <- rbind(stats_overley, row)
+stats_overley$trait_mean <- as.numeric(stats_overley$trait_mean)
+stats_overley$trait_id <- as.factor(stats_overley$trait_id)
+colnames(stats_overley)[1] <- "trait"
+
+STATS_bacup[4,1] <- "FHB DISEASE INDEX"
+STATS_bacup[5,1] <- "DON (ppm)"
+stats_bacup <- STATS_bacup[c(4,5),]
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA")
+stats_bacup <- rbind(stats_bacup, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_bacup <- rbind(stats_bacup, row)
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_bacup <- rbind(stats_bacup, row)
+stats_bacup$trait_mean <- as.numeric(stats_bacup$trait_mean)
+stats_bacup$trait_id <- as.factor(stats_bacup$trait_id)
+colnames(stats_bacup)[1] <- "trait"
+
+STATS_roblin[4,1] <- "FHB DISEASE INDEX"
+STATS_roblin[5,1] <- "DON (ppm)"
+stats_roblin <- STATS_roblin[c(4,5),]
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA")
+stats_roblin <- rbind(stats_roblin, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_roblin <- rbind(stats_roblin, row)
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_roblin <- rbind(stats_roblin, row)
+stats_roblin$trait_mean <- as.numeric(stats_roblin$trait_mean)
+stats_roblin$trait_id <- as.factor(stats_roblin$trait_id)
+colnames(stats_roblin)[1] <- "trait"
+
+STATS_everest[4,1] <- "FHB DISEASE INDEX"
+STATS_everest[5,1] <- "DON (ppm)"
+stats_everest <- STATS_everest[c(4,5),]
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA")
+stats_everest <- rbind(stats_everest, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_everest <- rbind(stats_everest, row)
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_everest <- rbind(stats_everest, row)
+stats_everest$trait_mean <- as.numeric(stats_everest$trait_mean)
+stats_everest$trait_id <- as.factor(stats_everest$trait_id)
+colnames(stats_everest)[1] <- "trait"
+
+#set up input table for wheat checks
+wl_roblin <- stats_roblin
+wl_roblin <- stats_roblin %>%
+        mutate(Label = paste0("Roblin"))
+wl_bacup <- stats_bacup
+wl_bacup <- wl_bacup %>%
+        mutate(Label = paste0("Bacup"))
+wl_overley <- stats_overley
+wl_overley <- wl_overley %>%
+        mutate(Label = paste0("Overley"))
+wl_everest <- stats_everest
+wl_everest <- wl_everest %>%
+        mutate(Label = paste0("Everest"))
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+    facet_wrap(~trait, scales = "free") +
+   geom_vline(data = stats_bacup, aes(xintercept=trait_mean), color= "#55DDE0")+
+      geom_text(data = wl_bacup, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    geom_vline(data = stats_roblin, aes(xintercept=trait_mean), color= '#CC6677')+
+    geom_text(data = wl_roblin, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+      geom_vline(data = stats_everest, aes(xintercept=trait_mean), color= '#44AA99')+
+    geom_text(data = wl_everest, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+        geom_vline(data = stats_overley, aes(xintercept=trait_mean), color= '#DDCC77')+
+    geom_text(data = wl_overley, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    scale_fill_identity(name = 'the checks', guide = 'legend',labels = c('Bacup','Roblin', 'Everest','Overley'))+
+    scale_colour_manual(name = 'the checks', 
+         values =c('#55DDE0'='#55DDE0','#CC6677'='#CC6677', '#44AA99'='#44AA99', '#DDCC77'='#DDCC77'), labels = c('Bacup','Roblin', 'Everest','Overley'))+
+  labs(title= "Histograms of Disease Traits Cycle 7 2019 Salina, KS")+
+  theme(strip.text = element_text(size = 5.5, face = 'bold'))+ 
+  labs(x = "Phenotype Rating", y= "count")+
+  theme(axis.title=element_text(size=8))
+
+#Export to data/Figures/Histogram+Checks_2019.pdf
+
+# Small adjustments for Figure
+## Remove title, adjust text size, capitialize axis titles
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+    facet_wrap(~trait, scales = "free") +
+   geom_vline(data = stats_bacup, aes(xintercept=trait_mean), color= "#55DDE0")+
+      geom_text(data = wl_bacup, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    geom_vline(data = stats_roblin, aes(xintercept=trait_mean), color= '#CC6677')+
+    geom_text(data = wl_roblin, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+      geom_vline(data = stats_everest, aes(xintercept=trait_mean), color= '#44AA99')+
+    geom_text(data = wl_everest, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+        geom_vline(data = stats_overley, aes(xintercept=trait_mean), color= '#DDCC77')+
+    geom_text(data = wl_overley, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    scale_fill_identity(name = 'the checks', guide = 'legend',labels = c('Bacup','Roblin', 'Everest','Overley'))+
+    scale_colour_manual(name = 'the checks', 
+         values =c('#55DDE0'='#55DDE0','#CC6677'='#CC6677', '#44AA99'='#44AA99', '#DDCC77'='#DDCC77'), labels = c('Bacup','Roblin', 'Everest','Overley'))+
+  theme(strip.text = element_text(size = 5.5, face = 'bold'))+ 
+  labs(x = "Phenotype Rating", y= "Count")+
+  theme(axis.title=element_text(size=8))
+
+#Export to data/Figures/Histogram+Checks_2019.3.pdf
+
+
+```
+
+```{r}
+# sample number
+# are checks significantly different from each other
+# others years that could be used in paper
+
+rob <- STATS_roblin
+rob$check <- "Roblin"
+ove <- STATS_overley
+ve$check <- "Overley"
+bac <- STATS_bacup
+bac$check <- "Bacup"
+eve <- STATS_everest
+eve$check <- "Everest"
+combinedchecks <- rbind(rob,ove)
+combinedchecks <- rbind(combinedchecks,bac)
+combinedchecks <- rbind(combinedchecks,eve)
+combinedchecks$check <- as.factor(combinedchecks$check)
+anova(lm(trait_mean ~ check, data = combinedchecks))
+
+combinedchecks2 <- combinedchecks %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = trait_mean
+  )
+
+anova(lm(`DON (ppm)` ~ check, data = combinedchecks2))
+anova(lm(`FHB DISEASE INDEX` ~ check, data = combinedchecks2))
+
+
+
+```

@@ -1,0 +1,269 @@
+---
+title: "QTL_Table"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+#Objectives
+
+
+clean up and combine output files for FarmCPU
+
+```{r input_BLAST}
+Blast_Results <- read.csv("data/Final_Files/Blast_Results.csv")
+#Blast_Results <- Blast_Results[,c(1,4,5,2,3,6:16)]
+colnames(Blast_Results)[4] <- "Trait"
+```
+
+```{r input_PVE}
+#uploading and formating each of these and then added to QTL_LIST
+plots <- c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+directory <- "data/Final_Files/QTL_" 
+QTL_LIST <- data.frame()
+for (i in plots){
+QTL <- read.csv(directory,i,".csv")
+QTL$Plot <- i
+QTL$Trait <- paste0("FarmCPU.", QTL$Trait)
+QTL <- QTL[,c("SNP", "Trait", "Plot", "Chr", "Position", "Ref", "alleles", "P.value", "MAF", "effect", "PVE")]
+QTL_LIST <- rbind(QTL_LIST, QTL)
+}
+
+#adding in PVE for markers that were the only snp for that trait and so only the 'whole' model score would have been recorded and the formatting code grabs the PVE column which would have not had anything in it since PVE is whole-independent 
+hmm <- QTL_LIST
+hmm[44,11] <- "-3.244485e-05" #C07_SAL_2019, FarmCPU.FHBD3G, SV05_543093563
+hmm[60,11] <- "-0.001225415" #C07_SAL_2019, FarmCPU.GLBLSEV, SS07_402885068
+hmm[116,11] <- "-0.002378715" #C07_SAL_2020, FarmCPU.HDANG, SJ05_317782015
+hmm[131,11] <- "0.0008412498" #C10_SAL_2021,FarmCPU.ZDK,SV01_442280490
+
+QTL_LIST <- hmm
+
+write.csv(QTL_LIST, "data/Final_Files/QTL_COMBINED.csv", row.names = FALSE)
+```
+
+
+(OLD)
+```{r input_MAF}
+#https://www.geeksforgeeks.org/how-to-read-a-xlsx-file-with-multiple-sheets-in-r/
+# importing required packages
+library(readxl)	
+multiplesheets <- function(fname) {
+
+# getting info about all excel sheets
+sheets <- readxl::excel_sheets(fname)
+tibble <- lapply(sheets, function(x) readxl::read_excel(fname, sheet = x))
+data_frame <- lapply(tibble, as.data.frame)
+	
+# assigning names to data frames
+names(data_frame) <- sheets
+	
+# print data frame
+#print(data_frame)
+}
+
+MAF_List <- data.frame()
+MAF_list <- data.frame()
+
+# specifying the path name
+path <- "data/Final_Files/Phenotypic_Means+Frequencies_C07_SAL_2019.xlsx"
+my_Sheets <- multiplesheets(path) #list 
+maf <- names(my_Sheets) #vector of traits in list
+for (i in maf){
+  MAF = my_Sheets[[i]]
+  i <- paste0(i)
+  MAF$Trait <- i
+    MAF$allele1 <- gsub("/.*", "", MAF$alleles) #Remove characters after first allele
+    MAF$allele2 <- gsub(".*/","",MAF$alleles) #Remove all before and up to "/"
+  MAF$ALT <- ifelse(MAF$Ref == MAF$allele1, MAF$allele2, MAF$allele1)
+
+MAF <- MAF[,c(1,32,3,2,35,31,14:30)]
+MAF_list <- rbind(MAF_list, MAF)
+}
+MAF_list$Plot <- "C10_OLA_2022"
+MAF_list$Trait <- paste0("FarmCPU.", MAF_list$Trait)
+MAF_list <- MAF_list[,c(1,2,24,3:23)]
+
+MAF_List <- rbind(MAF_List, MAF_list)
+MAF_list <- data.frame()
+
+write_csv(MAF_List, "data/Final_Files/Phenotypic_Means+Frequencies_COMBINED.csv")
+```
+(New)
+```{r input_MAF}
+plots <- c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+directory <- "data/Final_Files/Phenotypic_Means+Frequencies_" 
+MAF_list <- data.frame()
+for (i in plots){
+  MAF <- read.csv(paste0(directory, i, ".csv"))
+  MAF <- MAF[,c(2:ncol(MAF))]
+  MAF$Trait <- paste0("FarmCPU.", MAF$Trait)
+  
+  MAF_list <- rbind(MAF_list, MAF)
+}
+
+write.csv(MAF_list, "data/Final_Files/Pheno_Means+Frequencies_COMBINED.csv", row.names = FALSE)
+```
+
+```{r combine}
+QTL_LIST$long_id <- paste0(QTL_LIST$SNP,"_",QTL_LIST$Trait,"_",QTL_LIST$Plot)
+MAF_list$long_id <- paste0(MAF_list$SNP,"_",MAF_list$Trait,"_",MAF_list$Plot)
+Blast_Results$long_id <- paste0(Blast_Results$SNP,"_",Blast_Results$Trait,"_",Blast_Results$Plot)
+MAFQTL <- merge(QTL_LIST,MAF_list,by="long_id", all=TRUE)
+#MAFQTL <- MAFQTL[,c(1,2,13,3,14,4,15,5,6,7,17,8,16,18,19,9,10,11,12,20:46)]
+All <- merge(MAFQTL, Blast_Results, by="long_id", all=TRUE)
+All <- All[,c(1,2,3,47,4,5,48,6,7,49,8,50,9,51,10,11,12,13,14,15,16,52,17,53,18,19,20:46,56:62)]
+
+find <- All$long_id[c(2,27,48,51,58,63,64,68,78,79,84,88,98,100,102,108,115,119,130,132,145,147,150,152,176,187,194,206,212,227,244)]
+find2 <- All[c(2,4,9,11,20,27,42,43,48,51,57,58,63,64,68,74,75,78,79,84,88,95,98,100,101,102,108,111,112,113,115,117,119,122,125,129,130,131,132,134,135,145,147,150,151,152,163,169,176,184,186,187,194,200,206,208,212,221,227,232,244),]
+find2 <- arrange(find2, Plot.y, Plot)
+View(find2)
+rm.list <- find2$long_id[c(10,15,17,18,21,24,26,27,39:61)]
+All2 <- All[ ! All$long_id %in% rm.list, ]
+All3 <- All2
+rownames(All3) <- NULL
+blast <- All3[c(3,8,10,19,40,41,53,66,67,83,87,95,96,97,100,104,107,111,112,114,115,128,139,145,159,161,173,180,192,202),c(1,4,7,10,12,14,54:60)]
+blast$Chr.y <- gsub("_.*", "", blast$long_id) #Remove all from this and after
+blast$Chr.y <- sub("S","",blast$Chr.y)
+blast$SNP <- blast$long_id
+blast$SNP <- gsub("_FarmCPU.*","",blast$SNP) #Remove all from this and after
+blast$Trait <- blast$long_id
+blast$Trait <- gsub("_C.*","",blast$Trait) #Remove all from this and after 
+blast$Trait <- gsub(".*FarmCPU.","",blast$Trait) #Remove all from this and before
+blast$Trait <- paste("FarmCPU.",blast$Trait)
+blast$Plot <- blast$long_id
+blast$Plot <- gsub(".*_C","",blast$Plot) #Remove all from this and after 
+blast$Pos <- gsub(".*_","",blast$SNP) #Remove all from this and before 
+blast$Pos <- as.numeric(blast$Pos)
+blast$LPos <- blast$Pos - 100
+blast$HPos <- blast$Pos + 100
+blast$Phytozome <- paste(blast$Chr.y,":",blast$LPos,"..",blast$HPos)
+rownames(blast) <- NULL
+
+blast$T.inter_Genes <- c("Thintv31008243m.g", "Thintv31002694m.g", "NA", "NA", "NA", "Thintv31081687m.g", "NA", "NA", "NA", "NA", "NA", "NA", "Thintv31177157m.g", "Thintv31177365m.g", "NA", "Thintv31190369m.g", "NA", "Thintv31211533m.g", "NA", "Thintv31224334m.g", "Thintv31216847m.g", "NA", "NA", "NA", "Thintv31284194m.g", "Thintv31268736m.g", "NA", "NA", "Thintv31352601m.g", "NA")
+blast$T.inter_Description <- c("E2F-like protein,Transcription Factor DP", "Uncharacterized", "NA", "NA", "NA","Glycerol-3-phosphate dehydrogenase (NAD(+))", "NA", "NA", "NA", "NA", "NA", "NA", "Thaumatin family", "Ubiquitin activating enzyme", "NA", "Aspartyl protease, Nepenthesin, Xylanase inhibitor", "NA", "linoleate 9S-lipoxygenase, oxidation-reduction process", "NA", "Uncharacterized", "[Protein-PII] uridylyltransferase", "NA", "NA", "NA", "ATPase containing the peptidase M41, prorteolysis, metalloendopeptidase activity", "Pectate lyase", "NA", "NA", "Uncharacterized", "NA")
+blast$NCBI_Description <- c("NA", "NA", "NA", "disease resistance protein RGA4-like mRNA", "NA", "glycerol-3-phosphate dehydrogenase (NAD(+))", "NA", "disease resistance protein Pik-2", "disease resistance protein Pik-2", "NA", "NA", "NA", "thaumatin-like protien", "ubiquitin activating enzyme E1", "NA", "aspartic protease in guard cell", "NA", "NA", "NA", "Uncharacterized", "NA", "NA", "NA", "NA", "ATP-dependent zinc metalloprotease FTSH1", "Uncharacterized", "NA", "NA", "NA", "NA")
+blast$NCBI_Species <- c("NA", "NA", "NA", "T.aestivum", "NA", "T.aestivum", "NA", "T.aestivum", "T.aestivum", "NA", "NA", "NA", "T.aestivum", "T.aestivum", "NA", "T.aestivum", "NA", "NA", "NA", "T.aestivum", "NA", "NA", "NA", "NA", "T.aestivum", "T.aestivum", "NA", "NA", "NA", "NA")
+blast$Query <- c("NA", "NA", "NA", "99%", "NA", "59%", "NA", "100%", "100%", "NA", "NA", "NA", "97%", "100%", "NA", "100%", "NA", "NA", "NA", "100%", "NA", "NA", "NA", "NA", "100%", "51%", "NA", "NA", "NA", "NA")
+blast$Per.Ident <- c("NA", "NA", "NA", "92%", "NA", "100%", "NA", "94.03%", "94.03%", "NA", "NA", "NA", "92.86%", "97.51%", "NA", "96.52%", "NA", "NA", "NA", "94.12%", "NA", "NA", "NA", "NA", "89.81%", "95.19%", "NA", "NA", "NA", "NA")
+
+#backup in case this closes over the weekend
+write.csv(blast, "data/Intermediate_Files/random_Blast.csv", row.names = FALSE) 
+write.csv(All3, "data/Intermediate_Files/random_Blast.csv", row.names = FALSE)
+#add the new blast table to the full table
+
+All4 <- merge(All3,blast,by="long_id", all=TRUE)
+#clean up, merge columns of same trait together, rename final columns to remove .x or .y from end of name
+  #> All4$Per.Ident[!is.na(All4$Per.Ident.x)] = All4$Per.Ident.x[!is.na(All4$Per.Ident.x)]
+  #> All4$Per.Ident[!is.na(All4$Per.Ident.y)] = All4$Per.Ident.y[!is.na(All4$Per.Ident.y)]
+
+write.csv(All5, "data/Final_Files/output_COMBINED.csv", row.names = FALSE)
+```
+
+```{r}
+source('scripts/QTL_range.R')
+library(dplyr)
+
+All2 <- read.csv('data/Final_Files/output_COMBINED.csv')
+#colnames(All2)[4] <- "CHR"
+#colnames(All2)[5] <- "Pos"
+
+qtl.comparison(All5, 100000, order=TRUE, space=TRUE) # run function ; one list (qtl_list) of snps that were exact matches and snps that were within a designated range of each other; order: default is FALSE, will order the output table by chromosome; space: default is False, will add a blank row in between each set for easier viewing of pairs
+
+write.csv(qtl_list, "data/Final_Files/output_COMBINED_snps.close.to.each.other_100000.csv", row.names = FALSE)
+```
+
+# Add in toxin data for 2022
+
+```{r additions}
+Blast_Results <- read.csv("data/Final_Files/Blast_Results.csv")
+colnames(Blast_Results)[4] <- "Trait"
+blast <- Blast_Results[str_detect(Blast_Results$Plot, "2022"),]
+
+qtl_S <- read.csv("data/Final_Files/QTL_C10_SAL_2022.csv")
+qtl_O <- read.csv("data/Final_Files/QTL_C10_OLA_2022.csv")
+qtl_S$Trait <- paste0("FarmCPU.", qtl_S$Trait)
+qtl_O$Trait <- paste0("FarmCPU.", qtl_O$Trait)
+qtl_S <- qtl_S[,c("SNP", "Trait", "Plot", "Chr", "Position", "Ref", "alleles", "P.value", "MAF", "effect", "PVE")]
+qtl_O <- qtl_O[,c("SNP", "Trait", "Plot", "Chr", "Position", "Ref", "alleles", "P.value", "MAF", "effect", "PVE")]
+qtl <- rbind(qtl_S, qtl_O)
+
+maf_S <- read.csv("data/Final_Files/Phenotypic_Means+Frequencies_C10_SAL_2022.csv")
+maf_O <- read.csv("data/Final_Files/Phenotypic_Means+Frequencies_C10_OLA_2022.csv")
+maf_S$Trait <- paste0("FarmCPU.", maf_S$Trait)
+maf_O$Trait <- paste0("FarmCPU.", maf_O$Trait)
+maf <- rbind(maf_S,maf_O)
+
+blast$long_id <- paste0(blast$SNP,"_",blast$Trait,"_",blast$Plot)
+qtl$long_id <- paste0(qtl$SNP,"_",qtl$Trait,"_",qtl$Plot)
+maf$long_id <- paste0(maf$SNP,"_",maf$Trait,"_",maf$Plot)
+
+mafqtl <- merge(qtl,maf,by="long_id", all=TRUE)
+mafqtlblast <- merge(mafqtl,blast,by="long_id",all=TRUE)
+
+Original <- read.csv("data/Final_Files/output_COMBINED.csv")
+colnames(Original)
+
+colnames(mafqtlblast)[8] <- "alleles"
+colnames(mafqtlblast)[7] <- "Ref"
+colnames(mafqtlblast)[9] <- "P.value"
+colnames(mafqtlblast)[10] <- "MAF"
+
+MAFQTLBLAST <- mafqtlblast[,c("SNP", "Trait", "Plot", "CHR", "Pos", "alleles", "Ref", "ALT", "Minor.Allele", "P.value", "MAF", "effect", "PVE", "GG", "AG", "AA", "CC", "CT", "TT", "AC", "CG", "AT", "GT", "genotypic_frequency.CT", "genotypic_frequency.CC", "genotypic_frequency.TT", "genotypic_frequency.AT",  "genotypic_frequency.AA","genotypic_frequency.AG", "genotypic_frequency.GG","genotypic_frequency.CG", "genotypic_frequency.AC","genotypic_frequency.GT","allelic_frequency.A","allelic_frequency.T", "allelic_frequency.G","allelic_frequency.C","Phentypic.Mean.of.Minor.Homozygous","Phentypic.Mean.of.Heterozygous","Phentypic.Mean.of.Major.Homozygous","T.inter_Genes","T.inter_Description","NCBI_Description","NCBI_Species","Query","Per.Ident")]
+
+#remove 2022 data from original and replace with updated 2022 data by rbind the mafqtlblast data into the orginal
+original <- Original[! str_detect(Original$Plot, "2022"),]
+
+New <- rbind(original,MAFQTLBLAST)
+
+write.csv(Original, "data/Final_Files/output_COMBINED_old.csv", row.names = FALSE)
+write.csv(New, "data/Final_Files/output_COMBINED.csv", row.names = FALSE)
+
+source('scripts/QTL_range.R')
+library(dplyr)
+
+qtl.comparison(New, 100000, order=TRUE, space=TRUE) 
+
+write.csv(qtl_list, "data/Final_Files/output_COMBINED_snps.close.to.each.other_100000.csv", row.names = FALSE)
+```
+
+
+# Replace calculated PVE with PVE from GAPIT output 1/5/2024
+
+# First, take the files for PVE from each year and combine in excel, make column for Trait and include FarmCPU.TRAIT as fill then PLot with Cycle_Site_Year as the fill
+# Files named GAPIT.Association.PVE.FarmCPU.TRAITNAME
+
+```{r}
+# read in final list
+END <- read.csv("data/Final_Files/output_COMBINED.csv")
+
+END$ID <- paste0(END$SNP,"-",END$Trait,"-",END$Plot)
+
+# list of all PVE
+library(readxl)
+GAPIT_PVE <- read_excel("output/FarmCPU/GAPIT_PVE.xlsx")
+
+GAPIT_PVE$ID <- paste0(GAPIT_PVE$SNP,"-FarmCPU.",GAPIT_PVE$Trait,"-",GAPIT_PVE$Plot)
+
+# add PVE rows to final list
+new <- merge(END,GAPIT_PVE[,c(8,11)],by="ID", all=TRUE)
+
+# clean up
+done <- new[,c(2:14,48,15:47)]
+
+# save
+write.csv(done, "data/Final_Files/output_COMBINED_NEW.csv", row.names = FALSE)
+
+```

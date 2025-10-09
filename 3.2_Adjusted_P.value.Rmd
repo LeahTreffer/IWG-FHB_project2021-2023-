@@ -1,0 +1,461 @@
+---
+title: "Adjusted P.value"
+output: html_document
+date: "2022-10-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r}
+library(stringr)
+install.packages("bindr")
+library(bindr)
+library(dplyr)
+#install.packages("errorist")
+#library(errorist)
+```
+
+# Objective: Determine if the FHB1 region has an effect on all traits using a priori hypothesis. 
+  # If the region has no effect then a p.value calculated to just the region instead of multiple testing (like in GWAS) then will be null. 
+  # If the region does have an effect then markers will have a significant p.value
+# 1. How many markers are in FHB1 region (What is the effective marker number)
+# 2. Calculate new P value
+# 3. Reevaluate output of all traits using new p.value threshold as the cutoff
+
+
+```{r input_data}
+GM <- read.table('data/Intermediate_Files/SNP_Position.txt', head=TRUE)
+```
+
+```{r}
+# 1. How many markers are in FHB1 region
+  # J03 : J03:50676750..51198852
+  # V03 : V03:18027299..18318355
+  # S03 : S03:43496709..43892886
+
+FHB1 <- read.csv('data/Intermediate_Files/FHB1_markers.csv')
+```
+
+```{r}
+# 2. Calculate new P value
+  # p.value threshold = (p.value) / (# markers)
+
+# J03 : 11 markers
+0.10 / 11 
+0.05 / 11
+0.01 / 11
+# = 0.009090909
+# = 0.004545455
+# = 0.0009090909
+# V03 : 5 markers
+0.10 / 5
+0.05 / 5
+0.01 / 5
+# = 0.02
+# = 0.01
+# = 0.002
+# S03 : 3 markers
+0.10 / 3
+0.05 / 3
+0.01 / 3
+# = 0.03333333
+# = 0.01666667
+# = 0.003333333
+```
+
+```{r}
+# 3. Reevaluate output of FHB related traits using new p.value threshold as the cutoff
+
+#2018
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("FHBD3G", "FHBD3G.DON", "FHBDISIND", "FHBDON", "FHBSPKINC", "HDANG", "PTHT", "SPKDEN", "SPKYLD", "STMANG")
+main_dirr <- 'output/FarmCPU/C07_SAL_2018/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+  
+  i = paste0('2018_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9, 1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+all2018 <- bind_rows(`2018_FHBD3G`, `2018_FHBD3G.DON`, `2018_FHBDISIND`, `2018_FHBDON`, `2018_FHBSPKINC`, `2018_HDANG`,`2018_PTHT`,`2018_SPKDEN`,`2018_SPKYLD`,`2018_STMANG`)
+rm(`2018_FHBD3G`, `2018_FHBD3G.DON`, `2018_FHBDISIND`, `2018_FHBDON`, `2018_FHBSPKINC`, `2018_HDANG`,`2018_PTHT`,`2018_SPKDEN`,`2018_SPKYLD`,`2018_STMANG`)
+
+#2019
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("BLSSEV", "FHBD3G", "FHBD3G.DON", "FHBDISIND", "FHBDON", "FHBSPKINC", "GLBLSEV", "HDANG", "HSATIVLSEV", "PTHT", "SPKDEN", "SPKYLD", "ZDK")
+main_dirr <- 'output/FarmCPU/C07_SAL_2019/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+  
+  i = paste0('2019_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9, 1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+all2019 <- bind_rows(`2019_BLSSEV`,`2019_FHBD3G`,`2019_FHBD3G.DON`,`2019_FHBDISIND`, `2019_FHBDON`,`2019_FHBSPKINC`,`2019_GLBLSEV`,`2019_HDANG`,`2019_HSATIVLSEV`,`2019_PTHT`,`2019_SPKDEN`,`2019_SPKYLD`,`2019_ZDK`)
+rm(`2019_BLSSEV`,`2019_FHBD3G`,`2019_FHBD3G.DON`,`2019_FHBDISIND`, `2019_FHBDON`,`2019_FHBSPKINC`,`2019_GLBLSEV`,`2019_HDANG`,`2019_HSATIVLSEV`,`2019_PTHT`,`2019_SPKDEN`,`2019_SPKYLD`,`2019_ZDK`)
+
+#2020
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("BLSSEV", "FHBDISIND", "FHBDON", "FHBSPKINC", "GLBLSEV", "HDANG", "HSATIVLSEV", "PTHT", "SDHD", "SPKDEN", "SPKHD", "SPKLNG", "SPKYLD", "STMANG", "ZDK")
+main_dirr <- 'output/FarmCPU/C07_SAL_2020/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+
+  i = paste0('2020_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9,1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+all2020 <- bind_rows(`2020_BLSSEV`,`2020_FHBDISIND`, `2020_FHBDON`, `2020_FHBSPKINC`, `2020_GLBLSEV`, `2020_HDANG`, `2020_HSATIVLSEV`, `2020_PTHT`, `2020_SDHD`, `2020_SPKDEN`, `2020_SPKHD`, `2020_SPKLNG`, `2020_SPKYLD`, `2020_STMANG`, `2020_ZDK`)
+rm(`2020_BLSSEV`,`2020_FHBDISIND`, `2020_FHBDON`, `2020_FHBSPKINC`, `2020_GLBLSEV`, `2020_HDANG`, `2020_HSATIVLSEV`, `2020_PTHT`, `2020_SDHD`, `2020_SPKDEN`, `2020_SPKHD`, `2020_SPKLNG`, `2020_SPKYLD`, `2020_STMANG`, `2020_ZDK`)
+
+#OLA 2021
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("FHBDISIND", "FHBDON", "FHBSPKINC", "PTHT", "ZDK")
+main_dirr <- 'output/FarmCPU/C10_OLA_2021/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+
+  i = paste0('2021O_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9,1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+allO2021 <- bind_rows(`2021O_FHBDISIND`,`2021O_FHBDON`,`2021O_FHBSPKINC`,`2021O_PTHT`,`2021O_ZDK`)
+rm(`2021O_FHBDISIND`,`2021O_FHBDON`,`2021O_FHBSPKINC`,`2021O_PTHT`,`2021O_ZDK`)
+
+#OLA 2022
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("FHBZEA", "FHBDON", "BLSSEV", "FHBDISIND", "FHBSPKINC", "HSATIVLSEV", "PTHT", "ZDK")
+main_dirr <- 'output/FarmCPU/C10_OLA_2022/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+
+  i = paste0('2022O_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9,1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+allO2022 <- bind_rows(`2022O_FHBZEA`,`2022O_FHBDON`,`2022O_BLSSEV`,`2022O_FHBDISIND`,`2022O_FHBSPKINC`,`2022O_HSATIVLSEV`,`2022O_PTHT`,`2022O_ZDK`)
+rm(`2022O_FHBZEA`,`2022O_FHBDON`,`2022O_BLSSEV`,`2022O_FHBDISIND`,`2022O_FHBSPKINC`,`2022O_HSATIVLSEV`,`2022O_PTHT`,`2022O_ZDK`)
+
+#SAL 2021
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("BLSSEV", "FHBDISIND", "FHBDON", "FHBSPKINC", "GLBLSEV", "HSATIVLSEV", "PTHT", "ZDK")
+main_dirr <- 'output/FarmCPU/C10_SAL_2021/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+
+  i = paste0('2021S_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9,1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+allS2021 <- bind_rows(`2021S_BLSSEV`,`2021S_FHBDISIND`,`2021S_FHBDON`,`2021S_FHBSPKINC`,`2021S_GLBLSEV`,`2021S_HSATIVLSEV`,`2021S_PTHT`,`2021S_ZDK`)
+rm(`2021S_BLSSEV`,`2021S_FHBDISIND`,`2021S_FHBDON`,`2021S_FHBSPKINC`,`2021S_GLBLSEV`,`2021S_HSATIVLSEV`,`2021S_PTHT`,`2021S_ZDK`)
+
+#SAL 2022
+#Set up and run loop to read in output tables for disease related traits and assign a year_trait name
+traits <- c("FHBZEA", "FHBDON", "BLSSEV", "FHBDISIND", "FHBSPKINC", "HSATIVLSEV", "PTHT", "ZDK")
+main_dirr <- 'output/FarmCPU/C10_SAL_2022/GAPIT.Association.GWAS_Results.FarmCPU.' #designate directory path 
+
+for(i in traits){
+  two = (paste0(main_dirr, i, '.csv'))
+  two <- read.csv(two)
+  j <- two[str_detect(two$Chr, "J03"), ] #extract rows with a partial match using the stringr package
+  j <- subset(j, j$Pos>50676750 & j$Pos<51198852)
+  v <- two[str_detect(two$Chr, "V03"), ] #extract rows with a partial match using the stringr package
+  v <- subset(v, v$Pos>18027299 & v$Pos<18318355)
+  s <- two[str_detect(two$Chr, "S03"), ] #extract rows with a partial match using the stringr package
+  s <- subset(s, s$Pos>43496709 & s$Pos<43892886)
+  two <- bind_rows(j,v,s)
+
+  i = paste0('2022S_', i)
+  two$trait = paste(i)
+  
+  assign(paste0(i), two[,c(9,1:8)]) #assign the reordered four table the trait name of i 
+}
+rm(two, i, traits, main_dirr, j, v, s)
+#Clean up lists to just the Chr 3 range we are interested in 
+allS2022 <- bind_rows(`2022S_FHBZEA`,`2022S_FHBDON`,`2022S_BLSSEV`,`2022S_FHBDISIND`,`2022S_FHBSPKINC`,`2022S_HSATIVLSEV`,`2022S_PTHT`,`2022S_ZDK`)
+rm(`2022S_FHBZEA`,`2022S_FHBDON`,`2022S_BLSSEV`,`2022S_FHBDISIND`,`2022S_FHBSPKINC`,`2022S_HSATIVLSEV`,`2022S_PTHT`,`2022S_ZDK`)
+
+```
+
+```{r}
+#Subset rows based on p value using subset function
+#J03
+# P Value threshold = 0.009090909
+# P Value threshold = 0.004545455
+# P Value threshold = 0.0009090909
+#V03
+# P Value threshold = 0.02
+# P Value threshold = 0.01
+# P Value threshold = 0.002
+#S03
+# P Value threshold = 0.03333333
+# P Value threshold = 0.01666667
+# P Value threshold = 0.003333333
+
+# P.Value Threshold of 0.10
+threshold_0.10_2018 <- subset(all2018, all2018$Chr == "J03" & all2018$P.value<0.009090909 | all2018$Chr == "V03" & all2018$P.value<0.02 | all2018$Chr == "S03" & all2018$P.value<0.03333333) #extract rows with p.values less than J03 threshold, or V03 threshold, or S03 threshold 
+threshold_0.10_2019 <- subset(all2019, all2019$Chr == "J03" & all2019$P.value<0.009090909 | all2019$Chr == "V03" & all2019$P.value<0.02 | all2019$Chr == "S03" & all2019$P.value<0.03333333)
+threshold_0.10_2020 <- subset(all2020, all2020$Chr == "J03" & all2020$P.value<0.009090909 | all2020$Chr == "V03" & all2020$P.value<0.02 | all2020$Chr == "S03" & all2020$P.value<0.03333333)
+threshold_0.10_O2021 <- subset(allO2021, allO2021$Chr == "J03" & allO2021$P.value<0.009090909 | allO2021$Chr == "V03" & allO2021$P.value<0.02 | allO2021$Chr == "S03" & allO2021$P.value<0.03333333)
+threshold_0.10_O2022 <- subset(allO2022, allO2022$Chr == "J03" & allO2022$P.value<0.009090909 | allO2022$Chr == "V03" & allO2022$P.value<0.02 | allO2022$Chr == "S03" & allO2022$P.value<0.03333333)
+threshold_0.10_S2021 <- subset(allS2021, allS2021$Chr == "J03" & allS2021$P.value<0.009090909 | allS2021$Chr == "V03" & allS2021$P.value<0.02 | allS2021$Chr == "S03" & allS2021$P.value<0.03333333)
+threshold_0.10_S2022 <- subset(allS2022, allS2022$Chr == "J03" & allS2022$P.value<0.009090909 | allS2022$Chr == "V03" & allS2022$P.value<0.02 | allS2022$Chr == "S03" & allS2022$P.value<0.03333333)
+
+# P.Value Threshold of 0.05
+threshold_0.05_2018 <- subset(all2018, all2018$Chr == "J03" & all2018$P.value<0.004545455 | all2018$Chr == "V03" & all2018$P.value<0.01 | all2018$Chr == "S03" & all2018$P.value<0.01666667) #extract rows with p.values less than J03 threshold, or V03 threshold, or S03 threshold 
+threshold_0.05_2019 <- subset(all2019, all2019$Chr == "J03" & all2019$P.value<0.004545455 | all2019$Chr == "V03" & all2019$P.value<0.01 | all2019$Chr == "S03" & all2019$P.value<0.01666667)
+threshold_0.05_2020 <- subset(all2020, all2020$Chr == "J03" & all2020$P.value<0.004545455 | all2020$Chr == "V03" & all2020$P.value<0.01 | all2020$Chr == "S03" & all2020$P.value<0.01666667)
+threshold_0.05_O2021 <- subset(allO2021, allO2021$Chr == "J03" & allO2021$P.value<0.004545455 | allO2021$Chr == "V03" & allO2021$P.value<0.01 | allO2021$Chr == "S03" & allO2021$P.value<0.01666667)
+threshold_0.05_O2022 <- subset(allO2022, allO2022$Chr == "J03" & allO2022$P.value<0.004545455 | allO2022$Chr == "V03" & allO2022$P.value<0.01 | allO2022$Chr == "S03" & allO2022$P.value<0.01666667)
+threshold_0.05_S2021 <- subset(allS2021, allS2021$Chr == "J03" & allS2021$P.value<0.004545455 | allS2021$Chr == "V03" & allS2021$P.value<0.01 | allS2021$Chr == "S03" & allS2021$P.value<0.01666667)
+threshold_0.05_S2022 <- subset(allS2022, allS2022$Chr == "J03" & allS2022$P.value<0.004545455 | allS2022$Chr == "V03" & allS2022$P.value<0.01 | allS2022$Chr == "S03" & allS2022$P.value<0.01666667)
+
+
+# P.Value Threshold of 0.01
+threshold_0.01_2018 <- subset(all2018, all2018$Chr == "J03" & all2018$P.value<0.0009090909 | all2018$Chr == "V03" & all2018$P.value<0.002 | all2018$Chr == "S03" & all2018$P.value<0.003333333) 
+threshold_0.01_2019 <- subset(all2019, all2019$Chr == "J03" & all2019$P.value<0.0009090909 | all2019$Chr == "V03" & all2019$P.value<0.002 | all2019$Chr == "S03" & all2019$P.value<0.003333333)
+threshold_0.01_2020 <- subset(all2020, all2020$Chr == "J03" & all2020$P.value<0.0009090909 | all2020$Chr == "V03" & all2020$P.value<0.002 | all2020$Chr == "S03" & all2020$P.value<0.003333333)
+threshold_0.01_O2021 <- subset(allO2021, allO2021$Chr == "J03" & allO2021$P.value<0.0009090909 | allO2021$Chr == "V03" & allO2021$P.value<0.002 | allO2021$Chr == "S03" & allO2021$P.value<0.003333333)
+threshold_0.01_O2022 <- subset(allO2022, allO2022$Chr == "J03" & allO2022$P.value<0.0009090909 | allO2022$Chr == "V03" & allO2022$P.value<0.002 | allO2022$Chr == "S03" & allO2022$P.value<0.003333333)
+threshold_0.01_S2021 <- subset(allS2021, allS2021$Chr == "J03" & allS2021$P.value<0.0009090909 | allS2021$Chr == "V03" & allS2021$P.value<0.002 | allS2021$Chr == "S03" & allS2021$P.value<0.003333333)
+threshold_0.01_S2022 <- subset(allS2022, allS2022$Chr == "J03" & allS2022$P.value<0.0009090909 | allS2022$Chr == "V03" & allS2022$P.value<0.002 | allS2022$Chr == "S03" & allS2022$P.value<0.003333333)
+
+threshold_0.10_2018$threshold <- "0.10"
+threshold_0.10_2019$threshold <- "0.10"
+threshold_0.10_2020$threshold <- "0.10"
+threshold_0.10_O2021$threshold <- "0.10"
+threshold_0.10_O2022$threshold <- "0.10"
+#threshold_0.10_S2021$threshold <- "0.10"
+threshold_0.10_S2022$threshold <- "0.10"
+threshold_0.10_2018$Year <- "2018"
+threshold_0.10_2019$Year <- "2019"
+threshold_0.10_2020$Year <- "2020"
+threshold_0.10_O2021$Year <- "2021"
+threshold_0.10_O2022$Year <- "2022"
+#threshold_0.10_S2021$Year <- "2021"
+threshold_0.10_S2022$Year <- "2022"
+threshold_0.10_2018$Plot <- "C07_SAL_2018"
+threshold_0.10_2019$Plot <- "C07_SAL_2019"
+threshold_0.10_2020$Plot <- "C07_SAL_2020"
+threshold_0.10_O2021$Plot <- "C10_OLA_2021"
+threshold_0.10_O2022$Plot <- "C10_OLA_2022"
+#threshold_0.10_S2021$Plot <- "C10_SAL_2021"
+threshold_0.10_S2022$Plot <- "C10_SAL_2022"
+threshold_0.10 <- rbind(threshold_0.10_2018,threshold_0.10_2019,threshold_0.10_2020,threshold_0.10_O2021,threshold_0.10_O2022,threshold_0.10_S2022)
+
+threshold_0.05_2018$threshold <- "0.05"
+threshold_0.05_2019$threshold <- "0.05"
+threshold_0.05_2020$threshold <- "0.05"
+threshold_0.05_O2021$threshold <- "0.05"
+threshold_0.05_O2022$threshold <- "0.05"
+#threshold_0.05_S2021$threshold <- "0.05"
+threshold_0.05_S2022$threshold <- "0.05"
+threshold_0.05_2018$Year <- "2018"
+threshold_0.05_2019$Year <- "2019"
+threshold_0.05_2020$Year <- "2020"
+threshold_0.05_O2021$Year <- "2021"
+threshold_0.05_O2022$Year <- "2022"
+#threshold_0.05_S2021$Year <- "2021"
+threshold_0.05_S2022$Year <- "2022"
+threshold_0.05_2018$Plot <- "C07_SAL_2018"
+threshold_0.05_2019$Plot <- "C07_SAL_2019"
+threshold_0.05_2020$Plot <- "C07_SAL_2020"
+threshold_0.05_O2021$Plot <- "C10_OLA_2021"
+threshold_0.05_O2022$Plot <- "C10_OLA_2022"
+#threshold_0.05_S2021$Plot <- "C10_SAL_2021"
+threshold_0.05_S2022$Plot <- "C10_SAL_2022"
+threshold_0.05 <- rbind(threshold_0.05_2018,threshold_0.05_2019,threshold_0.05_2020,threshold_0.05_O2021,threshold_0.05_O2022,threshold_0.05_S2022)
+
+#threshold_0.01_2018$threshold <- "0.01"
+#threshold_0.01_2019$threshold <- "0.01"
+threshold_0.01_2020$threshold <- "0.01"
+#threshold_0.01_O2021$threshold <- "0.01"
+threshold_0.01_O2022$threshold <- "0.01"
+#threshold_0.01_S2021$threshold <- "0.01"
+#threshold_0.01_S2022$threshold <- "0.01"
+#threshold_0.01_2018$Year <- "2018"
+#threshold_0.01_2019$Year <- "2019"
+threshold_0.01_2020$Year <- "2020"
+#threshold_0.01_O2021$Year <- "2021"
+threshold_0.01_O2022$Year <- "2022"
+#threshold_0.01_S2021$Year <- "2021"
+#threshold_0.01_S2022$Year <- "2022"
+#threshold_0.01_2018$Plot <- "C07_SAL_2018"
+#threshold_0.01_2019$Plot <- "C07_SAL_2019"
+threshold_0.01_2020$Plot <- "C07_SAL_2020"
+#threshold_0.01_O2021$Plot <- "C10_OLA_2021"
+threshold_0.01_O2022$Plot <- "C10_OLA_2022"
+#threshold_0.01_S2021$Plot <- "C10_SAL_2021"
+#threshold_0.01_S2022$Plot <- "C10_SAL_2022"
+threshold_0.01 <- rbind(threshold_0.01_2020,threshold_0.01_O2022)
+
+threshold <- rbind(threshold_0.10,threshold_0.05,threshold_0.01)
+
+rm(list=ls(pattern="^threshold_0."))
+
+threshold$trait <- gsub(".*_","",threshold$trait) #Remove all before and up to "_"
+threshold$trait <- paste0("FarmCPU.", threshold$trait)
+threshold <- threshold[,c(10,1,11,12,2:9)]
+rownames(threshold) <- NULL
+
+```
+
+
+```{r BLAST}
+# Region Example V01:504888459..505003458 
+FHB1$LPos <- FHB1$Pos - 100
+FHB1$HPos <- FHB1$Pos + 100
+
+FHB1$Phytozome <- paste(FHB1$Chr,":",FHB1$LPos,"..",FHB1$HPos)
+
+FHB1$T.inter_Genes <- c("Thintv31047538m.g", "Thintv31047542m.g", "Thintv31047551m.g", "Thintv31047551m.g", "Thintv31047556m.g", "Thintv31047556m.g", "Thintv31047556m.g", "Thintv31047556m.g", "NA", "NA", "NA", "Thintv31047566m.g", "Thintv31047569m.g", "Thintv31324453m.g", "NA", "NA", "NA", "NA", "Thintv31324479m.g", "Thintv31324493m.g", "Thintv31194839m.g", "NA", "Thintv31194873m.g", "Thintv31194873m.g", "Thintv31194874m.g")
+FHB1$T.inter_Description <- c("tRNA (adenine(58)-N(1))-methyltransferase, TRANSLATION INITIATION FACTOR EIF3-RELATED", "(S)-beta-bisabolene synthase, terpene synthase, (-)-germacrene D synthase", "transcription initiation from RNA polymerase II promoter, TIF TFIIE subunit beta, TIF IIE, beta subunit", "transcription initiation from RNA polymerase II promoter, TIF TFIIE subunit beta, TIF IIE, beta subunit", "Ubiquitin--protein ligase, seven in absentia protein family", "Ubiquitin--protein ligase, seven in absentia protein family", "Ubiquitin--protein ligase, seven in absentia protein family", "Ubiquitin--protein ligase, seven in absentia protein family", "NA", "NA", "NA", "GDSL-like Lipase/Acylhydrolase, Alpha-L-fucosidase", "Protein of unknown function", "protein binding, F-box domain", "NA", "NA", "NA", "NA", "FBD", "tRNA (adenine(58)-N(1))-methyltransferase, TRANSLATION INITIATION FACTOR EIF3-RELATED", "tRNA (adenine(58)-N(1))-methyltransferase, TRANSLATION INITIATION FACTOR EIF3-RELATED", "NA", "GDSL-like Lipase/Acylhydrolase, Alpha-L-fucosidase, ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "GDSL-like Lipase/Acylhydrolase, Alpha-L-fucosidase, ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN","protein binding, F-box domain")
+
+FHB1$NCBI_Description <- c("Sumai 3 FHB1 region genomic sequence", "eudesmanediol synthase-like transcript variant", "general transcription factor IIE subunit 2", "Sumai 3 FHB1 region genomic sequence", "E3 ubiquitin-protein ligase SINA", "E3 ubiquitin-protein ligase SINA", "E3 ubiquitin-protein ligase SINA", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "NA", "putative F-box protein", "F-box protein", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "putative pentatricopeptide repeat-containing protein", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence")
+FHB1$NCBI_Species <- c("T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "NA", "T.dicoccoides", "H.vulgarer subsp.vulgare", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "T.aestivum", "T.aestivum", "T.aestivum","T.aestivum")
+FHB1$Query <- c("100%", "100%", "96%", "90%", "68%", "61%", "61%", "74%", "100%", "100%", "34%", "NA", "50%", "50%", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "80%", "89%", "74%", "96%")
+FHB1$Per.Ident <- c("97.55%", "99%", "92.23%", "94.01", "97.83", "97.58%", "97.58%", "92%", "81.22%", "81.22%", "93.15%", "NA", "96.04%", "95.10%", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "86.55%", "95%", "95.97%", "92.46%")
+
+write.csv(FHB1, 'data/Final_Files/Blast_Results_FHB1.csv', row.names = FALSE)
+
+colnames(FHB1)[1] <- "SNP"
+FHB1 <- FHB1[-c(1,13,14,20,21,25),]
+rownames(FHB1) <- NULL
+T3 <- merge(threshold, FHB1[,c(1,7:12)], by="SNP")
+T3 <- T3[,c(2,1,3:18)]
+
+```
+
+```{r ref_allele}
+
+refall <- read.table("data/Original_Files/FHB_Reference_Allele.bed",header = FALSE, sep="\t",stringsAsFactors=FALSE, quote="") #load reference list 
+colnames(refall)[1] <- "rs" #rename snp column to rs to match hapmap format
+ 
+h <- read.table('data/Original_Files/FHB_Imputed.hmp.txt', header = TRUE, check.names = FALSE)
+hm <- h[,c(1:4)] #get snp block  
+colnames(hm)[1] <- "SNP"
+ 
+rs <- as.data.frame(gsub("\\:.*","",refall$rs)) #remove characters after the snp: section 
+colnames(rs)[1] <- "SNP" #rename snp column to rs to match hapmap format
+rs <- cbind(refall, rs) #combine the snp block to the map block
+rs <- rs[,c(3,2)] #reorder
+colnames(rs)[2] <- "Ref" #rename 
+hmm <- merge(rs, hm, by="SNP", all=TRUE) #merge files
+rm(hm)
+
+hmm$allele1 <- gsub("/.*", "", hmm$alleles) #Remove characters after first allele
+hmm$allele2 <- gsub(".*/","",hmm$alleles) #Remove all before and up to "_"
+hmm$ALT <- ifelse(hmm$Ref == hmm$allele1, hmm$allele2, hmm$allele1)
+T2 <- merge(T3,hmm[,c(1,3,2,8)], by="SNP")
+
+T2 <- T2[,c(2,1,3,4,5,6,7,19,20,21,8:18)]
+T2 <- arrange(T2, threshold, SNP)
+write.csv(T2, 'data/Final_Files/output_adjusted_threshold.csv', row.names = FALSE)
+
+```
+
+
+
+
+
+```{r}
+# Another way to try looking for markers above threshold: 
+#combine lists of markers in region and then semi_join with all2018 to see if any are in both lists
+mega <- bind_rows(J03, V03, S03) #combind lists of each chro into long list
+colnames(mega)[1] <- "SNP" #rename marker as SNP
+try <- semi_join(all2018, mega, by="SNP") #return rows in all2018 that are in the mega list
+#sort by chr and visually look at P. values 
+try <- semi_join(all2019, mega, by="SNP") #return rows in all2018 that are in the mega list
+try <- semi_join(all2020, mega, by="SNP") #return rows in all2018 that are in the mega list
+
+rm(try)
+rm(mega)
+```
+
+```{r clean_up}
+rm(threshold_0.05_O2022, threshold_0.05_O2021, threshold_0.05_S2022, threshold_0.05_S2021, threshold_0.05_2020, threshold_0.05_2019, threshold_0.05_2018, threshold_0.01_2018, threshold_0.01_2019, threshold_0.01_2020, threshold_0.01_O2021, threshold_0.01_O2022, threshold_0.01_S2021, threshold_0.01_S2022, threshold_0.10_2018, threshold_0.10_2019, threshold_0.10_2020, threshold_0.10_O2021, threshold_0.10_O2022, threshold_0.10_S2021, threshold_0.10_S2022)
+rm(all2018,all2019,all2020,allO2021,allO2022,allS2021,allS2022)
+rm(J03,V03,S03,GM)
+```

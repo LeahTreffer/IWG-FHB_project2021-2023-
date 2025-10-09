@@ -1,0 +1,568 @@
+---
+title: "Phenotypic_Analysis"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Objective
+
+# Format Phenotype Files to be used in all analysis
+# Is there a significant difference in disease scores between years of the same cycle
+# Is there a significant difference in disease scores between cycles
+# Do agronomic traits have an effect on disease scores
+
+```{r setup}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r packages include=FALSE}
+library(tidyr)
+library(dplyr)
+library(stringr)
+library(graphics)
+library(stats)
+library(ggpubr)
+library(janitor)
+library(data.table)
+library(car)
+library(tidyverse)
+library(lmerTest)
+library(knitr)
+library(broom)
+library(AICcmodavg)
+library(gapminder)
+library(cowplot); library(ggpubr)
+source('scripts/model_test_functions.R')
+#install.packages("errorist")
+#library(errorist)
+```
+
+#data
+
+```{r loadin}
+#load in phenotype tables
+pheno <- read.csv("data/Original_Files/plants.csv", head=TRUE) #read in file with all cycles and years and locations
+PHENO <- pheno #make copy to hold original file
+#create separate tables for each cycle, year, location
+#Get just iwg plants from the three cycles
+C07 <- pheno[str_detect(pheno$germplasm_id, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$germplasm_id, "C10"),] #keep only data from C10 population
+C07_checks <- pheno[str_detect(pheno$plant_id, "17FHB"),] #keep only data from C7 population
+C07_checks <- C07_checks[str_detect(C07_checks$notes, "check"),] #keep only data from C7 population
+C10_checks <- pheno[str_detect(pheno$plant_id, "20FHB"),] #keep only data from C10 population
+C10_checks <- C10_checks[str_detect(C10_checks$notes, "check"),] #keep only data from C10 population
+
+#bind back into one table
+phen <- rbind(C07, C10)
+phen$Cycle = gsub('_.*$', '', phen$germplasm_id) #extract cycle from the taxa name
+phen$Site = gsub('.*_(.*)_.*', '\\1', phen$experiment_id) #extract site from the exirement id
+phen$Time = phen$phenotype_year
+phen$Time[phen$Time=="2018"]<-1
+phen$Time[phen$Time=="2019"]<-2
+phen$Time[phen$Time=="2020"]<-3
+phen$Time[phen$Time=="2021"]<-4
+phen$Time[phen$Time=="2022"]<-5
+
+#reformat 
+test <- as_tibble(phen[c("phenotype_year", "source_id", "Cycle", "Site", "Time", "trait_id", "phenotype_value", "serpentine")]) #tibble table
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, source_id, trait_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove unnecessary traits
+#Keep : BLSSEV, FHBD3G, FHBD3G_DON, FHBDISIND, FHBDON, FHBSPKINC, GLBSEV, HSATIVLSEV, SDHD, SPKLNG, ZDK, ERGSEV, HDANG, PTHT, SPKDEN, SPKHD, SPKYLD, STMANG
+#Remove: SPTHT, STMCLP
+test <- test[ , ! names(test) %in% c("SPTHT", "STMCLP")]
+
+write.table(test, 'data/Original_Files/Phenotypic_Format.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+# Reshaping data.frame from wide to long format after fixing duplicate rows in C10 OLA and SAL 2021
+# fix in excel, import, check for duplicates, final export 
+
+#go into 'data/Original_Files/Phenotypic_Format.txt'file in excel and fix rows in C10 OLA and SAL 2021 where same taxa has multiple rows
+
+#import the edited file
+Pheno_wide <- read.delim("data/Original_Files/Phenotypic_Format.txt")
+
+# check to make sure there are no longer duplicates
+pheno <- Pheno_wide[str_detect(Pheno_wide$Cycle, "C10"),] #keep only one cycle #C7 #C9 #C10
+pheno <- pheno[str_detect(pheno$Site, "OLA"),] #keep only one site #SAL #OLA
+pheno <- pheno[str_detect(pheno$phenotype_year, "2022"),] #keep only one year #2018 #2019 #2020 #2021 #2022
+duplicated(pheno$source_id) #prints out if plant_id is duplicated
+
+colnames(Pheno_wide)[2] <- 'plant_id' #rename column
+
+#change phenotype file in long format
+Pheno_long <- Pheno_wide %>% 
+  pivot_longer(
+    cols = 7:24, 
+    names_to = "trait_id",
+    values_to = "LOD"
+)
+
+#export phenotype file long format
+write.table(Pheno_long, 'data/Intermediate_Files/Phenotypic_Format_long.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+#export phenotype file wide format
+write.table(Pheno_wide, 'data/Intermediate_Files/Phenotypic_Format_wide.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+test <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide.txt")
+test$HDANG <- ifelse(test$phenotype_year == "2019", test$HDANG/100, test$HDANG)
+test$SPKDEN <- ifelse(test$phenotype_year == "2019", test$SPKDEN/100, test$SPKDEN)
+test$SPKYLD <- ifelse(test$phenotype_year == "2019", test$SPKYLD/100, test$SPKYLD)
+test$FHBSPKINC <- ifelse(test$phenotype_year == "2018", test$FHBSPKINC*100, test$FHBSPKINC)
+test$FHBSPKINC <- ifelse(test$phenotype_year == "2019", test$FHBSPKINC*100, test$FHBSPKINC)
+write.table(test, 'data/Intermediate_Files/Phenotypic_Format_wide.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+test <- read.delim('data/Intermediate_Files/Phenotypic_Format_long.txt')
+test$phenotype_value <- ifelse(test$phenotype_year == "2018" & test$trait_id == "FHBSPKINC", test$phenotype_value * 100, test$phenotype_value) 
+test$phenotype_value <- ifelse(test$phenotype_year == "2019" & test$trait_id == "FHBSPKINC", test$phenotype_value * 100, test$phenotype_value)
+test$phenotype_value <- ifelse(test$phenotype_year == "2019" & test$trait_id == "HDANG",
+test$phenotype_value / 100, test$phenotype_value)
+test$phenotype_value <- ifelse(test$phenotype_year == "2019" & test$trait_id == "SPKDEN", test$phenotype_value / 100, test$phenotype_value)
+test$phenotype_value <- ifelse(test$phenotype_year == "2019" & test$trait_id == "SPKYLD", test$phenotype_value / 100, test$phenotype_value)
+write.table(test, 'data/Intermediate_Files/Phenotypic_Format_long.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+# Add in 2022 toxin 
+pheno <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide.txt")
+new <- read.csv('data/Original_Files/Phenotypic_Format_2022_Toxin.csv')
+phenoL <- read.delim('data/Intermediate_Files/Phenotypic_Format_long.txt')
+newL <- read.csv('data/Original_Files/Phenotypic_Format_2022_Toxin_Long.csv')
+
+neww <- new[,c("EntityID","source_id","experiment_id")]
+    neww$Site <- gsub(".*20_","",neww$experiment_id) #Remove all before and up to 
+    neww$Site <- gsub("_Fusarium.*", "",neww$Site) #Remove characters after
+neww$Time <- "5"
+neww$Cycle <- "C10"
+colnames(neww)[1] <- "plant_id"
+newL <- merge(newL[,c(2:5)],neww[,c(1,2,4,5,6)], by="plant_id")
+newL$serpentine <- NA
+newL <- newL[,c(3,1,5,8,6,7,9,2,4)]
+
+phenoL$match <- paste0(phenoL$phenotype_year,"_",phenoL$trait_id)
+phenoLL <- phenoL[!str_detect(phenoL$match, "2022_FHBDON"),]
+rownames(phenoLL) <- NULL
+phenoLL <- phenoLL[-c(50310:53044),]
+phenoLL <- phenoLL[,c(1:8)]
+newL <- newL[,c(1,3:9)]
+colnames(newL)[2] <- "plant_id"
+phenoL_new <- rbind(phenoLL,newL)
+rownames(phenoL_new) <- NULL
+write.table(phenoL_new, 'data/Intermediate_Files/Phenotypic_Format_long_2.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+
+new$Site <- new$experiment_id
+    new$Site <- gsub(".*20_","",new$Site) #Remove all before and up to 
+    new$Site <- gsub("_Fusarium.*", "",new$Site) #Remove characters after 
+    
+new$mergec <- paste0(new$source_id,"_",new$Site)
+new$mergec[new$mergec == "NA_SAL"] <- NA #replace
+new$mergec[new$mergec == "NA_OLA"] <- NA #replace
+pheno3$mergec <- paste0(pheno3$plant_id,"_",pheno3$Site)
+pheno3$mergec[pheno3$mergec == "NA_SAL"] <- NA #replace
+pheno3$mergec[pheno3$mergec == "NA_OLA"] <- NA #replace
+
+pheno4 <- merge(pheno3[,c(25,1:6,7:24)], new[,c(23,1:21)], by="mergec", all=TRUE)
+#remove wheat checks
+pheno4 <- pheno4[-c(803:897),]
+#remove C9 checks
+pheno4 <- pheno4[-c(1:63),]
+
+pheno5 <- pheno4[,c(2:7,45,9:25,46)]
+colnames(pheno5)[7] <- "FHBDON"
+colnames(pheno5)[25] <- "FHBZEA"
+
+pheno2$FHBZEA <- NA
+
+pheno6 <- rbind(pheno2,pheno5)
+pheno6 <- pheno6[,c(1:6,25,7:24)]
+rownames(pheno6) <- NULL
+
+write.table(pheno6, 'data/Intermediate_Files/Phenotypic_Format_wide_2.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+```
+
+#Stats 
+
+#Change trait to make table for each disease trait
+```{r}
+
+test <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide.txt")
+
+#"FHBDON", "FHBD3G", "FHBD3G.DON", "FHBDISIND", "FHBSPKINC", "PTHT", "STMANG", "ZDK", "GLBLSEV", "BLSSEV", "HSATIVLSEV", "ERGSEV", "SPKHD", "HDANG", "SPKLNG", "SDHD", "SPKYLD", "SPKDEN"  
+
+table <- test[,c("phenotype_year","plant_id", "Time", "Cycle", "Site", "FHBDON","serpentine")] #make pheno table for input into histogram function 
+colnames(table)[6] <- "Value"
+table <- na.omit(table) #remove rows with NA for Value
+table$LogVal = log(table$Value)
+table$LogVal[is.na(table$LogVal) | table$LogVal=="-Inf"] = NA
+table$sqrtVal = sqrt(table$Value)
+table <- table[,c(1:6,8,9,7)] #reorder
+colnames(table)[1] <- "Year"
+colnames(table)[2] <- "taxa"
+colnames(table)[9] <- "count"
+table$Values <- table$Value
+table$Cycle[table$Cycle == "C7"] <- "C07" #replace C7 with C07
+
+str(table) #structure ; shows what the variables(factors) are
+#making variables factors turns them from co-variants into variant factor
+#numerical factor treated as 1 degree of freedom
+#factor treated as group, not continual number
+#the workshop has the data values as integers and glmer seems to need them as integers
+table$Year= as.character(table$Year)
+table$taxa= as.integer(as.factor(table$taxa))
+table$Cycle= as.factor(as.character(table$Cycle))
+table$count= as.factor(as.character(table$count))
+table$Time= as.factor(as.character(table$Time)) 
+table$Site= as.factor(as.character(table$Site)) 
+table$Values= as.integer(as.factor(table$Values)) 
+table$sqrtValues = sqrt(table$Values)
+str(table)
+
+# Plot data.
+ggplot(table, aes(x= Year, y=Values, fill=Cycle ))+
+  geom_boxplot()+
+  #geom_jitter()+
+  labs(title='Distribution of FHBDON Ratings')
+#table that gets printed has the cycles (C7, C9, C10) and the shows scores for given trait in each year 
+#save plots to Year+Cycle_Comparison_TRAIT.pdf
+ggplot(table, aes(x= Cycle, y=Values, fill=Cycle ))+
+  geom_boxplot()+
+  #geom_jitter()+
+  labs(title='Average Cycle Differences for FHBDISIND')
+#table that gets printed has the difference between cycles
+#save plots to Cycle_Comparison_TRAIT.pdf
+
+#define the cultivar data sets
+Cycle07= table[table$Cycle=="C07",]
+Cycle10= table[table$Cycle=="C10",]
+
+ggplot(Cycle10, aes(x= Year, y=Values, fill=Site ))+
+  geom_boxplot()+
+  #geom_jitter()+
+  labs(title='Distribution of FHBDON Ratings')
+
+# Normality tests of all original data values, then for each cultivar.
+shapiro.test(table$Values)
+shapiro.test(Cycle07$Values)
+shapiro.test(Cycle10$Values)
+#significant pvalue here indicates data is not normal 
+
+#Data Distributions with Original Nodule Data
+ggplot(table, aes(x= Value, fill=Cycle))+
+  geom_histogram() +
+  facet_grid(.~ Year) +
+  #stat_density(geom="line")+
+  ggtitle("FHBDISIND Distribution with orginal nodule data")
+#Data Distribution with square root nodule data
+ggplot(table, aes(x= sqrtVal, fill=Cycle))+
+  geom_histogram() +
+  facet_grid(.~ Year) +
+  ggtitle("FHBDISIND Distribution with square root nodule data")
+#Data Distribution with log nodule data
+ggplot(table, aes(x= LogVal, fill=Cycle))+
+  geom_histogram() +
+  facet_grid(.~ Year) +
+  ggtitle("FHBDISIND Distribution with log nodule data")
+
+# Normality tests of all sqrt data values, then for each cultivar.
+shapiro.test(table$LogVal)
+shapiro.test(Cycle07$LogVal)
+shapiro.test(Cycle10$LogVal)
+# Normality tests of all log data values, then for each cultivar.
+shapiro.test(table$sqrtVal)
+shapiro.test(Cycle07$sqrtVal)
+shapiro.test(Cycle10$sqrtVal)
+#Sqrt is better, but still not normal 
+
+```
+
+```{r models}
+anova(lm(Values ~ Time+Site+Cycle, data = table))
+anova(lm(sqrtVal ~ Time+Site+Cycle, data = table)) #
+anova(lm(sqrtVal ~ Time+Cycle+Site, data = table)) 
+anova(lm(LogVal ~ Time+Site+Cycle, data = table))
+anova(lm(sqrtValues ~ Time+Site+Cycle, data = table)) #
+anova(lm(sqrtValues ~ Time+Cycle+Site, data = table)) #
+
+#compare 
+model=lm(sqrtVal ~ Time+Site+Cycle, data = table)
+summary(model) #gives each individual degree of freedom parameter of estimates
+
+model_nodule= lm(Value ~ Cycle, data=table )
+summary(model_nodule)
+anova(lm(Value ~ Cycle, data=table ))    # with type I sum of squares fitting
+
+Anova(model_nodule, type = 'III')
+
+anova(lm(Value ~ Time*Cycle*Site, data = table))
+anova(lm(Value ~ Time*Site*Cycle, data = table))
+
+anova(lm(sqrtVal ~ Time*Cycle*Site, data = table)) #
+anova(lm(sqrtVal ~ Time*Site*Cycle, data = table)) #
+
+anova(lm(sqrtValues ~ Time*Cycle*Site, data = table)) #
+anova(lm(sqrtValues ~ Time*Site*Cycle, data = table))
+
+#Generalized linear models (GLM): Poisson Regression
+model_glm_nodules=glm(Value~Time+Site+Cycle, family = poisson, data=table)
+summary(model_glm_nodules)
+
+
+#Generalized linear mixed model (GLMM)
+AIC_model_selection_glmer(table) # function that will test a long list of models ; input is the table of one trait
+best_models_glmer(26) # results of the best models determined by AIC selection ; input is the number that is output of best_model, if multiple numbers are outputed will have to change number to see each model
+
+AIC_model_selection_C07(Cycle07) # function that will test a long list of models ; input is the table of one trait
+best_models_C07(3) # results of the best models determined by AIC selection ; input is the number that is output of best_model, if multiple numbers are outputed will have to change number to see each model
+
+AIC_model_selection_C10(Cycle10) # function that will test a long list of models ; input is the table of one trait
+best_models_C10(5) # results of the best models determined by AIC selection ; input is the number that is output of best_model, if multiple numbers are outputed will have to change number to see each model
+
+
+# Find the best-fit model # https://www.scribbr.com/statistics/anova-in-r/
+# AIC calculates the information value of each model by balancing the variation explained against the number of parameters used
+# In AIC model selection, we compare the information value of each model and choose the one with the lowest AIC value (a lower number means more information explained!)
+
+one.way <- aov(Value ~ Cycle, data = table) # test one factor
+one.way2 <- aov(Value ~ Time, data = table) # test more than one factor, no interactions; any order
+one.way3 <- aov(Value ~ Site, data = table) 
+two.way <- aov(Value ~ Cycle + Time, data = table)
+interaction <- aov(Value ~ Cycle*Time, data = table) # aka three.way ; test more thann one factor and can include interactions; any order
+blocking <- aov(Value ~ Cycle + Time + Site, data = table) # a two or three way with one or more covarients (blocks) usually added as the last factor, blocks are never part of an interaction
+blocking2 <- aov(Value ~ Cycle + Site + Time, data = table)
+blocking3 <- aov(Value ~ Time + Cycle + Site, data = table)
+blocking4 <- aov(Value ~ Time + Site + Cycle, data = table)
+blocking5 <- aov(Value ~ Site + Time + Cycle, data = table)
+blocking6 <- aov(Value ~ Site + Cycle + Time, data = table)
+unknown <- aov(Value ~ Cycle*Time*Site, data = table)
+unknown2 <- aov(Value ~ Cycle*Site*Time, data = table)
+unknown3 <- aov(Value ~ Site*Cycle*Time, data = table)
+unknown4 <- aov(Value ~ Site*Time*Cycle, data = table)
+unknown5 <- aov(Value ~ Time*Site*Cycle, data = table)
+unknown6 <- aov(Value ~ Time*Cycle*Site, data = table)
+
+model.set <- list(one.way, one.way2, one.way3, two.way, interaction, blocking, blocking2, blocking3, blocking4, blocking5, blocking6, unknown, unknown2, unknown3, unknown4, unknown5, unknown6)
+model.names <- c("one.way", "two.way", "interaction", "blocking", "unknown", "unknown2", "unknown3", "unknown4", "unknown5", "unknown6")
+aictab(model.set, modnames = model.names)
+
+
+anova(lm(sqrtVal ~ Time+Site+Cycle, data = table))
+anova(lm(sqrtVal ~ Time*Cycle*Site, data = table))
+
+# post hoc multiple comparison test
+#To find out which groups are statistically different from one another, you can perform a Tukey’s Honestly Significant Difference (Tukey’s HSD) post-hoc test for pairwise comparisons
+
+model <- glmer(Values ~ Cycle + Site + Time + (1|count) + (1|Site:Time), 
+                             data = table, family = poisson(link = "sqrt"))  
+TukeyHSD(model, conf.level=.95)
+Fit : aov(formula = glmer(Values ~ Cycle + Site + Time + (1|count) + (1|Site:Time), 
+                          data = table, family = poisson(link = "sqrt")))
+
+
+
+#https://github.com/vicruiser/tukey_test_plot
+#tukey_test_plot
+#Match tukey test results (letters or asteriks resulting from the HSD.test function) and set them to their corresponding bar in a barplot. It takes into account possible facets from ggplot2.
+```
+
+```{r yield}
+
+```
+
+# Do agronomic traits have an effect on disease scores
+
+```{r anova}
+pheno <- read.table('data/Intermediate_Files/Phenotypic_Format_wide_2.txt', header=TRUE)
+
+#table <- pheno[,c("phenotype_year","plant_id", "Time", "Cycle", "Site", "FHBDON","serpentine")] #make pheno table for input into histogram function 
+#colnames(table)[6] <- "Value"
+#table <- na.omit(table) #remove rows with NA for Value
+#table$LogVal = log(table$Value)
+#table$LogVal[is.na(table$LogVal) | table$LogVal=="-Inf"] = NA
+#table$sqrtVal = sqrt(table$Value)
+#table <- table[,c(1:6,8,9,7)] #reorder
+colnames(pheno)[1] <- "Year"
+colnames(pheno)[2] <- "taxa"
+#colnames(table)[9] <- "count"
+#table$Values <- table$Value
+
+str(pheno) #structure ; shows what the variables(factors) are
+#making variables factors turns them from co-variants into variant factor
+#numerical factor treated as 1 degree of freedom
+#factor treated as group, not continual number
+#the workshop has the data values as integers and glmer seems to need them as integers
+pheno$Year= as.character(pheno$Year)
+pheno$taxa= as.integer(as.factor(pheno$taxa))
+pheno$Cycle= as.factor(as.character(pheno$Cycle))
+pheno$serpentine= as.factor(as.character(pheno$serpentine))
+pheno$Time= as.factor(as.character(pheno$Time)) 
+pheno$Site= as.factor(as.character(pheno$Site)) 
+pheno$PTHT = as.numeric(pheno$PTHT)
+pheno$STMANG = as.numeric(pheno$STMANG)
+pheno$ZDK = as.numeric(pheno$ZDK)
+pheno$GLBLSEV = as.numeric(pheno$GLBLSEV)
+pheno$BLSSEV = as.numeric(pheno$BLSSEV)
+pheno$HSATIVLSEV = as.numeric(pheno$HSATIVLSEV)
+str(pheno)
+
+#Are these traits significant for FHB traits? (spikelets per head, spikelet length, seeds per head, stem angle)
+anova(lm(FHBDISIND ~ SPKHD+SPKLNG+SDHD+STMANG, data = pheno)) #adding PTHT because we know it is correlated, so using it to test this anova
+anova(lm(FHBDON ~ SPKHD+SPKLNG+SDHD+STMANG, data = pheno)) 
+anova(lm(FHBSPKINC ~ SPKHD+SPKLNG+SDHD+STMANG, data = pheno)) 
+
+# how about for (Spikelet density, spikelet yield, head angle)
+anova(lm(FHBDISIND ~ SPKDEN+SPKYLD+HDANG, data = pheno)) #adding PTHT because we know it is correlated, so using it to test this anova
+anova(lm(FHBDON ~ SPKDEN+SPKYLD+HDANG, data = pheno)) 
+anova(lm(FHBSPKINC ~ SPKDEN+SPKYLD+HDANG, data = pheno)) 
+
+#working from here: https://www.statology.org/ancova-in-r/
+library(car)
+ancova_model <- aov(FHBDISIND ~ PTHT + SPKLNG, data = pheno)
+Anova(ancova_model, type="III") 
+library(multcomp)
+postHocs <- glht(ancova_model, linfct = mcp(PTHT = "Tukey"))
+
+###
+anova_model <- aov(SPKLNG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDISIND ~ taxa + SPKLNG, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SPKHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDISIND ~ taxa + SPKHD, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SDHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDISIND ~ taxa + SDHD, data = pheno)
+Anova(ancova_model, type="III") 
+#this showed SDHD to be significant ! and only had one year of data
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(STMANG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDISIND ~ taxa + STMANG, data = pheno)
+Anova(ancova_model, type="III")
+#this showed STMANG to be significant ! even if year if fitted first
+ancova_model <- aov(FHBDISIND ~ taxa + Year + STMANG, data = pheno)
+Anova(ancova_model, type="III")
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+
+# FHBDISIND:SDHD, STMANG
+
+###
+anova_model <- aov(SPKLNG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBSPKINC ~ taxa + SPKLNG, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SPKHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBSPKINC ~ taxa + SPKHD, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SDHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBSPKINC ~ taxa + SDHD, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(STMANG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBSPKINC ~ taxa + STMANG, data = pheno)
+Anova(ancova_model, type="III")
+#this showed STMANG to be significant ! *but only if year is not fitted first
+ancova_model <- aov(FHBSPKINC ~ taxa + Year + STMANG, data = pheno)
+Anova(ancova_model, type="III")
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+
+#FHBSPKINC:STMANG*
+
+###
+anova_model <- aov(SPKLNG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDON ~ taxa + SPKLNG, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SPKHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDON ~ taxa + SPKHD, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(SDHD ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDON ~ taxa + SDHD, data = pheno)
+Anova(ancova_model, type="III") 
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+###
+anova_model <- aov(STMANG ~ taxa, data = pheno)
+summary(anova_model)
+#p-value is greater than 0.05, covariate (SPKLNG) and the treatment (taxa) seem to be independent
+ancova_model <- aov(FHBDON ~ taxa + STMANG, data = pheno)
+Anova(ancova_model, type="III")
+postHocs <- glht(ancova_model, linfct = mcp(taxa = "Tukey"))
+
+
+
+# probably not the right method
+pheno2 = pheno
+
+pheno2$FHBZEA <- as.integer(as.factor(pheno2$FHBZEA))
+pheno2$FHBDON <- as.integer(as.factor(pheno2$FHBDON))
+pheno2$FHBD3G <- as.integer(as.factor(pheno2$FHBD3G))
+pheno2$FHBD3G.DON <- as.integer(as.factor(pheno2$FHBD3G.DON))
+pheno2$FHBDISIND <- as.integer(as.factor(pheno2$FHBDISIND))
+pheno2$FHBSPKINC <- as.integer(as.factor(pheno2$FHBSPKINC))
+pheno2$PTHT <- as.integer(as.factor(pheno2$PTHT))
+pheno2$STMANG <- as.integer(as.factor(pheno2$STMANG))
+pheno2$ZDK <- as.integer(as.factor(pheno2$ZDK))
+pheno2$GLBLSEV <- as.integer(as.factor(pheno2$GLBLSEV))
+pheno2$BLSSEV <- as.integer(as.factor(pheno2$BLSSEV))
+pheno2$HSATIVLSEV <- as.integer(as.factor(pheno2$HSATIVLSEV))
+pheno2$ERGSEV <- as.integer(as.factor(pheno2$ERGSEV))
+pheno2$SPKHD <- as.integer(as.factor(pheno2$SPKHD))
+pheno2$HDANG <- as.integer(as.factor(pheno2$HDANG))
+pheno2$SPKLNG <- as.integer(as.factor(pheno2$SPKLNG))
+pheno2$SDHD <- as.integer(as.factor(pheno2$SDHD))
+pheno2$SPKYLD <- as.integer(as.factor(pheno2$SPKYLD))
+pheno2$SPKDEN <- as.integer(as.factor(pheno2$SPKDEN))
+
+model_glm_nodules=glm(FHBDON~SPKHD+SPKLNG+SDHD+STMANG+PTHT, family = poisson, data=pheno2)
+summary(model_glm_nodules)
+
+
+```

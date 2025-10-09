@@ -1,0 +1,122 @@
+---
+title: "1.0 Retrieve Data"
+author: "Jared Crain"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+#Objective
+
+Retrieve data for the 17_SAL_FusariumCycle7Training experiment.  Phenotypic, plant information, and germplasm data was retrieved from the database and organized for phenotypic analysis.  The phenotypic analysis will be used to generate GS models to predict FHB.
+
+```{r setup, eval=TRUE}
+#rm(list=ls(all=TRUE))
+knitr::opts_knit$set(root.dir = '~/Desktop/TLI/AM/Other_Traits')
+setwd('~/Desktop/TLI/AM/Other_Traits')
+options(digits = 10) #set options to include lots of digits
+#Git directory
+#ssh://git@gitlab-ssh.beocat.ksu.edu:2220/jcrain/17_SAL_Fusarium.git
+#https://gitlab.beocat.ksu.edu/jcrain/17_SAL_Fusarium.git
+```
+
+```{r get_functions}
+source('~/Desktop/TLI/AM/FHB_ANALYISIS/scripts/Function_R.r') #source functions
+```
+
+#Retrieve Data
+```{r retrieve_data, eval=FALSE}
+#log into beocat through terminal
+#ssh -L 6306:apate.beocat.ksu.edu:3306 treffer@headnode.beocat.ksu.edu
+
+install.packages("RMySQL")
+#log_detail <- getLoginDetails() #fill in username and password in popup box
+require(RMySQL) #load required packages may need to install.packages("RMySQL") dependicies are DBI packaage as well
+
+#username <- 'treffer'
+username <- charToRaw(invisible(rstudioapi::askForPassword("Database username"))) #get username
+#password <- 'leah'
+password <- charToRaw(invisible(rstudioapi::askForPassword("Database password"))) #get password
+
+#Make a MySQL connection to beocat and intermediate_wheatgrass database
+iwg <- dbConnect(MySQL(),user = rawToChar(username), dbname = 'intermediate_wheatgrass', host = '127.0.0.1', password = rawToChar(password), port = 6306) #run this line to connect to the database
+
+plant_query <- 'SELECT intermediate_wheatgrass.plant.* FROM intermediate_wheatgrass.plant WHERE intermediate_wheatgrass.plant.experiment_id = "17_SAL_FusariumCycle7Training"'
+
+plant <- dbGetQuery(iwg, plant_query)
+
+#get phenotype data
+phen_query <- 'SELECT intermediate_wheatgrass.phenotype.* FROM intermediate_wheatgrass.phenotype WHERE intermediate_wheatgrass.phenotype.entity_id in (SELECT intermediate_wheatgrass.plant.plant_id FROM intermediate_wheatgrass.plant WHERE intermediate_wheatgrass.plant.experiment_id = "17_SAL_FusariumCycle7Training")'
+
+phen <- dbGetQuery(iwg, phen_query)
+
+#get germplasm information
+germ_query <- 'SELECT intermediate_wheatgrass.germplasm.* FROM intermediate_wheatgrass.germplasm' #just download entire table
+
+germ <- dbGetQuery(iwg, germ_query)
+
+dbDisconnect(iwg) #disconnect from database
+
+#write out original queried data
+write.table(plant, file = './Original_Data/FHB_Plant.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(phen, file = './Original_Data/FHB_Phenotype_2018.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+write.table(germ, file = './Original_Data/Germplams_Information.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+#clean up
+rm(iwg, log_detail, phen, phen_query, plant, plant_query, germ_query, germ)
+
+```
+
+#Format data
+
+Remove unneeded column, format data to analyze with ASREML.
+
+```{r format_data}
+germ <- read.delim(file = './Original_Data/Germplams_Information.txt', header = TRUE, stringsAsFactors = FALSE) #load germplasm information
+
+germ$male_parent <- ifelse(is.na(germ$male_parent), germ$genetic_male_parent, germ$male_parent) #if male parent is NA replace with genetic male parent
+
+#load plant data
+plant <- read.delim(file = './Original_Data/FHB_Plant.txt', header = TRUE, stringsAsFactors = FALSE) #laod plant data
+
+plant <- plant[str_detect(plant$germplasm_id, "C7_"),] #keep only C7 population, remove wheat checks
+
+#get selection to prune pedigree file
+selections <- unique(plant$germplasm_id) #get all unique germplasm_id
+
+pedigree <- prune_pedigree(selections, germ) #prune the pedigree file to just the germplasm needed to set up the model.
+
+pedigree <- pedigree[, c(2,4,3)] #select only germplasm_id, male and female file to make peidgree matrix
+
+write.table(pedigree, file = './Intermediate_File/FHB_Pedigree.txt', sep = '\t', quote = FALSE, row.names =FALSE)
+
+#join plant and phenotype information for analysis
+phen <- read.table(file = './Original_Data/FHB_Phenotype_2018.txt', header = TRUE, fill = TRUE, stringsAsFactors = FALSE, sep='\t') #load phenotype data
+
+#remove unneeded columns
+phen <- phen[, c(2,4,5,7)] #keep entity_id, trait_id, phenotype_value, and phenotype_year
+
+colnames(phen)[1] <- 'plant_id' #rename entity_id to plant_id to match plant table
+
+#select columns of plant
+plant <- plant[, c(2,3)]
+
+#merge with phenotype_data
+fhb <- merge(plant, phen, by = 'plant_id') #makes wide format for each trait with trial information
+
+#save file
+write.table(fhb, file = './Intermediate_File/FHB_Data.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+
+#clean up
+rm(germ, plant, selections, pedigree, phen, fhb)
+
+```
+
+#Get Genotypic Data?
+
+
+#Session Information
+
+```{r sessionInformation}
+sessionInfo()
+```

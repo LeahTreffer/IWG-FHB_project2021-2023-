@@ -1,0 +1,114 @@
+---
+title: "compare models"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+compare the significant snps from different models to detect potential consistencies 
+
+```{r, echo=FALSE, include=FALSE}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r library}
+source('scripts/QTL_range.R')
+library(dplyr)
+library(tidyr)
+```
+
+```{r FarmCPU_input}
+FarmCPU <- read.csv('data/Final_Files/output_COMBINED.csv')
+FarmCPU_results <- FarmCPU[,c(1,4,5,10,11,2,3)]
+colnames(FarmCPU_results)[2] <- "CHR"
+colnames(FarmCPU_results)[3] <- "Pos"
+colnames(FarmCPU_results)[6] <- "traits"
+```
+
+```{r BLINK_input}
+plots <- c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+dir <- c("output/BLINK/")
+dirr <- c("/GAPIT.Association.Filter_GWAS_results.csv")
+BLINK_results <- data.frame()
+for (i in plots){
+  BLINK = read.csv(paste0(dir,i,dirr))
+  BLINK$Plot <- i
+  BLINK_results <- rbind(BLINK_results, BLINK)
+}
+BLINK_results <- BLINK_results[,-c(1)]
+colnames(BLINK_results)[2] <- "CHR"
+```
+
+```{r rrBLUP_input}
+plots <- c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+dir <- c("output/rrBLUP/")
+rrBLUP_results <- data.frame()
+for (i in plots){
+  rrBLUP = read.csv(paste0(dir,i,'/Significant_Markers_',i,'.csv'))
+
+  rrBLUP_long <- rrBLUP %>% 
+  pivot_longer(
+    cols = 5:ncol(rrBLUP), 
+    names_to = "trait_id",
+    values_to = "LOD"
+)
+  
+  rrBLUP_long$Plot <- i
+  rrBLUP <- na.omit(rrBLUP_long)
+
+  rrBLUP_results <- rbind(rrBLUP_results, rrBLUP)
+}
+colnames(rrBLUP_results)[1] <- "SNP"
+colnames(rrBLUP_results)[2] <- "CHR"
+colnames(rrBLUP_results)[3] <- "Pos"
+colnames(rrBLUP_results)[5] <- "traits"
+rrBLUP_results$traits <- paste0("rrBLUP_",rrBLUP_results$traits)
+
+```
+
+```{r GWASpoly}
+gwaspoly <- read.csv('output/GWASpoly/output_Sig_table_all.csv')
+gwaspoly$Trait <- paste0("GWASpoly.",gwaspoly$Trait)
+colnames(gwaspoly)[1] <- "traits"
+colnames(gwaspoly)[4] <- "SNP"
+colnames(gwaspoly)[5] <- "CHR"
+colnames(gwaspoly)[6] <- "Pos"
+colnames(gwaspoly)[12] <- "P.value"
+colnames(gwaspoly)[13] <- "Plot"
+
+```
+
+```{r run}
+##columns you MUST have: SNP, Plot, CHR, Pos
+FarmCPU_results$LOD <- NA
+BLINK_results$LOD <- NA
+gwaspoly$LOD <- NA
+rrBLUP_results$P.value <- NA
+FarmCPU_results$Model <- NA
+BLINK_results$Model <- NA
+rrBLUP_results$Model <- NA
+
+FarmCPU_results <- FarmCPU_results[,c("SNP", "CHR", "Pos", "traits", "Plot", "Model", "P.value", "LOD")]
+BLINK_results <- BLINK_results[,c("SNP", "CHR", "Pos", "traits", "Plot", "Model", "P.value", "LOD")]
+rrBLUP_results <- rrBLUP_results[,c("SNP", "CHR", "Pos", "traits", "Plot", "Model", "P.value", "LOD")]
+GWASpoly_results <- gwaspoly[,c("SNP", "CHR", "Pos", "traits", "Plot", "Model", "P.value", "LOD")]
+
+TOGETHER <- rbind(FarmCPU_results,BLINK_results,rrBLUP_results,GWASpoly_results)
+TOG <- TOGETHER[!str_detect(TOGETHER$traits, "ERGSEV"),]
+
+qtl.comparison(TOG, 100000, order=FALSE, space=TRUE) # run function ; one list (qtl_list) of snps that were exact matches and snps that were within a designated range of each other; order: default is FALSE, will order the output table by chromosome; space: default is False, will add a blank row in between each set for easier viewing of pairs
+
+write.csv(qtl_list, "output/comparing_snps_all_models_snps.close.to.each.other_100000.csv", row.names = FALSE)
+write.csv(TOG, "output/comparing_snps_all_models.csv", row.names = FALSE)
+```

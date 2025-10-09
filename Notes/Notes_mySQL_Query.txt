@@ -1,0 +1,2 @@
+SELECT intermediate_wheatgrass.plant.*, intermediate_wheatgrass.phenotype.* FROM intermediate_wheatgrass.plant LEFT JOIN intermediate_wheatgrass.phenotype on intermediate_wheatgrass.plant.plant_id=intermediate_wheatgrass.phenotype.entity_id WHERE intermediate_wheatgrass.plant.experiment_id LIKE '%fusarium%';
+

@@ -1,0 +1,240 @@
+---
+title: "0.5_Genotypic_Analysis"
+output: html_document
+date: "2023-05-04"
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+Average number of markers per chromosome
+Range of number of markers for each chromosome 
+Principle Component Analysis
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r include=FALSE}
+library(ggplot2)
+```
+
+```{r load_data, include=FALSE}
+
+# Genotype Files: 
+  # taken from beocat directory (Jan 2023), after Jared filtered for MAF > 0.01 and less than 70% missing (minimum of 30% of the individuals had a particular SNP called)
+    # data set has ~32067 markers and ~2165 individuals
+  # FHB_for_GS_GWAS.txt is the imputed (all data) calls changed to a -1, 0, 1 format 
+  # FHB_Imputed.hmp.txt has the allele calls (A, C, G, T, etc.)
+
+FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+#make a copy of master file to work with
+GENO <- FHB_for_GS_GWAS
+GENO <- GENO + 1 # change geno numeric format from -101 to 012
+```
+
+```{r subset}
+J <- GENO[,grepl("SJ", colnames(GENO))]
+S <- GENO[,grepl("SS", colnames(GENO))]
+V <- GENO[,grepl("SV", colnames(GENO))]
+```
+
+```{r count}
+length(grep(x = colnames(GENO), pattern = "^SJ01")) #1547
+length(grep(x = colnames(GENO), pattern = "^SJ02")) #2086
+length(grep(x = colnames(GENO), pattern = "^SJ03")) #1757
+length(grep(x = colnames(GENO), pattern = "^SJ04")) #1043
+length(grep(x = colnames(GENO), pattern = "^SJ05")) #1527
+length(grep(x = colnames(GENO), pattern = "^SJ06")) #1418
+length(grep(x = colnames(GENO), pattern = "^SJ07")) #2070
+
+length(grep(x = colnames(GENO), pattern = "^SS01")) #1359
+length(grep(x = colnames(GENO), pattern = "^SS02")) #2006
+length(grep(x = colnames(GENO), pattern = "^SS03")) #1763
+length(grep(x = colnames(GENO), pattern = "^SS04")) #1172
+length(grep(x = colnames(GENO), pattern = "^SS05")) #2180
+length(grep(x = colnames(GENO), pattern = "^SS06")) #1471
+length(grep(x = colnames(GENO), pattern = "^SS07")) #1690
+
+length(grep(x = colnames(GENO), pattern = "^SV01")) #1052
+length(grep(x = colnames(GENO), pattern = "^SV02")) #1599
+length(grep(x = colnames(GENO), pattern = "^SV03")) #1371
+length(grep(x = colnames(GENO), pattern = "^SV04")) #943
+length(grep(x = colnames(GENO), pattern = "^SV05")) #1449
+length(grep(x = colnames(GENO), pattern = "^SV06")) #1011
+length(grep(x = colnames(GENO), pattern = "^SV07")) #1553
+```
+
+```{r table}
+J01 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ01"))) #
+J02 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ02"))) #
+J03 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ03"))) #
+J04 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ04"))) #
+J05 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ05"))) #
+J06 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ06"))) #
+J07 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SJ07"))) #
+
+S01 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS01"))) #
+S02 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS02"))) #
+S03 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS03"))) #
+S04 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS04"))) #
+S05 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS05"))) #
+S06 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS06"))) #
+S07 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SS07"))) #
+
+V01 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV01"))) #
+V02 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV02"))) #
+V03 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV03"))) #
+V04 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV04"))) #
+V05 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV05"))) #
+V06 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV06"))) #
+V07 <- as.numeric(length(grep(x = colnames(GENO), pattern = "^SV07"))) #
+
+table <- data.table(J01,J02,J03,J04,J05,J06,J07,S01,S02,S03,S04,S05,S06,S07,V01,V02,V03,V04,V05,V06,V07)
+table2 <- t(table)
+table2 <- as.data.frame(table2)
+table2 <- tibble::rownames_to_column(table2, "row_names") #convert row names into first column of data
+colnames(table2)[1] <- "Chromosome"
+colnames(table2)[2] <- "number_of_markers"
+table2$SubGenome <- table2$Chromosome
+table2$SubGenome <- gsub("0.*", "",table2$SubGenome) #Remove 0 and all characters after
+
+write.csv(table2, "data/Final_Files/Markers_per_Chrom_Summary.csv", row.names = FALSE)
+
+```
+
+```{r chart}
+# Basic barplot
+p <-ggplot(data=table2, aes(x=Chromosome, y=number_of_markers)) +
+  geom_bar(stat="identity")
+p
+
+p<-ggplot(table2, aes(x=Chromosome, y=number_of_markers, fill=SubGenome)) +
+  geom_bar(stat="identity")+theme_minimal()
+p
+
+p<-ggplot(table2, aes(x=Chromosome, y=number_of_markers, fill=SubGenome)) +
+  geom_bar(stat="identity")+theme_minimal()
+p+scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9"))
+
+
+p<-ggplot(table2, aes(x=Chromosome, y=number_of_markers, fill=SubGenome)) +
+  geom_bar(stat="identity", show.legend = FALSE)+theme_minimal()
+p+scale_fill_manual(values=c("#999999", "#E69F00", "#56B4E9")) 
+
+p<-ggplot(table2, aes(x=Chromosome, y=number_of_markers, fill=SubGenome)) +
+  geom_bar(stat="identity", show.legend = FALSE)+theme_minimal()
+p+scale_fill_manual(values=c("#332288", "#888888", "#6699CC")) 
+
+# Redo for paper 
+## capitalize axis lables
+colnames(table2)[2] <- "Number of Markers"
+
+p<-ggplot(table2, aes(x=Chromosome, y=`Number of Markers`, fill=SubGenome)) +
+  geom_bar(stat="identity", show.legend = FALSE)+theme_minimal()
+p+scale_fill_manual(values=c("#332288", "#888888", "#6699CC")) 
+
+# Export as pdf : ~/data/Figures/Markers_per_Chromosome2.pdf
+
+```
+
+```{r table_sum}
+sum_tab <- table2[c(18,12),c(1,2)]
+mean(table2$number_of_markers)
+sum_tab$Average_number_markers <- c("1527",NA)
+
+Sum_Tab <- data.table()
+Sum_Tab$least_markers <- c("V04", "943")
+Sum_Tab$most_markers <- c("S05", "2180")
+Sum_Tab$average_markers <- c(NA, "1527")
+Sum_Tab$J_range <- c("J", "1043-2086")
+Sum_Tab$S_range <- c("S", "1172-2180")
+Sum_Tab$V_range <- c("V", "943-1599")
+
+sum_tab <- t(Sum_Tab)
+sum_tab <- as.data.frame(sum_tab)
+colnames(sum_tab)[1] <- "Group"
+colnames(sum_tab)[2] <- "Count"
+
+write.csv(sum_tab, "data/Final_Files/Markers_Summary.csv", row.names = TRUE)
+
+```
+
+Principle Component Analysis
+
+- Principal components analysis is very important for genetic analysis for two reasons:
+
+ 1. The measured data is often very highly dimensional (meaning there are thousands of SNPs measured, or genes measured for their expression).  Visualizing this data is impossible as we only see in 3-dimensions.  PCA lets us condense the dimensionality.
+ 
+ 2. Ancestry or population structure is a large and sometimes overwhelming cause for why genetic data looks the way it does. If we are testing whether SNP A causes trait X, we want to make sure that the p-value reflects SNP A, not the habits of the people who present with SNP A.  To factor out this population structure trend, we must first measure it - for this task we use PCA.
+ 
+ - The simplest explanation of a PCA is that it is a process that finds the axes of greatest variation within your data and projects the data onto these axes
+ 
+```{r}
+xa_matrix <- as.matrix(FHB_for_GS_GWAS)
+pca_result <- prcomp(xa_matrix %*% t(xa_matrix)) # correlation matrix to run prcomp on 
+# Extract principal components
+pcs <- pca_result$x
+# proportion of variance explained by each PC
+variance_explained <- pca_result$sdev^2 / sum(pca_result$sdev^2)
+# Percentages for the first two PCs
+percentage_pc1 <- variance_explained[1] * 100
+percentage_pc2 <- variance_explained[2] * 100
+percentage_pc3 <- variance_explained[3] * 100
+percentage_pc4 <- variance_explained[4] * 100
+percentage_pc5 <- variance_explained[5] * 100
+percentage_pc6 <- variance_explained[6] * 100
+# Create a dataframe with PC scores
+pc_df <- data.frame(PC1 = pcs[, 1], PC2 = pcs[, 2]) # first and second PC
+pc_df2 <- data.frame(PC2 = pcs[, 2], PC3 = pcs[, 3]) # first and second PC
+pc_df3 <- data.frame(PC3 = pcs[, 3], PC4 = pcs[, 4]) # first and second PC
+pc_df4 <- data.frame(PC4 = pcs[, 4], PC5 = pcs[, 5]) # first and second PC
+pc_df5 <- data.frame(PC5 = pcs[, 5], PC6 = pcs[, 6]) # first and second PC
+#Round 
+ppc1 <- round(percentage_pc1, digits = 4)
+ppc2 <- round(percentage_pc2, digits = 4)
+ppc3 <- round(percentage_pc3, digits = 4)
+ppc4 <- round(percentage_pc4, digits = 4)
+ppc5 <- round(percentage_pc5, digits = 4)
+ppc6 <- round(percentage_pc6, digits = 4)
+# Plot PC1 vs PC2 with different colors for the two ancestor groups
+ggplot(pc_df, aes(x = PC1, y = PC2)) +
+  geom_point(size = 4) +
+  labs(x=paste("PC1",ppc1), y=paste("PC2",ppc2)) +
+  ggtitle("Principal Component Analysis") + 
+  theme_minimal()
+# Plot PC2 vs PC3 with different colors for the two ancestor groups
+ggplot(pc_df2, aes(x = PC2, y = PC3)) +
+  geom_point(size = 4) +
+  labs(x=paste("PC2",ppc2), y=paste("PC3",ppc3)) +
+  ggtitle("Principal Component Analysis") + 
+  theme_minimal()
+# Plot PC3 vs PC4 with different colors for the two ancestor groups
+ggplot(pc_df3, aes(x = PC3, y = PC4)) +
+  geom_point(size = 4) +
+  labs(x=paste("PC3",ppc3), y=paste("PC4",ppc4)) +
+  ggtitle("Principal Component Analysis") + 
+  theme_minimal()
+# Plot PC4 vs PC5 with different colors for the two ancestor groups
+ggplot(pc_df4, aes(x = PC4, y = PC5)) +
+  geom_point(size = 4) +
+  labs(x=paste("PC4",ppc4), y=paste("PC5",ppc5)) +
+  ggtitle("Principal Component Analysis") + 
+  theme_minimal()
+# Plot PC5 vs PC6 with different colors for the two ancestor groups
+ggplot(pc_df5, aes(x = PC5, y = PC6)) +
+  geom_point(size = 4) +
+  labs(x=paste("PC5",ppc5), y=paste("PC6",ppc6)) +
+  ggtitle("Principal Component Analysis") + 
+  theme_minimal()
+
+# use 2 or 3 PC, after that the points are no longer separating
+```

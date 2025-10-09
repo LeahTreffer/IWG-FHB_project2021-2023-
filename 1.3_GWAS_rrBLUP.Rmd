@@ -1,0 +1,281 @@
+---
+title: "GWAS_rrBLUP"
+author: "Leah Treffer, adapted from Jared Crain"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+bibliography: citations.bib
+nocite: |
+  @*
+---
+
+# Objective
+
+1. Run a GWAS analysis for measured traits 
+	- C7 Salina 2018, 2019, 2020
+	- C10 Salina 2021, 2022
+	- C10 Olathe 2021, 2022
+2. Compare results to those from 1.1_GWAS_FarmCPU
+
+```{r setup, eval=TRUE, echo= FALSE, include=FALSE}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+Packages used:
+
+```{r library, eval=TRUE, echo= TRUE, include=FALSE}
+require(reshape2)
+require(rrBLUP)
+require(factoextra)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(tibble)
+install.packages("devtools")
+library("devtools")
+install_github("jdstorey/qvalue")
+require(qvalue)
+require(qqman)
+#install.packages("errorist")
+#library(errorist)
+```
+
+Custom function from Jared Crain:
+
+```{r get_functions, eval=TRUE, echo= TRUE, include=FALSE}
+source('./scripts/Function_R.r') #source functions
+
+#function to get value to make FDR line modified from rrBLUP GWAS function
+fdr_line <- function(q.ans = 'list of qvulues', logp = 'list of -log(P) values', fdr.level = 'Level for False Discovery Rate'){ #modified code from GWAS function of rrBLUP
+  fdr_line <- NULL #set up fdr line
+  temp <- cbind(q.ans, logp) #organizes data similar to rrBLUP
+  temp <- temp[order(temp[, 1]), ] #order data
+  #######from GWAS function (EXACT) of rrBLUP #cite rrBLUP
+  if (temp[1, 1] < fdr.level) {
+    temp2 <- tapply(temp[, 2], temp[, 1], mean) #averages over qvalues of the same value
+    qvals <- as.numeric(rownames(temp2)) #extract all unique qvalues
+    x <- which.min(abs(qvals - fdr.level)) #finds qvalue - fdr that has lowest value
+    first <- max(1, x - 2)
+    last <- min(x + 2, length(qvals))
+    if ((last - first) < 4) {
+      last <- first + 3
+    }
+    splin <- smooth.spline(x = qvals[first:last], y = temp2[first:last], 
+                           df = 3) #run spline to find smoothed line
+    ##Modified from GWAS function of rrBLUP to return FDR value for fdr level
+    fdr_line <- predict(splin, x = fdr.level)$y #get value for FDR line
+                                  
+  }
+ return(fdr_line) #return value for FDR line
+}
+```
+
+```{r data, eval=TRUE, echo= FALSE, include=FALSE}
+GENO <- read.delim("data/Intermediate_Files/C10_OLA_2022_numeric.txt", head=TRUE) #load genotype calls formated for GAPIT
+geno <- GENO #make copy to work with
+rownames(geno) <- geno[,1] # column to rownames
+geno <- geno[,-1] #remove first column 
+geno <- geno - 1 #change geno numeric format from 012 to -101
+
+pheno <- read.table("data/Intermediate_Files/C10_OLA_2022_pheno.txt", head=TRUE)
+```
+
+# Set up rrBLUP GWAS
+
+**Population structure** : We will first get a realized relationship matrix by calculating the additive relationship matrix. Then, principle comonenet analysis can be done for the genotype matrix followed by evaluting population structure through eigen values taken from the realized relationship matrix. The output plot is created using this equation: $lambda/sum(lambda)$ where lambda is the variance explained. 
+
+```{r population_structure, eval=TRUE, echo=FALSE, include=TRUE}
+
+#get realized relationship matrix
+# A.mat() Calculates the realized additive relationship matrix
+A <- A.mat(geno) #realized relationship matrix (G matrix)
+
+#PCA on genotype matrix
+prmarker <- prcomp(geno)
+fviz_eig(prmarker)
+#first 2 components
+
+#look for population structure
+eig.result <- eigen(A) #get Eigen values from the A matrix
+lambda <- eig.result$values #extract variance explained
+  
+pdf(file = './output/rrBLUP/C10_OLA_2022/AM_Genotypes_Structure.pdf', height = 6, width = 6) #save plot
+plot(lambda/sum(lambda), ylab = 'Fraction Explained Num Offspring', main = 'Fraction explained by Genotypes') #plot fraction explained for each value
+dev.off()
+
+```
+
+Our plot of population structure shows a sharp decline at 2 principle components. A change in slope is a guideline for deciding how many principle components to use. There is very little population structure, which is in line with other analysis of *Thinopyrum intermedium* [@citation_here_2004]. 
+
+```{r gwas_rrBLUP, eval=FALSE, echo=FALSE, include=FALSE}
+#remove unstructured chromosomes from mapping
+geno <- geno[, !grepl('SUN', colnames(geno), ignore.case = TRUE) ] 
+
+#GWAS fit geno file for gwas
+rr_gwas <- t(geno) #transpose
+
+#format marker names
+markers <- as.data.frame(rownames(rr_gwas)) #extract maker names
+colnames(markers)[1] <- 'marker_name'
+markers$pos <- gsub('^.*_', '', markers$marker_name) #split string and extract marker position
+markers$pos <- as.numeric(markers$pos) #convert to numeric
+markers$chrom <- gsub('_.*$', '', markers$marker_name) #split string and extract chromosome
+markers$chrom <- sub('S', '', markers$chrom) #remove string 
+markers <- markers[order(markers$chrom, markers$pos),] #orders markers by chromosome and then position
+markers$marker <- 1:nrow(markers) #add marker name as numeric
+markers <- markers[ , c(4:1)] #rearrange columns
+
+#merge markers with gwas to format for rrBLUP
+rr_gwas <- as.data.frame(rr_gwas) #convert to data frame
+rr_gwas$marker_name <- rownames(rr_gwas) #move marker_names to rownames
+rownames(rr_gwas) <- NULL #remove rownames
+
+rr_gwas <- merge(markers, rr_gwas, by = 'marker_name') #join marker number, name, and chromosome for rrBLUP
+
+rr_gwas <- rr_gwas[ order(rr_gwas$marker), ] #sort marker order
+rr_gwas <- rr_gwas[ , -1] #remove first column
+
+all(geno$names == colnames(rr_gwas)[4:ncol(rr_gwas)]) #check that they match
+
+#loop over all columns
+for(i in 2:ncol(pheno)){ #set up forloop
+
+#run GWAS
+  #Performs genome-wide association analysis based on the mixed model (Yu et al. 2006)
+ans.emmax <- GWAS(pheno = pheno[, c(1, i)], geno = rr_gwas, P3D = TRUE, n.core = 1 , K = A, n.PC = 2, plot = TRUE) 
+  #PD3 (population parameters previously determined)
+  #PD3 = FALSE  EMMA with REML (Kang et al. 2008)
+  #PD3 = TRUE  EMMAX (Kang et al. 2010); faster but can underestimate significance compared to P3D=FALSE
+
+#save results and plots
+saveRDS(ans.emmax, file = paste('./output/rrBLUP/C10_OLA_2022/', colnames(pheno)[i], '.RDS', sep = '')) 
+#plotting with qqman #tutorial ran with 2 PC 
+  #data frame where the first three columns are the marker name, chromosome, and position, and subsequent columns are the marker scores (−log10p) for the traits
+}
+
+#clean up 
+rm(ans.emmax, A, eig.result, geno, markers, pheno, prmarker, rr_gwas, lambda)
+```
+
+```{r get_results, eval=TRUE, echo=FALSE, include=FALSE}
+
+gwas <- list.files(path = './output/rrBLUP/C10_OLA_2022/', pattern = '*.RDS')
+
+result <- NULL #start dataframe for results
+
+for(i in 1:length(gwas)){ #loop over GWAS and load results
+  trait <- gwas[i] #get trait_id
+  
+  values <- readRDS(paste('./output/rrBLUP/C10_OLA_2022/', trait, sep = '')) #load file
+  values$trait_id <- colnames(values)[4] #get column name
+  colnames(values)[4] <- 'LOD' #set standard LOD column name
+  values$trait_id <- gsub('^X', '', values$trait_id)
+  result <- rbind(result, values[, 2:5]) #write out results
+}
+
+result <- dcast(result, formula = chrom + pos ~ trait_id, value.var = 'LOD', fun.aggregate = mean) #write out LOD scores
+
+#write results
+write.csv(result, file = './output/rrBLUP/C10_OLA_2022/SPAM_AM_GWAS_Results.csv', row.names = FALSE, quote = FALSE) 
+
+#clean up
+rm(gwas, i, trait, values)
+
+```
+
+```{r graph_results, eval=TRUE, echo=FALSE, include=TRUE}
+
+traits <- colnames(result)[3:ncol(result)] #get trait_ids
+traits <- unique(traits) #make sure trait names are unique 
+
+#for each trait loop through and create graphs for each year and trial as applicable
+for(i in 1:length(traits)){ #loop over traits 
+  
+  if(paste(traits[i]) %in% colnames(result) ){ #if exist prepare for graph
+    am_C <- result[, c('chrom', 'pos', paste(traits[i])), ] #table of chrom, pos, and one trait
+    colnames(am_C)[3] <- 'LOD' #set LOD score, change column name from trait id to 'LOD'
+    am_C$pval <- 10^-am_C$LOD #make p value instead -log(pvalue)
+    am_C_gw_fdr <- fdr_line(q.ans = qvalue(am_C$pval)$qvalues, logp = am_C$LOD, fdr.level = 0.05)  #get genome wide fdr 
+  }
+  
+  } #close for loop
+
+
+key <- as.data.frame(unique(result$chrom)) #get unique chromosomes
+key$number <- 1:nrow(key)
+colnames(key)[1] <- 'chrom' #rename column
+
+result <- merge(result, key, by = 'chrom')  #add chromosome number to results 
+result <- result[, c(1:2, 9, 3:8)] #rearrange columns *always check this to have all columns 
+
+
+#get pvalues
+for(i in 4:ncol(result)){ #loop over columns and make pvalues
+  x <- result[, c(1:3, i)] #columns before traits
+  trait_id <- colnames(x)[4]
+  colnames(x)[4] <- 'trait'
+  x$pval <- 10^-x$trait #make p value instead -log(pvalue)
+
+  #get genome wide fdr
+gw_fdr <- fdr_line(q.ans = qvalue(x$pval)$qvalues, logp = x$trait, fdr.level = 0.05)
+  pdf(file = paste('./output/rrBLUP/C10_OLA_2022/QQ_Plot_', trait_id, '.pdf', sep = ''), height = 4, width = 4)
+qq( x$trait)#make a qq plot
+dev.off()
+
+#rename columns
+colnames(x)[c(1, 3, 2)] <- c('SNP', 'CHR', 'BP') 
+x <- x[order(x$CHR, x$BP), ] #order markers
+
+pdf(file = paste('./output/rrBLUP/C10_OLA_2022/Manhattan_', trait_id, '.pdf', sep = ''), height = 6, width = 9 ) #save as a smaller pdf
+
+
+#Model AM.
+if(is.null(gw_fdr)){
+  gw_fdr <- FALSE
+}else{
+  gw_fdr <- gw_fdr
+}
+
+manhattan(x, main=trait_id, p = 'pval', suggestiveline = FALSE, col = c('darkseagreen2', 'darkseagreen'), ylim = c(0, 8), genomewideline = gw_fdr) #make main plot
+#chr:numeric string denoting the column name for the chromosome#bp:numeric string denoting the column name for the chromosomal position#p:numeric string denoting the column name for the p-value#snp:character string denoting the column name for the SNP name (rs number)
+dev.off()
+
+  
+  }
+
+
+#clean up
+rm(am_C,key,x,am_C_gw_fdr,gw_fdr,i,trait_id)
+```
+
+# Significant markers
+
+```{r get_significant_markers, eval=TRUE, echo=FALSE, include=TRUE}
+
+sig_results <- result[,c('chrom','pos','number')]
+sig_results$snp <- paste0(sig_results$chrom,'_',sig_results$pos)
+result$snp <- paste0(result$chrom,'_',result$pos)
+
+for(i in traits){ #loop over columns and make pvalues
+  temp <- result[,c('chrom','pos','number','snp',i)]
+  x <- result[,c('chrom','pos','number','snp',i)]
+    trait_id <- colnames(x)[5]
+    colnames(x)[5] <- 'trait'
+    x$pval <- 10^-x$trait #make p value instead -log(pvalue)
+    gw_fdr <- fdr_line(q.ans = qvalue(x$pval)$qvalues, logp = x$trait, fdr.level = 0.05) #get genome wide fdr
+    
+  sig <- temp[temp[[i]] > gw_fdr,] #LOD values above the fdr line for that trait
+  sig_results <- merge(sig_results, sig[,c(4,5)], by="snp", all=TRUE)
+}
+
+df <- filter(sig_results, rowSums(is.na(sig_results[,c(5:ncol(sig_results))])) != ncol(sig_results[,c(5:ncol(sig_results))])) #remove all rows where all trait columns are NA
+
+write.csv(df, file = './output/rrBLUP/C10_OLA_2022/Significant_Markers_C10_OLA_2022.csv', row.names = FALSE, quote = FALSE) #write results for BLAST or gene search
+
+#clean up
+rm(GENO,df,result,sig,sig_results,temp,x,gw_fdr,i,trait_id,traits)
+```
+

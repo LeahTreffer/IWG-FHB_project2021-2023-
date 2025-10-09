@@ -1,0 +1,375 @@
+---
+title: "GWAS_GWASpoly"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+Run a GWAS analysis for measured traits 
+	C7 Salina 2018, 2019, 2020
+	C10 Salina 2021, 2022
+	C10 Olathe 2021, 2022
+Compare results to those from 1.1_GWAS_FarmCPU
+
+If you use the GWASpoly package in a publication, please cite Rosyara et al. (2016).
+
+```{r, echo=FALSE, include=FALSE}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r library}
+install.packages("devtools")
+devtools::install_github("jendelman/GWASpoly", build_vignettes=FALSE)
+library(GWASpoly)
+library(ggplot2)
+```
+
+https://jendelman.github.io/GWASpoly/GWASpoly.html
+https://jendelman.github.io/GWASpoly/GWASpoly_manual.pdf
+
+# Format Input Files
+
+```{r geno_data, eval=FALSE, echo=FALSE, include=FALSE}
+FHB_Hap.hmp <- read.delim("data/Original_Files/FHB_Imputed.hmp.txt", header=TRUE, check.names = FALSE) #Imputed and Filtered File from Jared (Jan 2023)
+test <- FHB_Hap.hmp
+  colnames(test) <- test[1, ] #make first row into header
+  test <-  test[-1,] #remove first row
+test[test == "A"] <- "AA" #replace
+test[test == "C"] <- "CC" #replace
+test[test == "G"] <- "GG" #replace
+test[test == "T"] <- "TT" #replace
+test[test == "R"] <- "AG" #replace
+test[test == "Y"] <- "CT" #replace
+test[test == "S"] <- "CG" #replace
+test[test == "W"] <- "AT" #replace
+test[test == "K"] <- "GT" #replace
+test[test == "M"] <- "AC" #replace
+test[test == "N"] <- "NN" #replace
+colnames(test)[1] <- "Marker"
+colnames(test)[3] <- "Chrom"
+colnames(test)[4] <- "Position"
+
+
+#The first three columns of the genotype file are (1) marker name, (2) chromosome, and (3) position. Optionally, columns 4 and 5 can be REF and ALT, respectively. Subsequent columns contain the marker data for each individual in the population.  
+# Marker data can be coded in one of three formats: 
+  # "numeric": markers are coded based on the dosage of the alternate allele, taking on values between 0 and ploidy
+  # "AB": e.g., AAAB, ABBB for tetraploids
+  # "ACGT": e.g., AAAT, GGCC for tetraploids
+
+#Add Ref and Alleles to table
+refall <- read.table("data/Original_Files/FHB_Reference_Allele.bed",header = FALSE, sep="\t",stringsAsFactors=FALSE, quote="") #load reference list 
+colnames(refall)[1] <- "rs" #rename snp column to rs to match hapmap format
+
+hm <- test[,c(1:4)] #get snp block  
+
+rs <- as.data.frame(gsub("\\:.*","",refall$rs)) #remove characters after the snp: section 
+colnames(rs)[1] <- "Marker" #rename snp column to rs to match hapmap format
+rs <- cbind(refall, rs) #combine the snp block to the map block
+rs <- rs[,c(3,2)] #reorder
+colnames(rs)[2] <- "REF" #rename 
+hmm <- merge(rs, hm, by="Marker", all=TRUE) #merge files
+
+hmm$allele1 <- gsub("\\/.*","",hmm$alleles) #remove everything after /
+hmm$allele2 <- gsub(".*/","",hmm$alleles) #remove everything before and up to /
+
+hmm$ALT <- ifelse(hmm$REF == hmm$allele1, hmm$allele2, hmm$allele1) # find which allele matches the reference and add the other allele to the ALT column 
+  #hmm$check = ifelse(hmm$REF == hmm$ALT, 'yikes', NA) #make sure this worked, none should match so seaching for yikes should give zero rows 
+
+hmm <- hmm[,c("Marker", "Chrom", "Position", "REF", "ALT")] #clean up table
+
+hummm <- merge(hmm, test[,c(1,12:ncol(test))], by="Marker")
+
+genofile <- hummm %>% rename_at(vars(starts_with('17')), ~paste0('X',.)) %>% rename_at(vars(starts_with('18')), ~paste0('X',.)) %>% rename_at(vars(starts_with('19')), ~paste0('X',.)) %>% rename_at(vars(starts_with('20')), ~paste0('X',.)) %>% rename_at(vars(starts_with('21')), ~paste0('X',.))
+
+#write.csv(genofile, 'data/Intermediate_Files/FHB_gwaspoly.hmp.csv', row.names = FALSE)
+
+rm(test,hm,rs,hmm)
+
+```
+
+```{r pheno_data, eval=FALSE, echo=FALSE, include=FALSE}
+#The first column of the phenotype file contains the genotype identifier, columns 2 through (n.traits + 1) contain trait values, and subsequent columns contain the levels (for factors) or numeric values (for covariates) of any fixed effects.
+C07_2018 <- read.table("data/Intermediate_Files/C07_SAL_2018_pheno.txt", head=TRUE)
+C07_2018$Year <- "2018"
+C07_2019 <- read.table("data/Intermediate_Files/C07_SAL_2019_pheno.txt", head=TRUE)
+C07_2019$Year <- "2019"
+C07_2020 <- read.table("data/Intermediate_Files/C07_SAL_2020_pheno.txt", head=TRUE)
+C07_2020$Year <- "2020"
+
+pheno_C07 <- dplyr::bind_rows(C07_2018, C07_2019, C07_2020) #bind tables with different number of columns 
+colnames(pheno_C07)[1] <- "id" #rename taxa to id
+pheno_C07 <- pheno_C07[,c(1,2:11,13:20,12)] #re order to year column is at end of table
+pheno_C07$id <- paste("X",pheno_C07$id,sep="")
+pheno_C07$Year <- as.factor(pheno_C07$Year)
+write.csv(pheno_C07, file = 'data/Intermediate_Files/C07_gwaspoly_pheno.csv', row.names = FALSE)
+
+C10_S_2021 <- read.table("data/Intermediate_Files/C10_SAL_2021_pheno.txt", head=TRUE)
+C10_S_2021$Year <- "2021"
+C10_S_2021$Site <- "Salina"
+C10_S_2022 <- read.table("data/Intermediate_Files/C10_SAL_2022_pheno.txt", head=TRUE)
+C10_S_2022$Year <- "2022"
+C10_S_2022$Site <- "Salina"
+C10_O_2021 <- read.table("data/Intermediate_Files/C10_OLA_2021_pheno.txt", head=TRUE)
+C10_O_2021$Year <- "2021"
+C10_O_2021$Site <- "Olathe"
+C10_O_2022 <- read.table("data/Intermediate_Files/C10_OLA_2022_pheno.txt", head=TRUE)
+C10_O_2022$Year <- "2022"
+C10_O_2022$Site <- "Olathe"
+
+pheno_C10 <- dplyr::bind_rows(C10_S_2021, C10_S_2022, C10_O_2021, C10_O_2022) #bind tables with different number of columns 
+colnames(pheno_C10)[1] <- "id" #rename taxa to id
+pheno_C10$id <- paste("X",pheno_C10$id,sep="")
+pheno_C10$Year <- as.factor(pheno_C10$Year)
+pheno_C10$Site <- as.factor(pheno_C10$Site)
+write.csv(pheno_C10, file = 'data/Intermediate_Files/C10_gwaspoly_pheno.csv', row.names = FALSE)
+```
+
+# Read in data 
+
+```{r read_gwaspoly, echo=TRUE, include=FALSE}
+#Read in marker and phenotype data
+#read.GWASpoly(ploidy, pheno.file, geno.file, format, n.traits, delim = ",")
+  #ploidy	: Ploidy (e.g., 2 for diploid, 4 for tetraploid)
+  #pheno.file: Name of the phenotype file (as character or connection)
+  #geno.file: Name of the genotype file (as character or connection)
+  #format: Format for the marker data ("numeric", "AB", "ACGT")
+  #n.traits: Number of traits
+  #delim: Character to indicate the delimiter in the data files (e.g., "," for csv, "\t" for tab-delimited)
+phenofile <- "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Intermediate_Files/C07_gwaspoly_pheno.csv"
+phenofile <- "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Intermediate_Files/C10_gwaspoly_pheno.csv"
+genofile <- "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Intermediate_Files/FHB_gwaspoly.hmp.csv"
+my_data <- read.GWASpoly(ploidy=2, pheno.file=phenofile, geno.file=genofile,
+                      format="ACGT", n.traits=18, delim=",")
+```
+
+#Population Structure
+
+GWASpoly uses a random polygenic effect (K model) to control for population structure. 
+LOCO = TRUE : all markers were used to calculate a single covariance matrix proportional to MM′, where M is the n x m centered genotype matrix for n individuals and m markers. This polygenic model is equivalent to including all of the markers as random effects, when each marker is tested as a fixed effect to calculate the p-value for QTL discovery, it is also present as a random effect (proximal contamination).
+LOCO = FALSE : leave-one-chromosome-out (LOCO) method, in which a different covariance matrix is calculated for each chromosome based on the markers from all other chromosomes
+
+In many situations, the K model is sufficient to control population structure. The main diagnostic to assess this is a QQ plot. If additional control is desired, the function set.params can be used to specify the inclusion of principal components as fixed effects (P+K model), or the user can supply their own population covariates in the phenotype input file (Q+K model).
+
+```{r pop_structure}
+data.loco <- set.K(my_data,LOCO=TRUE,n.core=2)
+data.original <- set.K(my_data,LOCO=FALSE,n.core=2)
+```
+
+#Marker Curation
+
+GWAS relies on linkage disequilibrium (LD) between markers and QTL for detection. Differences in allele frequency at the two loci reduce LD, therefore markers with low-allele frequency are primarily useful for detecting QTL with similar frequency. 
+
+Remove markers below a frequency threshold using the function set.params. Although it is common to do this based on minor allele frequency, a more appropriate metric for heterozygous panels (especially when dominance models are used) is maximum genotype frequency. 
+
+set.params is also used to specify a fixed effect for “env” of type “factor” (the other option for fixed effects is “numeric”). Recomendation is to use 1 - 5/N for the maximum geno.freq. Markers below this threshold have too low power and unnecessarily increase the detection threshold for multiple testing.
+
+```{r marker_curation}
+N <- 428 #Population size
+params <- set.params(geno.freq = 1 - 5/N, fixed = "Year", fixed.type = "factor")
+```
+
+#Testing Markers for significance 
+
+The function GWASpoly conducts hypothesis test for each marker. Will test the traditional additive relationship between trait and marker allele dosage and also tests non-additive models. Testing more models increaes probability of a Type 1 error. 
+
+Complete dominance denoted with "1-dom" because 1 copy of the dominant allele is sufficient. Two different anayses are conducted for this model corresponding to whether the reference or alterenate allele is dominant. 
+
+```{r gwas_poly}
+trait.list <- colnames(my_data@pheno[,c(2:19)]) #get vector of trait names
+
+data.loco.scan <- GWASpoly(data=data.loco,models=c("additive","1-dom"), traits=trait.list,params=params,n.core=2)
+
+data.original.scan <- GWASpoly(data.original,models=c("additive","1-dom"), traits=trait.list,params=params,n.core=2)
+
+```
+
+#QQ plots
+
+check -log10(p) values (scores) with quantile-quantile plot of observed vs expected values under null hypothesis. Null hypothesis follows a uniform distribution and is shown with dotted line. 
+
+print(trait.list)
+ [1] "FHBDON"     "FHBD3G"     "FHBD3G.DON" "FHBDISIND"  "FHBSPKINC"  "PTHT"       "STMANG"     "HDANG"     
+ [9] "SPKYLD"     "SPKDEN"     "ZDK"        "GLBLSEV"    "BLSSEV"     "HSATIVLSEV" "ERGSEV"     "SPKHD"     
+[17] "SPKLNG"     "SDHD" 
+
+```{r qq_plot}
+pdf('output/GWASpoly/QQplot_C07_Original_SDHD.pdf', height = 25, width = 35)
+qq.plot(data.original.scan,trait="SDHD") + ggtitle(label="Original_SDHD")
+dev.off()
+pdf('output/GWASpoly/QQplot_C07_LOCO_SDHD.pdf', height = 25, width = 25)
+qq.plot(data.loco.scan,trait="SDHD") + ggtitle(label="LOCO_SDHD")
+dev.off()
+```
+
+Association scores under LOCO are expected to be higher than the original because no other markers on chromosome are present under the null hypothesis. 
+
+There are several methods for establishing a -log10(p) threshold with set.threshold, to control the genome-wide false positive rate. For the original “Bonferroni” method, the overall significance level is divided by the number of tested markers. However, using the total number of tests is overly conservative because the tests are not independent due to LD. The LD between markers can be used to estimate an effective number of markers using method=“M.eff”. One can also use a permutation test (method=“permute”), but this is more computationally intensive.
+
+```{r fdr_threshold}
+data2 <- set.threshold(data.loco.scan,method="Bonferroni",level=0.05)
+data3 <- set.threshold(data.loco.scan,method="M.eff",level=0.05)
+
+data4 <- set.threshold(data.original.scan,method="Bonferroni",level=0.05)
+data5 <- set.threshold(data.original.scan,method="M.eff",level=0.05)
+
+```
+
+#Write Results to File
+
+print(trait.list)
+ [1] "FHBDON"     "FHBD3G"     "FHBD3G.DON" "FHBDISIND"  "FHBSPKINC"  "PTHT"       "STMANG"     "HDANG"     
+ [9] "SPKYLD"     "SPKDEN"     "ZDK"        "GLBLSEV"    "BLSSEV"     "HSATIVLSEV" "ERGSEV"     "SPKHD"     
+[17] "SPKLNG"     "SDHD" 
+```{r save}
+# write.GWASpoly(data, trait, filename, what = "scores", delim = ",")
+  # data = Variable of class GWASpoly.fitted
+  # trait = Trait name
+  # filename = Filename
+  # what = Either "scores" or "effects"
+    # Score = -log10(p). Effect = marker effect (not available for the general and diplo-general models).
+  # delim = Delimiter to use in the output file (default is comma)
+#data2 : C07_LOCO_Bonferroni
+#data3 : C07_LOCO_M.eff
+#data4 : C07_Original_Bonferroni
+#data5 : C07_Original_M.eff
+
+dir <- 'output/GWASpoly/data/C07_Original_M.eff_effects_'
+for (i in trait.list){
+  i = paste0(i)
+  path = paste0(dir,i,'.csv')
+  write.GWASpoly(data5, i, path, what = "effects", delim = ",")
+}
+```
+
+#Manhattan Plot
+
+distribution of -log10(p) values along the genome is visualized using manhattan.plot. When several models are combinined in a single panel, the most stringent value is shown. To avoid this behavior, make separate figures for each model.
+
+print(trait.list)
+ [1] "FHBDON"     "FHBD3G"     "FHBD3G.DON" "FHBDISIND"  "FHBSPKINC"  "PTHT"       "STMANG"     "HDANG"     
+ [9] "SPKYLD"     "SPKDEN"     "ZDK"        "GLBLSEV"    "BLSSEV"     "HSATIVLSEV" "ERGSEV"     "SPKHD"     
+[17] "SPKLNG"     "SDHD" 
+
+```{r manhattan_plot}
+#manhattan.plot(data, traits = NULL, models = NULL, chrom = NULL)
+  #data = variable of class GWASpoly.fitted
+  #traits = vector of trait names (by default, all traits plotted)
+  #models = vector of model names (by default, all models plotted)
+  #chrom = optional, to plot only one chromosome
+p <- manhattan.plot(data5,traits="SDHD")
+p + theme(axis.text.x = element_text(angle=90,vjust=0.5))
+#Export from plot window
+#data2 : Manhattan_C07_LOCO_Bonferroni_TRAIT
+#data3 : Manhattan_C07_LOCO_M.eff_TRAIT
+#data4 : Manhattan_C07_Original_Bonferroni_TRAIT
+#data5 : Manhattan_C07_Original_M.eff_TRAIT
+#pdf('output/GWASpoly/Manhattan_C07_Original_M.eff_SDHD', height = 10.06, width = 6.36)
+#dev.off()
+
+#manhattan.plot(data2,traits="vine.maturity",chrom="chr05") #zoom into a single chromosome
+```
+
+#QTL Effects and R2
+
+Return all markers with scores above the threshold, with option to filter for most significant 
+
+```{r qtl_LD}
+p <- LD.plot(data5, max.loci=NULL)
+p + xlim(0,200) 
+#Export from plot window
+#data2 : LD_C07_LOCO_Bonferroni
+#data3 : LD_C07_LOCO_M.eff
+#data4 : LD_C07_Original_Bonferroni
+#data5 : LD_C07_Original_M.eff
+#pdf('output/rrBLUP/LD_C07_LOCO_Bonferroni', height = 5.06, width = 3.36)
+#dev.off()
+```
+
+Evaluate shape of curve to determine appropriate window size. Capture the steepest section of slope. The argument max.loci controls how many markers are used per chromosome for calculating LD. To use all of the markers, set max.loci=NULL.
+
+```{r qtl_effect}
+#data2 : qtl_effect_C07_LOCO_Bonferroni 
+#data3 : qtl_effect_C07_LOCO_M.eff
+#data4 : qtl_effect_C07_Original_Bonferroni
+#data5 : qtl_effect_C07_Original_M.eff
+qtl <- get.QTL(data=data5,traits=trait.list,models=c("additive","1-dom"), bp.window=30e6)
+knitr::kable(qtl)
+write.csv(qtl,'output/GWASpoly/qtl_effect_C07_Original_M.eff.csv', row.names = FALSE)
+```
+
+The function fit.QTL can be used to build a multiple QTL model and estimate the partial R2 for each QTL based on backward elimination. The argument “qtl” is a data frame with two columns: Marker and Model. We also need to include the fixed effect for “env”.
+
+```{r qtl_r2}
+#fit.ans <- fit.QTL(data=data2,trait="vine.maturity",
+                   #qtl=qtl[,c("Marker","Model")],
+                   #fixed=data.frame(Effect="env",Type="factor"))
+  #data = variable inheriting from class GWASpoly.K
+  #trait = name of trait 
+  #qtl = data frame to specify the multi-QTL model, each row corresponds to a QTL
+  #fixed = data frame to specify the fixed effects, "Effect" and "Type": the first column is the name of the effect, which must match a column in the phenotype input file, and the second column is either "factor" or "numeric"
+
+#data2 : r2_C07_LOCO_Bonferroni 
+#data3 : r2_C07_LOCO_M.eff
+#data4 : r2_C07_Original_Bonferroni
+#data5 : r2_C07_Original_M.eff
+#qtl table must match fit.QTL data designation, fit.ans will only allow one trait at a time
+FIT <- data.frame()
+for (j in trait.list){
+  j = paste0(j)
+qtl <- get.QTL(data=data5,traits=j,models=c("additive","1-dom"), bp.window=30e6)
+n = as.numeric(nrow(qtl))
+if (n != 0){
+fit.ans <- fit.QTL(data=data5,trait=j,
+                   qtl=qtl[,c("Marker","Model")],
+                   fixed=data.frame(Effect="Year",Type="factor"))
+fit.ans$Trait <- j
+FIT <- rbind(FIT, fit.ans)
+  }
+}
+
+write.csv(FIT,'output/GWASpoly/r2_C07_Original_M.eff.csv', row.names = FALSE)
+
+```
+
+These R2 values are the percent of explained variation for each QTL
+
+# Make table with effect and r2 columns 
+```{r combine_effect_r2}
+#data2 : C07_LOCO_Bonferroni 
+#data3 : C07_LOCO_M.eff
+#data4 : C07_Original_Bonferroni
+#data5 : C07_Original_M.eff
+qtll <- read.csv('output/GWASpoly/qtl_effect_C07_Original_M.eff.csv')
+r2 <- read.csv('output/GWASpoly/r2_C07_Original_M.eff.csv')
+qtll$mrg <- paste0(qtll$Trait,'_',qtll$Model,'_',qtll$Marker)
+r2$mrg <- paste0(r2$Trait,'_',r2$Model,'_',r2$Marker)
+COM <- merge(qtll, r2[,c("R2", "pval", "mrg")], by="mrg", all=TRUE)
+COM <- COM[,-c(1)]
+write.csv(COM, 'output/GWASpoly/output_Sig_table_C07_Original_M.eff.csv', row.names = FALSE)
+rm(qtll,r2,COM)
+
+two <- read.csv('output/GWASpoly/output_Sig_table_C07_LOCO_Bonferroni.csv')
+two$Type <- "C07_LOCO_Bonferroni"
+three <- read.csv('output/GWASpoly/output_Sig_table_C07_LOCO_M.eff.csv')
+three$Type <- "C07_LOCO_M.eff"
+four <- read.csv('output/GWASpoly/output_Sig_table_C07_Original_Bonferroni.csv')
+four$Type <- "C07_Original_Bonferroni"
+five <- read.csv('output/GWASpoly/output_Sig_table_C07_Original_M.eff.csv')
+five$Type <- "C07_Original_M.eff"
+six <- rbind(two,three,four,five)
+rm(two,three,four,five)
+write.csv(six, 'output/GWASpoly/output_Sig_table_all.csv', row.names = FALSE)
+rm(six)
+```
+

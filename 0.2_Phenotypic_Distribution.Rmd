@@ -1,0 +1,2345 @@
+---
+title: "Phenotypic_Distribution"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r ksetup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r setup}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r packages, include=FALSE}
+library(ggplot2)
+install.packages("gridExtra")
+library(gridExtra)
+library(stringr)
+library(dplyr)
+library(psych)
+library(tibble)
+library("car")
+install.packages("textshape")
+library(textshape)
+library(openxlsx)
+library(readxl)
+library(magrittr)
+library(rstatix)
+install.packages("ggh4x")
+library('ggh4x')
+#load in functions
+source('scripts/figure_functions.R')
+source('scripts/paste_na.R')
+source('~/Downloads/rowr/R/rowr.R')
+#install.packages("errorist")
+#library(errorist)
+library(shiny)
+```
+
+#data
+
+```{r rawdata}
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C7 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$Cycle, "C10"),] #keep only data from C10 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),] #Olathe
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),] #Salina
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),] #Olathe
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),] #Salina
+```
+
+#Histograms
+
+```{r histograms}
+#change for each table
+  #C7_2018_S, C7_2019_S, C7_2020_S, C10_2021_O, C10_2022_O, C10_2021_S,  C10_2022_S
+
+#reformat for Histogram 
+test <- as_tibble(C10_2022_O[c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove columns with no data
+empty_columns <- colSums(is.na(test) | test == "") == nrow(test)
+test <- test[, !empty_columns]
+
+#input for functions
+phen <- test[,c(2:ncol(test))] #make pheno table for input into histogram function 
+list <- colnames(phen) #make list of traits for input into histogram function 
+
+#Histogram
+pdf("data/Figures/C10_2022_O_Histograms.pdf", width=5, height=3.5)
+Histogram(list, phen)
+dev.off()
+
+#Histogram + Kernel Density
+path = "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures/C10_2022_O_Histograms+KernelDensity.pdf" #path to save file
+Histogram_Kernel_Density(path, list, phen)
+
+
+#Normalized Histogram + Kernel Density
+Nphen <- log(as.data.frame(phen)) #Normalize/ log transform
+
+path = "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures/C10_2022_O_N_Histograms+KernelDensity.pdf" #path to save file
+N_Histogram_Kernel_Density(path, list, Nphen)
+
+
+#Compare raw to normalized 
+Nphen <- Nphen %>% 
+  mutate(across(everything(), sub, pattern = "-Inf", replacement = "", fixed = TRUE))
+Nphen <- Nphen %>%
+  mutate(across(everything(), sub, pattern = "NaN", replacement = "", fixed = TRUE))
+
+path = "/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures/C10_2022_O_Compare_Raw+Normalized.pdf"
+Raw_Normalized(path, list, phen, Nphen)
+
+#phen <- phen[,c(1,4:ncol(phen))] #C7_2020_S  has a couple traits that are all zero, removing to make correlations work better
+
+```
+
+#Correlation Plots
+
+```{r correlation_plots}
+#Correlation plot with histograms and bivariate scatter plots
+#The distribution of each variable is shown on the diagonal.
+#On the bottom of the diagonal : the bivariate scatter plots with a fitted line are displayed
+#On the top of the diagonal : the value of the correlation plus the significance level as stars
+#Each significance level is associated to a symbol : p-values(0, 0.001, 0.01, 0.05, 0.1, 1) <=> symbols(“***”, “**”, “*”, “.”, " “)
+
+pdf("data/Figures/C10_2022_O_ChartCorr.pdf", width = 10, height = 7)
+chart.Correlation(phen, histogram=TRUE, pch=5) +
+mtext("C10_2022_Olathe", side=3, line=3)
+dev.off()
+
+#Bubble correlations
+# Positive correlations are displayed in blue and negative correlations in red color. 
+#Color intensity and the size of the circle are proportional to the correlation coefficients. 
+#In the right side of the correlogram, the legend color shows the correlation coefficients and the corresponding colors.
+# Insignificant correlations are crossed
+
+#Correlation matrix
+resASp<-rcorr(as.matrix(phen)) #this leaves NAs in, can also take them out by first running #phen_Naomit=na.omit(phen) #mm2=rcorr(as.matrix(phen_Naomit)) #OR M=cor(phen,y=NULL,use = "complete.obs") for the newer corr.test version
+# matrix of the p-value of the correlation
+pval_corr <- cor.mtest(phen) 
+
+pdf("data/Figures/C10_2022_O_CorrPlot.pdf", width = 10, height = 7)
+corrplot(resASp$r, type="upper", order="hclust", 
+         p.mat = pval_corr, sig.level = 0.01, title="C10_2022_Olathe", mar=c(0,0,1,0))
+dev.off()
+
+#Correlation Tables
+corr.test(phen, adjust = "none") 
+avg.cor <- corr.test(phen, adjust = "none") 
+write.csv(avg.cor$p,file="data/Figures/C10_2022_O_CorrTable_p.csv")  ## p-values
+write.csv(avg.cor$r,file="data/Figures/C10_2022_O_CorrTable_r.csv")  ## r2
+
+rm(C10_2022_O,Nphen,phen,pval_corr,resASp,test,list,path,avg.cor)
+
+```
+
+
+#Average of Whole Cycle
+
+
+```{r cycle_average_figures}
+#Cycle Average # only need to run C7, C9 (S & O), and C10 (S & O) files
+C9_S <- C9[str_detect(C9$experiment_id, "SAL"),] #Salina
+C9_O <- C9[str_detect(C9$experiment_id, "OLA"),] #Olathe
+C10_S <- C10[str_detect(C10$experiment_id, "SAL"),] #Salina
+C10_O <- C10[str_detect(C10$experiment_id, "OLA"),] #Olathe
+
+short <- as_tibble(C10_O[c("source_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+short$phenotype_value <- as.numeric(short$phenotype_value) #make one column numeric 
+
+three_year_average <- short %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value,
+    values_fn = mean
+  )
+
+tab <- three_year_average[,c(2:ncol(three_year_average))]
+tab <- tab[,c(1:5,8:ncol(tab))] #some trait columns were entirely empty and this messed with teh correlation tables, need to remove them first
+new_list <- colnames(tab) #make list of traits for input into histogram function 
+
+#Histogram
+pdf("/Volumes/Backup_Plus/FHB figures/C10_O_Histograms.pdf", width=5, height=3.5)
+Histogram(new_list, three_year_average)
+dev.off()
+
+#Compare raw to normalized 
+three_year_N <- log(as.data.frame(tab)) #Normalize/ log transform
+three_year_N <- three_year_N %>% 
+  mutate(across(everything(), sub, pattern = "-Inf", replacement = "", fixed = TRUE))
+three_year_N <- three_year_N %>%
+  mutate(across(everything(), sub, pattern = "NaN", replacement = "", fixed = TRUE))
+
+path = "/Volumes/Backup_Plus/FHB figures/C10_O_Compare_Raw+Normalized.pdf"
+Raw_Normalized(path, new_list, tab, three_year_N)
+
+#Correlation Tables
+pdf("/Volumes/Backup_Plus/FHB figures/C10_O_ChartCorr.pdf", width = 10, height = 7)
+chart.Correlation(tab, histogram=TRUE, pch=5) +
+  mtext("C10_Olathe_Averages", side=3, line=3)
+dev.off()
+
+resASp<-rcorr(as.matrix(tab)) #this leaves NAs in, can also take them out by first running #phen_Naomit=na.omit(phen) #mm2=rcorr(as.matrix(phen_Naomit)) #OR M=cor(phen,y=NULL,use = "complete.obs") for the newer corr.test version
+# matrix of the p-value of the correlation
+pval_corr <- cor.mtest(tab) 
+
+pdf("/Volumes/Backup_Plus/FHB figures/C10_O_CorrPlot.pdf", width = 10, height = 7)
+corrplot(resASp$r, type="upper", order="hclust", 
+         p.mat = pval_corr, sig.level = 0.01, title="C10_O_Average", mar=c(0,0,1,0))
+dev.off()
+
+#Correlation Tables
+corr.test(tab, adjust = "none") 
+avg.cor <- corr.test(tab, adjust = "none") 
+write.csv(avg.cor$p,file="/Volumes/Backup_Plus/FHB figures/C10_O_CorrTable_p.csv")  ## p-values
+write.csv(avg.cor$r,file="/Volumes/Backup_Plus/FHB figures/C10_O_CorrTable_r.csv")  ## r2
+
+rm(C10_O,short,three_year_average,three_year_N,tab,new_list,path,resASp,pval_corr,avg.cor)
+
+```
+
+# Box Plots
+
+```{r Box_plots}
+test <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide_2.txt")
+
+#Box Plots for Comparing Year and Cycle
+test$Cycle[test$Cycle == "C7"] <- "C07" #replace C7 with C07
+
+phen = test
+colnames(phen)[1] <- "Year"
+list = colnames(phen[,c(7:ncol(phen))])
+
+path = "data/Figures/BoxPlot_Cycle+Year.pdf"
+BoxPlots(path, list, phen)
+
+#path = "data/Figures/BoxPlot_Cycle_Averages.pdf"
+#BoxPlot(path, list, phen)
+
+#Box Plots for Comparing the Two Sites of C10
+table_name <- "data/Figures/BoxPlot_C10_Sites+Year.pdf"
+pheno_table <- test[str_detect(test$Cycle, "C10"),]
+pheno_table <- pheno_table[,c(1:18)] #get only columns with data
+colnames(pheno_table)[1] <- "Year"
+trait_list <- colnames(pheno_table[,c(7:ncol(pheno_table))])
+
+plot_list = list()
+
+for (j in trait_list){
+    j = paste0(j)
+    main = paste0('Distribution of',' ',j,' ','Ratings')
+    
+    pheno = pheno_table[,c("Year","plant_id","Cycle","Site","Time",j)]
+    colnames(pheno)[6] <- "Value"
+    pheno <- na.omit(pheno) #remove rows with NA for Value
+    pheno$Year= as.character(pheno$Year)
+    pheno$Cycle= as.factor(as.character(pheno$Cycle))
+
+    plot <- ggplot(pheno, aes(x=Year, y=Value, fill=Site))+
+      geom_boxplot()+
+      labs(title=main)
+    
+    plot_list[[j]] = plot
+    
+    pdf(table_name)
+    for (k in trait_list) {
+      print(plot_list[[k]])
+    }
+    dev.off()
+  }
+
+
+#Box Plots for Comparing the Year, Cycle, and Sites
+table_name <- "data/Figures/BoxPlot_Year+Cycle+Site2.pdf" #added name = "Site" and re-named with '2'
+#pheno_table <- test[str_detect(test$Cycle, "C10"),]
+#pheno_table <- test[,c(1:17)]
+pheno_table <- test
+colnames(pheno_table)[1] <- "Year"
+pheno_table$cycle_site <- paste0(pheno_table$Cycle, "_", pheno_table$Site)
+pheno_table <- pheno_table[,c(1:6,26,7:25)]
+trait_list <- colnames(pheno_table[,c(8:ncol(pheno_table))])
+pheno_table$Site[pheno_table$Site == "OLA"] <- "Olathe" #replace C7 with C07
+pheno_table$Site[pheno_table$Site == "SAL"] <- "Salina" #replace C7 with C07
+
+plot_list = list()
+
+for (j in trait_list){
+    j = paste0(j)
+    main = paste0('Distribution of',' ',j,' ','Ratings')
+    
+    pheno = pheno_table[,c("Year","plant_id","Cycle", "Site", "cycle_site","Time",j)]
+    colnames(pheno)[7] <- "Value"
+    pheno <- na.omit(pheno) #remove rows with NA for Value
+    pheno$Year= as.character(pheno$Year)
+    pheno$Cycle= as.factor(as.character(pheno$Cycle))
+    pheno$cycle_site= as.factor(as.character(pheno$cycle_site))
+
+    plot <- ggplot(pheno, aes(x=Year, y=Value, fill=Cycle, alpha=0.1))+
+      geom_boxplot()+
+      labs(title=main)+
+      geom_boxplot(aes(color=factor(Site)))+
+      scale_color_manual(name = "Site", values = c("Salina" = "#882255", "Olathe" = "#DDCC77"))+
+      guides(alpha = "none") # Remove legend for alpha
+    
+    plot_list[[j]] = plot
+    
+    pdf(table_name)
+    for (k in trait_list) {
+      print(plot_list[[k]])
+    }
+    dev.off()
+}
+
+```
+
+# Box Plot for Paper 
+# Only want FHBDISIND, FHBSPKINC, DON, and ZEA
+
+```{r}
+test <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide_2.txt")
+
+#Box Plots for Comparing Year and Cycle
+test$Cycle[test$Cycle == "C7"] <- "C07" #replace C7 with C07
+
+phen = test
+colnames(phen)[1] <- "Year"
+list = colnames(phen[,c(7:ncol(phen))])
+
+#Box Plots for Comparing the Year, Cycle, and Sites
+table_name <- "data/Figures/BoxPlot_Year+Cycle+Site3.pdf"
+pheno_table <- test
+colnames(pheno_table)[1] <- "Year"
+pheno_table$cycle_site <- paste0(pheno_table$Cycle, "_", pheno_table$Site)
+pheno_table <- pheno_table[,c(1:6,26,7:25)]
+trait_list <- c("FHBDISIND", "FHBSPKINC", "FHBDON", "FHBZEA")
+pheno_table$Site[pheno_table$Site == "OLA"] <- "Olathe" #replace C7 with C07
+pheno_table$Site[pheno_table$Site == "SAL"] <- "Salina" #replace C7 with C07
+
+plot_list = list()
+
+for (j in trait_list){
+    j = paste0(j)
+    main = paste0('Distribution of',' ',j,' ','Ratings')
+    
+    pheno = pheno_table[,c("Year","plant_id","Cycle", "Site", "cycle_site","Time",j)]
+    colnames(pheno)[7] <- "Value"
+    pheno <- na.omit(pheno) #remove rows with NA for Value
+    pheno$Year= as.character(pheno$Year)
+    pheno$Cycle= as.factor(as.character(pheno$Cycle))
+    pheno$cycle_site= as.factor(as.character(pheno$cycle_site))
+
+    plot <- ggplot(pheno, aes(x=Year, y=Value, fill=Cycle, alpha=0.1))+
+      geom_boxplot()+
+      labs(title=main)+
+      geom_boxplot(aes(color=factor(Site)))+
+      scale_color_manual(name = "Site", values = c("Salina" = "#882255", "Olathe" = "#DDCC77"))+
+      guides(alpha = "none") # Remove legend for alpha
+    
+    plot_list[[j]] = plot
+    
+    pdf(table_name)
+    for (k in trait_list) {
+      print(plot_list[[k]])
+    }
+    dev.off()
+}
+
+# new 11/10/2023 to clean up the overlayed boxes and add annual wheat checks
+
+table_name <- "data/Figures/BoxPlot_Year+Cycle+Site4.pdf"
+pheno_table <- test
+colnames(pheno_table)[1] <- "Year"
+pheno_table$cycle_site <- paste0(pheno_table$Cycle, "_", pheno_table$Site)
+pheno_table <- pheno_table[,c(1:6,26,7:25)]
+trait_list <- c("FHBDISIND", "FHBSPKINC", "FHBDON", "FHBZEA")
+pheno_table$Site[pheno_table$Site == "OLA"] <- "Olathe" #replace C7 with C07
+pheno_table$Site[pheno_table$Site == "SAL"] <- "Salina" #replace C7 with C07
+
+ggplot(phenooo, aes(x=Year, y=Value, fill=loc)) + 
+  geom_boxplot() + 
+#subset of data so we're just getting a couple of boxplots, no overplotting previous plots
+  geom_boxplot(data = my_data3[my_data3$year>2019,],aes(x=as.character(year), 
+                   y=measured_variable, fill=as.character(year)), lwd = 0.2, alpha = 0.4)
+```
+
+# Now add annual wheat checks as marks on each box plot
+
+```{r}
+# wheat checks
+phenow <- read.csv('data/Original_Files/plants.csv')
+phenow$Site <- gsub("_Fusarium.*", "", phenow$experiment_id) #Remove characters after first allele
+phenow$Site <- gsub(".*_","",phenow$Site) #Remove all before and up to "/"
+
+df <- phenow[str_detect(phenow$germplasm_id, "Overley|Bacup|Roblin|Everest"),]
+annualwheat18 <- df[str_detect(df$phenotype_year, "2018"),]
+annualwheat19 <- df[str_detect(df$phenotype_year, "2019"),]
+annualwheat20 <- df[str_detect(df$phenotype_year, "2020"),]
+annualwheat21S <- df[str_detect(df$phenotype_year, "2021") & str_detect(df$Site, "SAL"), ]
+annualwheat21O <- df[str_detect(df$phenotype_year, "2021") & str_detect(df$Site, "OLA"), ]
+annualwheat22S <- df[str_detect(df$phenotype_year, "2022") & str_detect(df$Site, "SAL"), ]
+annualwheat22O <- df[str_detect(df$phenotype_year, "2022") & str_detect(df$Site, "OLA"), ]
+
+aw18S <- annualwheat18 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw19S <- annualwheat19 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw20S <- annualwheat20 %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw21S <- annualwheat21S %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw21O <- annualwheat21O %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw22S <- annualwheat22S %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+aw22O <- annualwheat22O %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+# Elements `FHBZEA`, `ZDK`, `GLBLSEV`, `BLSSEV`, `HSATIVLSEV`, `ERGSEV`, `SPKHD`, `HDANG`, `SPKLNG`, `SDHD`, `SPKYLD`, `SPKDEN`, `STMANG`, `FHBDON`, `FHBD3G` don't exist
+aw18S$FHBZEA <- NA
+aw18S$ZDK <- NA
+aw18S$GLBLSEV <- NA
+aw18S$BLSSEV <- NA
+aw18S$HSATIVLSEV <- NA
+aw18S$ERGSEV <- NA
+aw18S$SPKHD <- NA
+aw18S$HDANG <- NA
+aw18S$SPKLNG <- NA
+aw18S$SDHD <- NA
+aw18S$SPKYLD <- NA
+aw18S$SPKDEN <- NA
+aw18S$STMANG <- NA
+aw19S$FHBZEA <- NA
+aw19S$ERGSEV <- NA
+aw19S$SPKHD <- NA
+aw19S$HDANG <- NA
+aw19S$SPKLNG <- NA
+aw19S$SDHD <- NA
+aw19S$SPKYLD <- NA
+aw19S$SPKDEN <- NA
+aw19S$STMANG <- NA
+aw20S$FHBZEA <- NA
+aw20S$FHBDON <- NA
+aw20S$FHBD3G <- NA
+aw21S$FHBZEA <- NA
+aw21S$ERGSEV <- NA
+aw21S$SPKHD <- NA
+aw21S$HDANG <- NA
+aw21S$SPKLNG <- NA
+aw21S$SDHD <- NA
+aw21S$SPKYLD <- NA
+aw21S$SPKDEN <- NA
+aw21S$STMANG <- NA
+aw21O$FHBZEA <- NA
+aw21O$GLBLSEV <- NA
+aw21O$ERGSEV <- NA
+aw21O$SPKHD <- NA
+aw21O$HDANG <- NA
+aw21O$SDHD <- NA
+aw21O$SPKYLD <- NA
+aw21O$SPKDEN <- NA
+aw21O$STMANG <- NA
+aw21O$SPKLNG <- NA
+aw22S$FHBZEA <- NA
+aw22S$GLBLSEV <- NA
+aw22S$ERGSEV <- NA
+aw22S$SPKHD <- NA
+aw22S$HDANG <- NA
+aw22S$SPKLNG <- NA
+aw22S$SDHD <- NA
+aw22S$SPKYLD <- NA
+aw22S$SPKDEN <- NA
+aw22S$STMANG <- NA
+aw22S$FHBDON <- NA
+aw22S$FHBD3G <-NA
+aw22O$FHBZEA <- NA
+aw22O$GLBLSEV <- NA
+aw22O$ERGSEV <- NA
+aw22O$SPKHD <- NA
+aw22O$HDANG <- NA
+aw22O$SPKLNG <- NA
+aw22O$SDHD <- NA
+aw22O$SPKYLD <- NA
+aw22O$SPKDEN <- NA
+aw22O$STMANG <- NA
+aw22O$FHBDON <- NA
+aw22O$FHBD3G <- NA
+
+# Year, plant_id, Cycle, Site, Time, serpentine, cycle_site, FHBZEA, FHBDON, FHBD3G, FHBDISIND, FHBSPKINC, PTHT, STMANG, ZDK, GLBLSEV, BLSSEV, HSATIVLSEV, ERGSEV, SPKHD, HDANG, SPKLNG, SDHD, SPKYLD, SPKDEN
+
+# Columns of interest
+columns_of_interest <- c("FHBZEA", "FHBDON", "FHBD3G", "FHBDISIND", "FHBSPKINC", 
+                         "PTHT", "STMANG", "ZDK", "GLBLSEV", "BLSSEV", "HSATIVLSEV", 
+                         "ERGSEV", "SPKHD", "HDANG", "SPKLNG", "SDHD", "SPKYLD", "SPKDEN")
+
+aw18S <- aw18S %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw19S <- aw19S %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw20S <- aw20S %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw21S <- aw21S %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw21O <- aw21O %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw22S <- aw22S %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+aw22O <- aw22O %>%
+  mutate_at(vars(all_of(columns_of_interest)), as.numeric)
+
+# some outliers in FHBSPKINC
+aw18S$FHBSPKINC <- aw18S$FHBSPKINC * 100
+aw19S$FHBSPKINC[aw19S$FHBSPKINC == 1.00000] <- 100
+
+# List of data tables
+data_tables <- list(aw18S, aw19S, aw20S, aw21S, aw21O, aw22S, aw22O)
+
+# Function to calculate the mean of each specified column in a data table
+calculate_means <- function(df) {
+  df %>%
+    select(all_of(columns_of_interest)) %>%
+    summarise(across(everything(), ~ mean(.x, na.rm = TRUE)))
+}
+
+# Apply the function to each data table
+means_list <- lapply(data_tables, calculate_means)
+
+# Combine the means into a single data frame
+mean_df <- do.call(rbind, means_list)
+
+new_df <- data.frame(
+Year = c('2018', '2019', '2020', '2021', '2021', '2022', '2022'),
+plant_id = NA,
+Cycle = c("C07", "C07", "C07", "C10", "C10", "C10", "C10"),
+Site = c("Salina", "Salina", "Salina", "Salina", "Olathe", "Salina", "Olathe"),
+Time = c('1', '2', '3', '4', '4', '5', '5'),
+serpentine = NA,
+cycle_site = c("C07_SAL", "C07_SAL", "C07_SAL", "C10_SAL", "C10_OLA", "C10_SAL", "C10_OLA"),
+cycle_site_yr = c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_OLA_2021", "C10_SAL_2022", "C10_OLA_2022")
+)
+
+wheat_df <- cbind(new_df, mean_df)
+
+wheat_df$Year <- as.numeric(as.character(wheat_df$Year))
+
+
+```
+
+```{r}
+test <- read.delim("data/Intermediate_Files/Phenotypic_Format_wide_2.txt")
+
+#Box Plots for Comparing Year and Cycle
+test$Cycle[test$Cycle == "C7"] <- "C07" #replace C7 with C07
+
+phen = test
+colnames(phen)[1] <- "Year"
+list = colnames(phen[,c(7:ncol(phen))])
+
+#Box Plots for Comparing the Year, Cycle, and Sites
+table_name <- "data/Figures/BoxPlot_Year+Cycle+Site4.pdf"
+pheno_table <- test
+colnames(pheno_table)[1] <- "Year"
+pheno_table$cycle_site <- paste0(pheno_table$Cycle, "_", pheno_table$Site)
+pheno_table <- pheno_table[,c(1:6,26,7:25)]
+trait_list <- c("FHBDISIND", "FHBSPKINC", "FHBDON", "FHBZEA")
+pheno_table$Site[pheno_table$Site == "OLA"] <- "Olathe" #replace C7 with C07
+pheno_table$Site[pheno_table$Site == "SAL"] <- "Salina" #replace C7 with C07
+pheno_table$cycle_site_yr <- paste0(pheno_table$cycle_site,"_",pheno_table$Year)
+
+plot_list = list()
+
+for (j in trait_list){
+    j = paste0(j)
+    main = paste0('Distribution of',' ',j,' ','Ratings')
+    
+    pheno = pheno_table[,c("Year", "plant_id", "Cycle", "Site", "cycle_site", "cycle_site_yr", "Time",j)]
+    wheat = wheat_df[,c("Year", "plant_id", "Cycle", "Site", "cycle_site", "cycle_site_yr", "Time",j)]
+    colnames(pheno)[8] <- "Value"
+    colnames(wheat)[8] <- "AvgCheck"
+    pheno <- na.omit(pheno) #remove rows with NA for Value
+    pheno$Year= as.character(pheno$Year)
+    pheno$Cycle= as.factor(as.character(pheno$Cycle))
+    pheno$cycle_site= as.factor(as.character(pheno$cycle_site))
+    wheat$Year= as.character(wheat$Year)
+    wheat$Cycle= as.factor(as.character(wheat$Cycle))
+    wheat$cycle_site= as.factor(as.character(wheat$cycle_site))
+    
+    plot <- ggplot(pheno, aes(x=Year, y=Value, fill=Cycle, alpha=0.1))+
+      geom_boxplot()+
+      labs(title=main)+
+      geom_boxplot(aes(color=factor(Site)))+
+      scale_color_manual(name = "Site", values = c("Salina" = "#882255", "Olathe" = "#DDCC77"))+
+      guides(alpha = "none")+
+      geom_point(data = wheat, aes(x = Year, y = AvgCheck, color = factor(Site)), size = 5, shape = 18, show.legend = FALSE) #shape 8 is star, 18 is diamond
+
+  plot_list[[j]] = plot
+  
+  pdf(table_name)
+  for (k in trait_list) {
+    print(plot_list[[k]])
+  }
+  dev.off()
+}
+
+```
+
+```{r not_run}
+#TESTS, not used
+pdf('~/Desktop/plot.pdf')
+ggplot(pheno, aes(x=Year, y=Values, fill=Cycle, alpha=0.2))+
+      geom_boxplot()+
+      labs(title=main)+
+    geom_boxplot(aes(color=factor(cycle_site))) #,position=position_dodge(width=0.5)
+dev.off()
+
+pdf('~/Desktop/plot2.pdf')
+ggplot(pheno, aes(x=Year, y=Values, fill=Cycle, alpha=0.1))+
+  geom_boxplot()+
+  labs(title=main)+
+  geom_boxplot(aes(color=factor(Site)))+
+  scale_color_manual(values = c("Salina" = "#882255", "Olathe" = "#DDCC77"))+
+  guides(alpha = "none") # Remove legend alpha
+dev.off()
+
+```
+
+### Unsure what this chunk was for 
+```{r unknown}
+#Histograms
+#create separate tables for each cycle, year, location
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$experiment_id, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$experiment_id, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$experiment_id, "SAL"),] #Salina
+C10_2021_O <- C10_2021[str_detect(C10_2021$experiment_id, "OLA"),] #Olathe
+C10_2021_S <- C10_2021[str_detect(C10_2021$experiment_id, "SAL"),] #Salina
+C10_2022_O <- C10_2022[str_detect(C10_2022$experiment_id, "OLA"),] #Olathe
+C10_2022_S <- C10_2022[str_detect(C10_2022$experiment_id, "SAL"),] #Salina
+
+
+#reformat for Histogram 
+test <- as_tibble(C10_2022_S[c("source_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, source_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#input for functions
+phen <- test[,c(2:ncol(test))] #make pheno table for input into histogram function 
+#phen$`FHBD3G:DON`[phen$'FHBD3G:DON'=="NaN"]<-NA #remove NaN and have NAs
+list <- colnames(phen) #make list of traits for input into histogram function
+
+
+
+# DON, D3G, D3G:DON info
+#reformat for Histogram 
+test <- as_tibble(C7_2020[c("source_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, source_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+test <- test[,c("source_id", "FHBDON", "FHBD3G", "FHBD3G:DON")]
+
+mean(test$FHBDON, trim=0, na.rm=TRUE)
+
+rm(test)
+
+```
+
+# see if the top scores for traits are coming from the same taxa across years
+
+```{r set_up}
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+#data
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C7 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+
+```
+
+```{r}
+# do this chunk for each year (C7_2018_S, C7_2019_S, C7_2020_S)
+
+test <- as_tibble(C7_2020_S[c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+traits <- colnames(test[,c(2:ncol(test))]) # list for loop 
+
+for (i in traits) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2020")
+  
+  trait <- test[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  
+  rm(trait, colname, high, low, highN, lowN)
+  
+}
+
+#repeat for each year
+
+rm(outputH,outputL,i)
+
+```
+
+```{r}
+#remove first column labeled 'init' which is empty 
+df_High_Score <- df_High_Score[,-1]
+df_Low_Score <- df_Low_Score[,-1]
+
+#make sure trait is measured in at least two years
+  #alphabetize to make looking for traits easier
+  #manually look at both tables to see which columns to include
+  #make table with only traits measured in at least two years
+
+df_High_Score <- df_High_Score[ , order(names(df_High_Score))] #order columns by name 
+df_Low_Score <- df_Low_Score[ , order(names(df_Low_Score))] #order columns by name 
+
+High_Scores <- df_High_Score #take out any traits that were just in one year, if all are replicated, just remane table
+Low_Scores <- df_Low_Score #take out any traits that were just in one year, if all are replicated, just remane table
+
+names(High_Scores)[names(High_Scores) == "FHBD3G.DON2018"] <- "ratio2018" #rename column so that it isn't included to FHBD3G table later
+names(High_Scores)[names(High_Scores) == "FHBD3G.DON2019"] <- "ratio2019" #rename column so that it isn't included to FHBD3G table later
+names(High_Scores)[names(High_Scores) == "FHBD3G.DON2020"] <- "ratio2020" #rename column so that it isn't included to FHBD3G table later
+names(Low_Scores)[names(Low_Scores) == "FHBD3G.DON2018"] <- "ratio2018" #rename column so that it isn't included to FHBD3G table later
+names(Low_Scores)[names(Low_Scores) == "FHBD3G.DON2019"] <- "ratio2019" #rename column so that it isn't included to FHBD3G table later
+names(Low_Scores)[names(Low_Scores) == "FHBD3G.DON2020"] <- "ratio2020" #rename column so that it isn't included to FHBD3G table later
+
+# Determine if there are any of the taxa the same across years
+all_H_traits <- colnames(High_Scores)
+all_L_traits <- colnames(Low_Scores)
+
+all_H_traits <- gsub('20.*$', '', all_H_traits)
+all_L_traits <- gsub('20.*$', '', all_L_traits)
+all_H_traits <- unique(all_H_traits)
+all_L_traits <- unique(all_L_traits)
+
+# High Scores (top 10%)
+for (k in all_H_traits){
+  k <- paste0(k)
+  
+mmm <- select(High_Scores, contains(k))
+  
+  x = ncol(mmm) 
+
+if (x > 2){
+SAME1 <- intersect(mmm[,1],mmm[,2])
+SAME2 <- intersect(mmm[,1],mmm[,3])
+SAME3 <- intersect(mmm[,2],mmm[,3])
+all <- c(SAME1,SAME2,SAME3)
+all <- na.omit(all)
+all <- unique(all)
+} else {
+SAME1 <- intersect(mmm[,1],mmm[,2])
+all <- SAME1
+all <- na.omit(all)
+all <- unique(all)
+}
+
+lll=cbind.fill(mmm, all, fill=NA)
+names(lll)[names(lll) == "object"] <- "multi_year" #rename column 
+
+  l <- paste0('HighScore_', k)
+assign(l, lll)
+
+rm(SAME1,SAME2,SAME3,mmm,lll,all)
+}
+rm(k,l,x,all_H_traits)
+
+# Low Scores (bottom 10%)
+for (k in all_L_traits){
+  k <- paste0(k)
+  
+  mmm <- select(Low_Scores, contains(k))
+  
+  x = ncol(mmm) 
+  
+  if (x > 2){
+    SAME1 <- intersect(mmm[,1],mmm[,2])
+    SAME2 <- intersect(mmm[,1],mmm[,3])
+    SAME3 <- intersect(mmm[,2],mmm[,3])
+    all <- c(SAME1,SAME2,SAME3)
+    all <- na.omit(all)
+    all <- unique(all)
+  } else {
+    SAME1 <- intersect(mmm[,1],mmm[,2])
+    all <- SAME1
+    all <- na.omit(all)
+    all <- unique(all)
+  }
+  
+  lll=cbind.fill(mmm, all, fill=NA)
+  names(lll)[names(lll) == "object"] <- "multi_year" #rename column 
+  
+  l <- paste0('LowScore_', k)
+  assign(l, lll)
+  
+  rm(SAME1,SAME2,SAME3,mmm,lll,all)
+}
+rm(k,l,x,all_L_traits)
+
+
+# export multiple dataframes in R to MS-Excel workbook
+packages <- c("openxlsx", "readxl", "magrittr", "purrr", "ggplot2")
+if (!require(install.load)) {
+  install.packages("install.load")
+}
+install.load::install_load(packages)
+
+dataframe01 <- HighScore_BLSSEV
+dataframe02 <- HighScore_ERGSEV
+dataframe03 <- HighScore_FHBD3G
+dataframe04 <- HighScore_FHBDISIND
+dataframe05 <- HighScore_FHBDON
+dataframe06 <- HighScore_FHBSPKINC
+dataframe07 <- HighScore_GLBLSEV
+dataframe08 <- HighScore_HDANG
+dataframe09 <- HighScore_HSATIVLSEV
+dataframe10 <- HighScore_PTHT
+dataframe11 <- HighScore_ratio
+dataframe12 <- HighScore_SDHD
+dataframe13 <- HighScore_SPKDEN
+dataframe14 <- HighScore_SPKHD
+dataframe15 <- HighScore_SPKLNG
+dataframe16 <- HighScore_SPKYLD
+dataframe17 <- HighScore_STMANG
+dataframe18 <- HighScore_ZDK
+
+list_of_datasets <- list("BLSSEV" = dataframe01, "ERGSEV" = dataframe02, "FHBD3G" = dataframe03, "FHBDISIND" = dataframe04, "FHBDON" = dataframe05,
+                         "FHBSPKINC" = dataframe06, "GLBLSEV" = dataframe07, "HDANG" = dataframe08, "HSATIVLSEV" = dataframe09, "PTHT" = dataframe10,
+                         "FHBD3GDON" = dataframe11, "SDHD" = dataframe12, "SPKDEN" = dataframe13, "SPKHD" = dataframe14, "SPKLNG" = dataframe15,
+                         "SPKYLD" = dataframe16, "STMANG" = dataframe17, "ZDK" = dataframe18)
+
+write.xlsx(list_of_datasets, "data/Final_Files/Highest10%Phenotype.xlsx")
+
+rm(dataframe01,dataframe02,dataframe03,dataframe04,dataframe05,dataframe06,dataframe07,dataframe08,dataframe09,dataframe10,dataframe11,dataframe12,dataframe13,dataframe14,dataframe15,dataframe16,dataframe17,dataframe18, list_of_datasets)
+
+dataframe01 <- LowScore_BLSSEV
+dataframe02 <- LowScore_ERGSEV
+dataframe03 <- LowScore_FHBD3G
+dataframe04 <- LowScore_FHBDISIND
+dataframe05 <- LowScore_FHBDON
+dataframe06 <- LowScore_FHBSPKINC
+dataframe07 <- LowScore_GLBLSEV
+dataframe08 <- LowScore_HDANG
+dataframe09 <- LowScore_HSATIVLSEV
+dataframe10 <- LowScore_PTHT
+dataframe11 <- LowScore_ratio
+dataframe12 <- LowScore_SDHD
+dataframe13 <- LowScore_SPKDEN
+dataframe14 <- LowScore_SPKHD
+dataframe15 <- LowScore_SPKLNG
+dataframe16 <- LowScore_SPKYLD
+dataframe17 <- LowScore_STMANG
+dataframe18 <- LowScore_ZDK
+
+list_of_datasets <- list("BLSSEV" = dataframe01, "ERGSEV" = dataframe02, "FHBD3G" = dataframe03, "FHBDISIND" = dataframe04, "FHBDON" = dataframe05,
+                         "FHBSPKINC" = dataframe06, "GLBLSEV" = dataframe07, "HDANG" = dataframe08, "HSATIVLSEV" = dataframe09, "PTHT" = dataframe10,
+                         "FHBD3GDON" = dataframe11, "SDHD" = dataframe12, "SPKDEN" = dataframe13, "SPKHD" = dataframe14, "SPKLNG" = dataframe15,
+                         "SPKYLD" = dataframe16, "STMANG" = dataframe17, "ZDK" = dataframe18)
+
+write.xlsx(list_of_datasets, "data/Final_Files/Lowest10%Phenotype.xlsx")
+```
+# pull out toxin traits
+# are any of the taxa the same across correlated traits
+```{r}
+High_toxin_Scores <- High_Scores[,c(7:12,16:18)] #get all columns with FHBDON, FHBD3G, or FHBD3GDON (ratio)
+Low_toxin_Scores <- Low_Scores[,c(7:12,16:18)] #get all columns with FHBDON, FHBD3G, or FHBD3GDON (ratio
+
+year <- c('2018', '2019', '2020')
+
+# High Scores (top 10%)
+for (m in year){
+  m <- paste0(m)
+  
+  mmm <- select(High_toxin_Scores, contains(m))
+  
+    SAME1 <- intersect(mmm[,1],mmm[,2])
+    SAME2 <- intersect(mmm[,1],mmm[,3])
+    SAME3 <- intersect(mmm[,2],mmm[,3])
+    all <- c(SAME1,SAME2,SAME3)
+    all <- na.omit(all)
+    all <- unique(all)
+  
+  lll=cbind.fill(mmm, all, fill=NA)
+  names(lll)[names(lll) == "object"] <- "across_traits" #rename column 
+  
+  n <- paste0('HighToxinScore_', m)
+  assign(n, lll)
+  
+  rm(SAME1,SAME2,SAME3,mmm,lll,all)
+}
+rm(m,n)
+
+# Low Scores (bottom 10%)
+for (m in year){
+  m <- paste0(m)
+  
+  mmm <- select(Low_toxin_Scores, contains(m))
+  
+  SAME1 <- intersect(mmm[,1],mmm[,2])
+  SAME2 <- intersect(mmm[,1],mmm[,3])
+  SAME3 <- intersect(mmm[,2],mmm[,3])
+  all <- c(SAME1,SAME2,SAME3)
+  all <- na.omit(all)
+  all <- unique(all)
+  
+  lll=cbind.fill(mmm, all, fill=NA)
+  names(lll)[names(lll) == "object"] <- "across_traits" #rename column 
+  
+  n <- paste0('LowToxinScore_', m)
+  assign(n, lll)
+  
+  rm(SAME1,SAME2,SAME3,mmm,lll,all)
+}
+rm(m,n)
+
+
+# High ratio (top 10%), Low DON (bottom 10%)
+
+ratio_DON <- cbind(High_toxin_Scores[,c(1:3)], Low_toxin_Scores[,c(7:9)])
+
+for (m in year){
+  m <- paste0(m)
+  
+  mmm <- select(ratio_DON, contains(m))
+  
+  SAME1 <- intersect(mmm[,1],mmm[,2])
+  all <- SAME1
+  all <- na.omit(all)
+  all <- unique(all)
+  
+  lll=cbind.fill(mmm, all, fill=NA)
+  names(lll)[names(lll) == "object"] <- "across_traits" #rename column 
+  
+  n <- paste0('ratio_DON_', m)
+  assign(n, lll)
+  
+  rm(SAME1,mmm,lll,all)
+}
+
+rm(m,n,year)
+
+
+
+# export multiple dataframes in R to MS-Excel workbook
+
+dataframe01 <- HighToxinScore_2018
+dataframe02 <- HighToxinScore_2019
+dataframe03 <- HighToxinScore_2020
+list_of_datasets <- list("2018" = dataframe01, "2019" = dataframe02, "2020" = dataframe03)
+write.xlsx(list_of_datasets, "data/Final_Files/Highest10%ToxinScores.xlsx")
+rm(dataframe01,dataframe02,dataframe03,list_of_datasets)
+
+dataframe01 <- LowToxinScore_2018
+dataframe02 <- LowToxinScore_2019
+dataframe03 <- LowToxinScore_2020
+list_of_datasets <- list("2018" = dataframe01, "2019" = dataframe02, "2020" = dataframe03)
+write.xlsx(list_of_datasets, "data/Final_Files/Lowest10%ToxinScores.xlsx")
+rm(dataframe01,dataframe02,dataframe03,list_of_datasets)
+
+dataframe01 <- ratio_DON_2018
+dataframe02 <- ratio_DON_2019
+dataframe03 <- ratio_DON_2020
+list_of_datasets <- list("2018" = dataframe01, "2019" = dataframe02, "2020" = dataframe03)
+write.xlsx(list_of_datasets, "data/Final_Files/Taxa_LowDON_HighD3GDON.xlsx")
+rm(dataframe01,dataframe02,dataframe03,list_of_datasets)
+```
+
+# Ranked Spearman Correlation
+
+Spearman’s rank correlation measures the strength and direction of association between two ranked variables.
+
+$$\rho = 1 - \frac{6 \Sigma d^2_i}{n(n^2 - 1)}$$
+$\rho$ = Spearman's rank correlation coefficient This will be a value between 0 and 1 with a positive or negative direction indicating direction of the correlation. +1 would mean a perfect association of rank, 0 means no association between ranks, and -1 means a perfect negative association of rank. 
+
+$d_i$ = difference between the two ranks of each observation. May be easiest to subtract the two rankings and put into new column
+
+$n$ = number of observations (number of genets)
+
+We have three years to find the difference between. So what I think I want to do is find a correlation coefficient $\rho$ for each of the the difference between rank (Y1 and Y2, Y1 and Y3, Y2 and Y3). Then I will look at the average and variance of these coefficients.   
+
+Manual Calculation:
+
+1. read in data
+
+2. Create columns with the rank of the genets in the two years. Make sure this is in descending order. The best/highest marks will get a rank of 1.
+
+3. Make a column for the difference and subtract the two rank columns to fill
+
+4. Make a column for the difference squared and fill with the squared value of the difference column 
+
+5. Calculate the sum of the squared differences ($\Sigma d^2_i$)
+
+6. Calculate $\rho$ using values for this data
+
+7. Calculate the mean and sd of the three $\rho$ values
+
+R Function Calculation:
+
+1. read in data
+
+2. use the `cor.test()` function in R:
+
+  `corr <- cor.test(x=Y1_table$trait_value, y=Y2_table$trait_value, method = 'spearman')`
+  `corr`
+
+3. Calculate the mean and sd of the three $\rho$ values
+
+```{r SpearmanSetup}
+library(stringr)
+library(tidyverse)
+#load in data
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C07 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$Cycle, "C10"),] #keep only data from C10 population
+#Year
+C07_2018 <- C07[str_detect(C07$phenotype_year, "2018"),]
+C07_2019 <- C07[str_detect(C07$phenotype_year, "2019"),]
+C07_2020 <- C07[str_detect(C07$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C07_2018_S <- C07_2018[str_detect(C07_2018$Site, "SAL"),] #Salina
+C07_2019_S <- C07_2019[str_detect(C07_2019$Site, "SAL"),] #Salina
+C07_2020_S <- C07_2020[str_detect(C07_2020$Site, "SAL"),] #Salina
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),] #Salina
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),] #Salina
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),] #Olathe
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),] #Olathe
+
+All_locations <- list(C07_2018_S = C07_2018_S, C07_2019_S = C07_2019_S, C07_2020_S = C07_2020_S, C10_2021_S = C10_2021_S, C10_2022_S = C10_2022_S, C10_2021_O = C10_2021_O, C10_2022_O = C10_2022_O)
+
+for (i in 1:length(All_locations)){
+test <- as_tibble(All_locations[[i]][c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+assign(paste0('data_', i), test)
+}
+# output is a data table for each cycle site year with a column for all possible traits from any year so all data tables have same number of columns but differing number of rows depending on cycle+site 
+# data tables are labeld data_# with # 1:7 ; done this way becuase it is much easier to assign names like this in the loop
+## 1 = C07 2018 S
+## 2 = C07 2019 S
+## 3 = C07 2020 S
+## 4 = C10 2021 S
+## 5 = C10 2022 S
+## 6 = C10 2021 O
+## 7 = C10 2022 O
+```
+
+```{r SpearmanCorrelationCorTest}
+# run Spearman ranked correlation for FHBDON
+corr1 <- cor.test(x=data_1$FHBDON, y=data_2$FHBDON, method = 'spearman') # 2018 : 2019
+corr1
+corr2 <- cor.test(x=data_1$FHBDON, y=data_3$FHBDON, method = 'spearman') # 2018 : 2020
+corr2
+corr3 <- cor.test(x=data_2$FHBDON, y=data_3$FHBDON, method = 'spearman') # 2019 : 2020
+corr3
+
+mean(corr1$estimate, corr2$estimate, corr3$estimate)
+
+# run Spearman ranked correlation for SPKYLD
+corr1 <- cor.test(x=data_1$SPKYLD, y=data_2$SPKYLD, method = 'spearman') # 2018 : 2019
+corr1
+corr2 <- cor.test(x=data_1$SPKYLD, y=data_3$SPKYLD, method = 'spearman') # 2018 : 2020
+corr2
+corr3 <- cor.test(x=data_2$SPKYLD, y=data_3$SPKYLD, method = 'spearman') # 2019 : 2020
+corr3
+
+mean(corr1$estimate, corr2$estimate, corr3$estimate)
+
+# run Spearman ranked correlation for FHBDISIND
+corr1 <- cor.test(x=data_1$FHBDISIND, y=data_2$FHBDISIND, method = 'spearman') # 2018 : 2019
+corr1
+corr2 <- cor.test(x=data_1$FHBDISIND, y=data_3$FHBDISIND, method = 'spearman') # 2018 : 2020
+corr2
+corr3 <- cor.test(x=data_2$FHBDISIND, y=data_3$FHBDISIND, method = 'spearman') # 2019 : 2020
+corr3
+
+mean(corr1$estimate, corr2$estimate, corr3$estimate)
+
+# run Spearman ranked correlation for FHBSPKINC
+corr1 <- cor.test(x=data_1$FHBSPKINC, y=data_2$FHBSPKINC, method = 'spearman') # 2018 : 2019
+corr1
+corr2 <- cor.test(x=data_1$FHBSPKINC, y=data_3$FHBSPKINC, method = 'spearman') # 2018 : 2020
+corr2
+corr3 <- cor.test(x=data_2$FHBSPKINC, y=data_3$FHBSPKINC, method = 'spearman') # 2019 : 2020
+corr3
+
+mean(corr1$estimate, corr2$estimate, corr3$estimate)
+```
+
+
+There is no correlation between the rankings of these traits. However, this is a large population where many of the plants have similar phenotypes so rankings may differ but actual phenotype is pretty much the same especially towards the median of our data 
+
+What if I used linear regression to find the slope of the rank for all three years together, instead of averaging the rho of each individual paired test? This works unless the rankings are not linear or near linear
+
+What if I subsetted to only have the top 50% of individuals or top N% This would reduce noise from the middle phenotypes that probably have a lot of change in rank but not in true phenotype value
+
+```{r}
+# lots of code to get a table for each year that is the top 10% and bottom 10% for each trait 
+
+library(textshape)
+library(dplyr)
+source('~/Downloads/rowr/R/rowr.R')
+
+# 2018 
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_1 <- colnames(data_1[,c(2:ncol(data_1))]) # list for loop 
+
+for (i in traits_data_1) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2018")
+  
+  trait <- data_1[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_1 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+#repeat for each year
+
+# 2019
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_2 <- colnames(data_2[,c(2:ncol(data_2))]) # list for loop 
+
+for (i in traits_data_2) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2019")
+  
+  trait <- data_2[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_2 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+# 2020
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_3 <- colnames(data_3[,c(2:ncol(data_3))]) # list for loop 
+
+for (i in traits_data_3) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2020")
+  
+  trait <- data_3[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_3 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+# 2021 Salina
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_4 <- colnames(data_4[,c(2:ncol(data_4))]) # list for loop 
+
+for (i in traits_data_4) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2021")
+  
+  trait <- data_4[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_4 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+# 2022 Salina
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_5 <- colnames(data_5[,c(2:ncol(data_5))]) # list for loop 
+
+for (i in traits_data_5) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2022")
+  
+  trait <- data_5[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_5 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+# 2021 Olathe
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_6 <- colnames(data_6[,c(2:ncol(data_6))]) # list for loop 
+
+for (i in traits_data_6) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2021")
+  
+  trait <- data_6[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_6 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+
+# 2022 Olathe
+
+# top N% + bottom N% in each year
+df_High_Score=data.frame()
+df_Low_Score=data.frame()
+outputH=data.frame()
+outputL=data.frame()
+
+traits_data_7 <- colnames(data_7[,c(2:ncol(data_7))]) # list for loop 
+
+for (i in traits_data_7) {
+  i <- paste0(i)
+  colname <- paste0(paste(i),"2022")
+  
+  trait <- data_7[,c("plant_id", i)] #table of IDs and one trait
+  trait <- column_to_rownames(trait, "plant_id") # column to rownames
+  trait <- na.omit(trait)
+  
+  high <- top_frac(trait, 0.1) #get top 10% of scores
+  low <- top_frac(trait, -0.1) #get bottom 10% of scores 
+  
+  outputH <- as.data.frame(rownames(high)) #output is taxa in the top 10%
+  outputL <- as.data.frame(rownames(low)) #output is taxa in the bottom 10%
+  
+  outputH_value <- as.data.frame(high[,c(1)])
+  colnames(outputH_value)[1] <- paste0(colname,'_value')
+  outputL_value <- as.data.frame(low[,c(1)])
+  colnames(outputL_value)[1] <- paste0(colname,'_value')
+  
+  colnames(outputH) <- colname #give output column the trait ID
+  colnames(outputL) <- colname #give output column the trait ID
+  
+  df_High_Score=cbind.fill(df_High_Score, outputH, fill=NA) #bind to table to get each trait/year in column
+  df_High_Score=cbind.fill(df_High_Score, outputH_value, fill=NA)# bind to table to have values next to the trait/year
+  df_Low_Score=cbind.fill(df_Low_Score, outputL, fill=NA) #bind to table to get each trait/year in column 
+  df_Low_Score=cbind.fill(df_Low_Score, outputL_value, fill=NA) # bind to table to have values next to the trait/year
+
+  rm(trait, colname, high, low, highN, lowN)
+  
+  HL_data_7 <- rbind(df_High_Score,df_Low_Score)
+  
+}
+
+rm(outputH,outputL,i,outputH_value,outputL_value,df_High_Score,df_Low_Score)
+```
+
+```{r Spearman Top&Bottom}
+res2 <-cor.test(HL_data_1$FHBDON2018_value, HL_data_2$FHBDON2019_value,  method = "spearman")
+res2
+#change column to numeric
+#must be same length, so think this approch will not work
+```
+
+this dosn't seem to work either. trying a different spearman package
+
+```{r SpearmanCorrelationCorFHBDON}
+SpearCorFHBDON <- data.frame()
+
+# C07 2018 S : C07 2019 S
+merged_df <- merge(data_1[,c("plant_id","FHBDON")], data_2[,c("plant_id","FHBDON")], by = "plant_id") # merge trait for the two years being observed
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDON.x, clean_df$FHBDON.y, method = "spearman")
+
+SpearCorFHBDON <- data.table(correlation = "C07_2018_S C07_2019_S", spearman_corr = spearman_corr)
+rm(merged_df,clean_df, spearman_corr)
+
+# C07 2018 S : C07 2020 S
+merged_df <- merge(data_1[,c("plant_id","FHBDON")], data_3[,c("plant_id","FHBDON")], by = "plant_id") 
+clean_df <- na.omit(merged_df) 
+
+spearman_corr <- cor(clean_df$FHBDON.x, clean_df$FHBDON.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2018_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBDON <- rbind(SpearCorFHBDON, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C07 2019 S : C07 2020 S
+merged_df <- merge(data_2[,c("plant_id","FHBDON")], data_3[,c("plant_id","FHBDON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDON.x, clean_df$FHBDON.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2019_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBDON <- rbind(SpearCorFHBDON, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 S : C10 2022 S
+merged_df <- merge(data_4[,c("plant_id","FHBDON")], data_5[,c("plant_id","FHBDON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBDON for C10 2022 S???
+rm(row,merged_df,clean_df)
+
+# C10 2021 O : C10 2022 O
+merged_df <- merge(data_6[,c("plant_id","FHBDON")], data_7[,c("plant_id","FHBDON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBDON for C10 2022 O???
+rm(row,merged_df,clean_df)
+```
+
+```{r SpearmanCorrelationCorFHBD3G}
+SpearCorFHBD3G <- data.frame()
+
+# C07 2018 S : C07 2019 S
+merged_df <- merge(data_1[,c("plant_id","FHBD3G")], data_2[,c("plant_id","FHBD3G")], by = "plant_id") # merge trait for the two years being observed
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBD3G.x, clean_df$FHBD3G.y, method = "spearman")
+
+SpearCorFHBD3G <- data.table(correlation = "C07_2018_S C07_2019_S", spearman_corr = spearman_corr)
+rm(merged_df,clean_df, spearman_corr)
+
+# C07 2018 S : C07 2020 S
+merged_df <- merge(data_1[,c("plant_id","FHBD3G")], data_3[,c("plant_id","FHBD3G")], by = "plant_id") 
+clean_df <- na.omit(merged_df) 
+
+spearman_corr <- cor(clean_df$FHBD3G.x, clean_df$FHBD3G.y, method = "spearman")
+# the standard deviation is zero
+row <- data.table(correlation = "C07_2018_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBD3G <- rbind(SpearCorFHBD3G, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C07 2019 S : C07 2020 S
+merged_df <- merge(data_2[,c("plant_id","FHBD3G")], data_3[,c("plant_id","FHBD3G")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBD3G.x, clean_df$FHBD3G.y, method = "spearman")
+#  the standard deviation is zero
+
+row <- data.table(correlation = "C07_2019_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBD3G <- rbind(SpearCorFHBD3G, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 S : C10 2022 S
+merged_df <- merge(data_4[,c("plant_id","FHBD3G")], data_5[,c("plant_id","FHBD3G")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBD3G for C10 2022 S???
+rm(merged_df,clean_df)
+
+# C10 2021 O : C10 2022 O
+merged_df <- merge(data_6[,c("plant_id","FHBD3G")], data_7[,c("plant_id","FHBD3G")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBD3G for C10 2022 O???
+rm(merged_df,clean_df)
+```
+
+```{r SpearmanCorrelationCorD3GDON}
+SpearCorFHBD3GDON <- data.frame()
+
+# C07 2018 S : C07 2019 S
+merged_df <- merge(data_1[,c("plant_id","FHBD3G.DON")], data_2[,c("plant_id","FHBD3G.DON")], by = "plant_id") # merge trait for the two years being observed
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBD3G.DON.x, clean_df$FHBD3G.DON.y, method = "spearman")
+
+SpearCorFHBD3GDON <- data.table(correlation = "C07_2018_S C07_2019_S", spearman_corr = spearman_corr)
+rm(merged_df,clean_df, spearman_corr)
+
+# C07 2018 S : C07 2020 S
+merged_df <- merge(data_1[,c("plant_id","FHBD3G.DON")], data_3[,c("plant_id","FHBD3G.DON")], by = "plant_id") 
+clean_df <- na.omit(merged_df) 
+
+spearman_corr <- cor(clean_df$FHBD3G.DON.x, clean_df$FHBD3G.DON.y, method = "spearman")
+# the standard deviation is zero
+row <- data.table(correlation = "C07_2018_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBD3GDON <- rbind(SpearCorFHBD3GDON, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C07 2019 S : C07 2020 S
+merged_df <- merge(data_2[,c("plant_id","FHBD3G.DON")], data_3[,c("plant_id","FHBD3G.DON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBD3G.DON.x, clean_df$FHBD3G.DON.y, method = "spearman")
+#  the standard deviation is zero
+
+row <- data.table(correlation = "C07_2019_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBD3GDON <- rbind(SpearCorFHBD3GDON, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 S : C10 2022 S
+merged_df <- merge(data_4[,c("plant_id","FHBD3G.DON")], data_5[,c("plant_id","FHBD3G.DON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBD3G.DON for C10 2022 S???
+rm(merged_df,clean_df)
+
+# C10 2021 O : C10 2022 O
+merged_df <- merge(data_6[,c("plant_id","FHBD3G.DON")], data_7[,c("plant_id","FHBD3G.DON")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+# No FHBD3G.DON for C10 2022 O???
+rm(merged_df,clean_df)
+```
+
+```{r SpearmanCorrelationCorDISIND}
+SpearCorFHBDISIND <- data.frame()
+
+# C07 2018 S : C07 2019 S
+merged_df <- merge(data_1[,c("plant_id","FHBDISIND")], data_2[,c("plant_id","FHBDISIND")], by = "plant_id") # merge trait for the two years being observed
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDISIND.x, clean_df$FHBDISIND.y, method = "spearman")
+
+SpearCorFHBDISIND <- data.table(correlation = "C07_2018_S C07_2019_S", spearman_corr = spearman_corr)
+rm(merged_df,clean_df, spearman_corr)
+
+# C07 2018 S : C07 2020 S
+merged_df <- merge(data_1[,c("plant_id","FHBDISIND")], data_3[,c("plant_id","FHBDISIND")], by = "plant_id") 
+clean_df <- na.omit(merged_df) 
+
+spearman_corr <- cor(clean_df$FHBDISIND.x, clean_df$FHBDISIND.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2018_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBDISIND <- rbind(SpearCorFHBDISIND, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C07 2019 S : C07 2020 S
+merged_df <- merge(data_2[,c("plant_id","FHBDISIND")], data_3[,c("plant_id","FHBDISIND")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDISIND.x, clean_df$FHBDISIND.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2019_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBDISIND <- rbind(SpearCorFHBDISIND, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 S : C10 2022 S
+merged_df <- merge(data_4[,c("plant_id","FHBDISIND")], data_5[,c("plant_id","FHBDISIND")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDISIND.x, clean_df$FHBDISIND.y, method = "spearman")
+
+row <- data.table(correlation = "C10_2021_S C10_2022_S", spearman_corr = spearman_corr)
+
+SpearCorFHBDISIND <- rbind(SpearCorFHBDISIND, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 O : C10 2022 O
+merged_df <- merge(data_6[,c("plant_id","FHBDISIND")], data_7[,c("plant_id","FHBDISIND")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBDISIND.x, clean_df$FHBDISIND.y, method = "spearman")
+
+row <- data.table(correlation = "C10_2021_O C10_2022_O", spearman_corr = spearman_corr)
+
+SpearCorFHBDISIND <- rbind(SpearCorFHBDISIND, row)
+rm(row,merged_df,clean_df, spearman_corr)
+```
+
+```{r SpearmanCorrelationCorSPKINC}
+SpearCorFHBSPKINC <- data.frame()
+
+# C07 2018 S : C07 2019 S
+merged_df <- merge(data_1[,c("plant_id","FHBSPKINC")], data_2[,c("plant_id","FHBSPKINC")], by = "plant_id") # merge trait for the two years being observed
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBSPKINC.x, clean_df$FHBSPKINC.y, method = "spearman")
+
+SpearCorFHBSPKINC <- data.table(correlation = "C07_2018_S C07_2019_S", spearman_corr = spearman_corr)
+rm(merged_df,clean_df, spearman_corr)
+
+# C07 2018 S : C07 2020 S
+merged_df <- merge(data_1[,c("plant_id","FHBSPKINC")], data_3[,c("plant_id","FHBSPKINC")], by = "plant_id") 
+clean_df <- na.omit(merged_df) 
+
+spearman_corr <- cor(clean_df$FHBSPKINC.x, clean_df$FHBSPKINC.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2018_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBSPKINC <- rbind(SpearCorFHBSPKINC, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C07 2019 S : C07 2020 S
+merged_df <- merge(data_2[,c("plant_id","FHBSPKINC")], data_3[,c("plant_id","FHBSPKINC")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBSPKINC.x, clean_df$FHBSPKINC.y, method = "spearman")
+
+row <- data.table(correlation = "C07_2019_S C07_2020_S", spearman_corr = spearman_corr)
+
+SpearCorFHBSPKINC <- rbind(SpearCorFHBSPKINC, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 S : C10 2022 S
+merged_df <- merge(data_4[,c("plant_id","FHBSPKINC")], data_5[,c("plant_id","FHBSPKINC")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBSPKINC.x, clean_df$FHBSPKINC.y, method = "spearman")
+
+row <- data.table(correlation = "C10_2021_S C10_2022_S", spearman_corr = spearman_corr)
+
+SpearCorFHBSPKINC <- rbind(SpearCorFHBSPKINC, row)
+rm(row,merged_df,clean_df, spearman_corr)
+
+# C10 2021 O : C10 2022 O
+merged_df <- merge(data_6[,c("plant_id","FHBSPKINC")], data_7[,c("plant_id","FHBSPKINC")], by = "plant_id")
+clean_df <- na.omit(merged_df) # remove NA values
+
+spearman_corr <- cor(clean_df$FHBSPKINC.x, clean_df$FHBSPKINC.y, method = "spearman")
+
+row <- data.table(correlation = "C10_2021_O C10_2022_O", spearman_corr = spearman_corr)
+
+SpearCorFHBSPKINC <- rbind(SpearCorFHBSPKINC, row)
+rm(row,merged_df,clean_df, spearman_corr)
+```
+
+```{r SpearmanCorrelationCorInterpret}
+# combine data tables and interpret the correlations
+
+SpearCorFHBDON$trait <- "FHBDON"
+SpearCorFHBD3G$trait <- "FHBD3G"
+SpearCorFHBD3GDON$trait <- "FHBD3GDON"
+SpearCorFHBDISIND$trait <- "FHBDISIND"
+SpearCorFHBSPKINC$trait <- "FHBSPKINC"
+
+SpearCor <- rbind(SpearCorFHBDON,SpearCorFHBD3G,SpearCorFHBD3GDON,SpearCorFHBDISIND,SpearCorFHBSPKINC)
+
+# None of these spearman coefficients are indicating high rank correlation. FHBDON between C07 2019 and C07 2020 is the closests (rho=0.246972009)
+
+# save file
+write.csv(SpearCor, '/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Final_Files/FHBSpearmanCorrelations.csv')
+```
+
+The Spearman correlation coefficient, denoted as $\rho$ (rho) or sometimes $r_s$, measures the strength and direction of a monotonic relationship between two variables
+
+Range: Spearman correlation coefficient ranges from -1 to 1
+rho value = -1 indicates perfect negative monotonic relationship
+rho value = 1 indicates perfect positive monotonic relationship
+rho value = 0 indicates no monotonic relationship
+
+Magnitude: 
+|rho| = 1 indicates ranks of the data points are perfectly correlated 
+|rho| > 0.7 indicates high degree of rank correlation
+0.3 < |rho| $\le$ 0.7 indicates moderate degree of rank correlation
+|rho| < 0.3 indicates weak degree of rank correlation
+
+Direction:
+positive rho (rho > 0) : as one variable increases the other tends to increase
+negative rho (rho < 0) : as one variable increases the other tends to decrease
+
+
+#Percent of population with FHB, DON
+
+```{r percents}
+#data
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C7 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+
+# do this for each year (C7_2018_S, C7_2019_S, C7_2020_S)
+
+test <- as_tibble(C7_2018_S[c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+traits <- colnames(test[,c(2:ncol(test))]) # list of traits
+
+
+table <- data.frame()
+
+x = as.numeric(nrow(test)) #number of plants in population
+
+don.total = x - (sum(as.numeric(is.na(test$FHBDON)))) #number of plants with data for trait 
+don.zero = (as.numeric(nrow(test[test$FHBDON == 0,]))) - (sum(as.numeric(is.na(test$FHBDON)))) # number of plants with score of zero
+don.range = (as.numeric(c(min(test$FHBDON, na.rm = TRUE), max(test$FHBDON, na.rm = TRUE))))
+don.avg = sum(as.numeric(test$FHBDON), na.rm = TRUE) / don.total # average score
+don.pctzero = (don.zero / don.total) * 100 # percent of plants with score of zero
+don.sc = as.numeric(don.total - don.zero) #number of plants with some level of DON greater than zero
+
+d3g.total = x - (sum(as.numeric(is.na(test$FHBD3G)))) #number of plants with data for D3G
+d3g.zero = (as.numeric(nrow(test[test$FHBD3G == 0,]))) - (sum(as.numeric(is.na(test$FHBD3G)))) # number of plants with score of zero
+d3g.range = (as.numeric(c(min(test$FHBD3G, na.rm = TRUE), max(test$FHBD3G, na.rm = TRUE))))
+d3g.avg = sum(as.numeric(test$FHBD3G), na.rm = TRUE) / d3g.total # average score
+d3g.pctzero = (d3g.zero / d3g.total) * 100 # percent of plants with score of zero
+d3g.sc = as.numeric(d3g.total - d3g.zero) #number of plants with some level of DON greater than zero
+
+disind.total = x - (sum(as.numeric(is.na(test$FHBDISIND)))) #total number of plants with data for fhbdisind
+disind.zero = (as.numeric(nrow(test[test$FHBDISIND == 0,]))) - (sum(as.numeric(is.na(test$FHBDISIND)))) # number of plants with zero FHBDISIND
+disind.range = (as.numeric(c(min(test$FHBDISIND, na.rm = TRUE), max(test$FHBDISIND, na.rm = TRUE))))
+disind.avg = sum(as.numeric(test$FHBDISIND), na.rm = TRUE) / disind.total # average score for FHBDISIND
+disind.pctzero = (disind.zero / disind.total) * 100 # percent of plants with zero FHBDISIND
+disind.sc = as.numeric(disind.total - disind.zero) #number of plants with some level of DON greater than zero
+
+spkinc.total = x - (sum(as.numeric(is.na(test$FHBSPKINC)))) #number of plants with data for trait
+spkinc.zero = (as.numeric(nrow(test[test$FHBSPKINC == 0,]))) - (sum(as.numeric(is.na(test$FHBSPKINC)))) # number of plants with zero for score
+spkinc.range = (as.numeric(c(min(test$FHBSPKINC, na.rm = TRUE), max(test$FHBSPKINC, na.rm = TRUE))))
+spkinc.avg = sum(as.numeric(test$FHBSPKINC), na.rm = TRUE) / spkinc.total # average score 
+spkinc.pctzero = (spkinc.zero / spkinc.total) * 100 # percent of plants with zero for score
+spkinc.sc = as.numeric(spkinc.total - spkinc.zero) #number of plants with some level of DON greater than zero
+
+d3g.don = ((d3g.total) / (don.total)) * 100 #percentage of plants with DON with D3G 
+#donavg = mean(test$FHBDON, na.rm = TRUE)
+#d3gavg = mean(test$FHBD3G, na.rm = TRUE)
+
+test$don <- test$FHBDON
+test$don[test$don == 0.0] <- NA #replace
+
+test$trnf <- (test$FHBD3G) / (test$don) #ppm of don that has been transformed to d3g
+ppm = mean(test$trnf, na.rm=TRUE) # average ppm of don transformed to d3g
+ratio.avg = mean(test$FHBD3G.DON, na.rm = TRUE) #average ratio of d3g to don
+
+tabbb <- data.frame(disind.total,disind.zero,disind.avg,disind.pctzero,disind.sc,
+                 spkinc.total,spkinc.zero,spkinc.avg,spkinc.pctzero,spkinc.sc,
+                 don.total,don.zero,don.avg,don.pctzero,don.sc,
+                 d3g.total,d3g.zero,d3g.avg,d3g.pctzero,d3g.sc,
+                 d3g.don,ppm,ratio.avg)
+tabb <- t(tabbb)
+colnames(tabb)[1]<- "2018"
+
+table <- cbind(table, tabb)
+```
+
+#Pie Chart & Bar Chart 
+```{r pie_chart}
+#don advisory levels: 1 ppm human; 10 ppm ruminating beef; 10 ppm  poultry; 5 ppm for swine; 5 ppm for all other animals
+#FHBDON
+# 0, 0.01-0.5, 0.51-1, 1.01-5, 5.01-10, >10
+#FHBD3G
+# 0, 0.01-0.5, 0.51-1, 1.01-5
+#FHBDISIND
+# 0, 0.01-0.5, 0.51-1, 1.01-2, 2.01-3, 3.01-4, 4.01-5
+#FHBSPKINC
+# 0, 0.01-0.1, 0.11-0.25, 0.26-0.5, 0.51-0.75. 0.76-1
+#################################
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt') #read in file with all cycles and years and locations
+#create separate tables for each cycle, year, location
+#Cycle 
+C7 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$Cycle, "C10"),] #keep only data from C7 population
+#Year
+C7_2018 <- C7[str_detect(C7$phenotype_year, "2018"),]
+C7_2019 <- C7[str_detect(C7$phenotype_year, "2019"),]
+C7_2020 <- C7[str_detect(C7$phenotype_year, "2020"),]
+C10_2021 <- C10[str_detect(C10$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+#Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),]
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),]
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),]
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),]
+
+################################################################
+#Need to have same trait columns in all pheno files even if no data for that trait
+C7_test <- pivot_wider(C7, names_from = trait_id, values_from = phenotype_value)
+C7_test$FHBZEA <- NA
+C7_new <- gather(C7_test, trait_id, phenotype_value, FHBDON:FHBZEA, factor_key=TRUE)
+C10_test <- pivot_wider(C10_2021, names_from = trait_id, values_from = phenotype_value)
+C10_test$FHBZEA <- NA
+C10_2021_new <- gather(C10_test, trait_id, phenotype_value, FHBDON:FHBZEA, factor_key=TRUE)
+  #Year
+C7_2018 <- C7_new[str_detect(C7_new$phenotype_year, "2018"),]
+C7_2019 <- C7_new[str_detect(C7_new$phenotype_year, "2019"),]
+C7_2020 <- C7_new[str_detect(C7_new$phenotype_year, "2020"),]
+C10_2021 <- C10_2021_new[str_detect(C10_2021_new$phenotype_year, "2021"),]
+C10_2022 <- C10[str_detect(C10$phenotype_year, "2022"),]
+  #Location
+C7_2018_S <- C7_2018[str_detect(C7_2018$Site, "SAL"),] #Salina
+C7_2019_S <- C7_2019[str_detect(C7_2019$Site, "SAL"),] #Salina
+C7_2020_S <- C7_2020[str_detect(C7_2020$Site, "SAL"),] #Salina
+C10_2021_S <- C10_2021[str_detect(C10_2021$Site, "SAL"),]
+C10_2022_S <- C10_2022[str_detect(C10_2022$Site, "SAL"),]
+C10_2021_O <- C10_2021[str_detect(C10_2021$Site, "OLA"),]
+C10_2022_O <- C10_2022[str_detect(C10_2022$Site, "OLA"),]
+
+Plots <- c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_OLA_2021", "C10_SAL_2022", "C10_OLA_2022")
+Traits <- c("FHBZEA","FHBDON", "FHBD3G", "FHBDISIND", "FHBSPKINC")
+List <- list(C07_SAL_2018 = C7_2018_S, C07_SAL_2019 = C7_2019_S, C07_SAL_2020 =C7_2020_S, C10_SAL_2021 = C10_2021_S, C10_OLA_2021 = C10_2021_O, C10_SAL_2022 = C10_2022_S, C10_OLA_2022 = C10_2022_O)
+
+path <- 'data/Figures/PiePlot_FHB.pdf'
+pie_plot_fhb(Plots,Traits,List,path)
+
+
+path <- 'data/Figures/BarPlot_FHB.pdf'
+bar_plot_fhb(Plots,Traits,List,path)
+
+#new bar plots for paper
+# remove FHBD3G for 2021
+C10_2021_O$phenotype_value[C10_2021_O$trait_id == 'FHBD3G'] <- NA
+C10_2021_S$phenotype_value[C10_2021_S$trait_id == 'FHBD3G'] <- NA
+# update list after making this change
+List <- list(C07_SAL_2018 = C7_2018_S, C07_SAL_2019 = C7_2019_S, C07_SAL_2020 =C7_2020_S, C10_SAL_2021 = C10_2021_S, C10_OLA_2021 = C10_2021_O, C10_SAL_2022 = C10_2022_S, C10_OLA_2022 = C10_2022_O)
+# stack graphs FHBDON, FHBDISIND, FHBSPKINC from 2021 and 2022 so that S and O for same year are stacked
+  #this done in new function
+  # need to have ggh4x and ggplot both loaded
+path <- 'data/Figures/BarPlot_FHB2.pdf'
+bar_plot_fhb2(Plots,Traits,List,path)
+
+#new par plots for paper 11/17/2023
+#updating function to remove grey background
+# remove FHBD3G for 2021
+C10_2021_O$phenotype_value[C10_2021_O$trait_id == 'FHBD3G'] <- NA
+C10_2021_S$phenotype_value[C10_2021_S$trait_id == 'FHBD3G'] <- NA
+# update list after making this change
+List <- list(C07_SAL_2018 = C7_2018_S, C07_SAL_2019 = C7_2019_S, C07_SAL_2020 =C7_2020_S, C10_SAL_2021 = C10_2021_S, C10_OLA_2021 = C10_2021_O, C10_SAL_2022 = C10_2022_S, C10_OLA_2022 = C10_2022_O)
+path <- 'data/Figures/BarPlot_FHB3.pdf'
+bar_plot_fhb2(Plots,Traits,List,path)
+
+#new par plots for paper 11/17/2023
+#adding annual wheat check averages
+source('wheat_checks_for_figure_functions.R') # creates list of FHB traits and values for annual checks; output = List3
+# remove FHBD3G for 2021
+C10_2021_O$phenotype_value[C10_2021_O$trait_id == 'FHBD3G'] <- NA
+C10_2021_S$phenotype_value[C10_2021_S$trait_id == 'FHBD3G'] <- NA
+# update list after making this change
+List <- list(C07_SAL_2018 = C7_2018_S, C07_SAL_2019 = C7_2019_S, C07_SAL_2020 =C7_2020_S, C10_SAL_2021 = C10_2021_S, C10_OLA_2021 = C10_2021_O, C10_SAL_2022 = C10_2022_S, C10_OLA_2022 = C10_2022_O)
+path <- 'data/Figures/BarPlot_FHB4.pdf'
+bar_plot_fhb2(Plots,Traits,List,List3,path)
+
+```
+
+```{r not_run}
+###### parts that were used to put together the function 
+Copy_C07_SAL_2018_FHBD3G <- test[,c("plant_id", "FHBD3G")]
+
+# Using multiple conditions on DataFrame
+df <- Copy_C07_SAL_2018_FHBD3G
+df$select <- df$FHBD3G
+df$select <- ifelse(df$FHBD3G <= 0, "0", df$select) 
+df$select <- ifelse(df$FHBD3G > 0 & df$FHBD3G <= 0.5, "0.01-0.5", df$select) 
+df$select <- ifelse(df$FHBD3G > 0.5 & df$FHBD3G <= 1, "0.51-1", df$select) 
+df$select <- ifelse(df$FHBD3G > 1 & df$FHBD3G <= 5, "1.01-5", df$select) 
+df$select <- ifelse(df$FHBD3G > 5 & df$FHBD3G <= 10, "5.01-10", df$select) 
+
+x = as.numeric(nrow(df)) #number of plants in population
+df.total = x - (sum(as.numeric(is.na(df$FHBD3G)))) #number of plants with data for trait
+df.one = ((as.numeric(nrow(df[df$select == "0",]))) - (sum(as.numeric(is.na(df$select))))) / df.total
+df.two = ((as.numeric(nrow(df[df$select == "0.01-0.5",]))) - (sum(as.numeric(is.na(df$select))))) / df.total
+df.three = ((as.numeric(nrow(df[df$select == "0.51-1",]))) - (sum(as.numeric(is.na(df$select))))) / df.total
+df.four = ((as.numeric(nrow(df[df$select == "1.01-5",]))) - (sum(as.numeric(is.na(df$select))))) / df.total
+df.five = ((as.numeric(nrow(df[df$select == "5.01-10",]))) - (sum(as.numeric(is.na(df$select))))) / df.total
+df.1 = ((as.numeric(nrow(df[df$select == "0",]))) - (sum(as.numeric(is.na(df$select)))))
+df.2 = ((as.numeric(nrow(df[df$select == "0.01-0.5",]))) - (sum(as.numeric(is.na(df$select)))))
+df.3 = ((as.numeric(nrow(df[df$select == "0.51-1",]))) - (sum(as.numeric(is.na(df$select)))))
+df.4 = ((as.numeric(nrow(df[df$select == "1.01-5",]))) - (sum(as.numeric(is.na(df$select)))))
+df.5 = ((as.numeric(nrow(df[df$select == "5.01-10",]))) - (sum(as.numeric(is.na(df$select)))))
+
+sel = c("0 ppm", "0.01-0.5 ppm", "0.51-1 ppm", "1.01-5 ppm", "5.01-10 ppm")
+p = c(df.one, df.two, df.three, df.four, df.five)
+c = c("31", "254", "73", "44", "3")
+dff <- data.frame(sel,c,p)
+
+df_FHBDON <- df
+df_FHBD3G <- df
+dfff <- data.frame(FHBDON = df_FHBDON$select2, FHBD3G = df_FHBD3G$select2)
+
+colnames(dff)[1] <- "toxin_level"
+colnames(dff)[2] <- "count"
+colnames(dff)[3] <- "percentage"
+dff$labels <- dff$percentage * 100
+dff$labels <- round(dff$labels,2)
+dff$labels <- paste0(dff$labels,"%")
+dff$count <- as.numeric(dff$count)
+dff$Plot <- "FHBD3G"
+
+db <- data.frame()
+db <- rbind(db,dff)
+
+pdf('~/Desktop/pie18.pdf', height = 10, width = 10)
+
+ggplot(db, aes(x = "", y = percentage, fill = toxin_level)) +
+  geom_col(stat="identity", width=1, color = "black") +
+  coord_polar("y", start=0)+
+  geom_text(aes(x = 1.3, label = labels), color="white", size= 3, position = position_stack(vjust = .5)) +
+  labs(x = NULL, y = NULL, fill = NULL)+
+  theme_void()+
+  theme(axis.ticks=element_blank(),
+        axis.title=element_blank(),
+        axis.text.y = element_blank(),
+        axis.text.x = element_blank(),
+        panel.grid  = element_blank())+
+  scale_fill_manual(values = c("#55DDE0", "#33658A", "#F6AE2D", "#F26419", "#999933", "#999999"))+
+        facet_wrap(~Plot, ncol = 2)+
+      labs(title= "main_title", color=NULL)  
+
+dev.off()
+
+```
+
+```{r, averages}
+pheno_2 <- read.delim('data/Intermediate_Files/Phenotypic_Format_wide.txt') #read in file with all cycles, years, and locations
+C7 <- pheno_2[str_detect(pheno_2$Cycle, "C07"),] #keep only data from C7 population
+C10 <- pheno_2[str_detect(pheno_2$Cycle, "C10"),] #keep only data from C7 population
+
+#average FHB index for each cycle
+mean(C7$FHBSPKINC, na.rm = TRUE)
+#59.88131
+mean(C10$FHBSPKINC, na.rm = TRUE)
+#83.21006
+```
+
+# Figure for Paper, 1-5 traits for one year
+
+```{r figure}
+#reformat for Histogram 
+test <- as_tibble(C7_2019_S[c("plant_id", "trait_id", "phenotype_value")]) #tibble table with three columns
+test$phenotype_value <- as.numeric(test$phenotype_value) #make one column numeric 
+
+test <- distinct(test, plant_id, trait_id, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+test <- test %>% 
+  pivot_wider(
+    names_from = trait_id,
+    values_from = phenotype_value
+  )
+
+#remove columns with no data
+empty_columns <- colSums(is.na(test) | test == "") == nrow(test)
+test <- test[, !empty_columns]
+
+phen <- test[,c("plant_id", "FHBDON", "FHBDISIND", "GLBLSEV", "BLSSEV", "HSATIVLSEV")]
+colnames(phen)[2] <- "DON (ppm)"
+colnames(phen)[3] <- "FHB DISEASE INDEX"
+colnames(phen)[4] <- "GLUME BLOTCH SEVERITY"
+colnames(phen)[5] <- "BACTERIAL LEAF STREAK SEVERITY"
+colnames(phen)[6] <- "SPOT BLOTCH SEVERITY"
+
+long <- gather(phen, trait, value, `DON (ppm)`:`SPOT BLOTCH SEVERITY`, factor_key=TRUE)
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+  facet_wrap(~trait, scales = "free") +
+  labs(title= "Histograms of Disease Traits Cycle 7 2019 Salina, KS")+
+  theme(strip.text = element_text(size = 8))
+
+#Export to data/Figures/Paper_Histogram.pdf
+
+#add mean line to histograms
+library(rstatix)
+STATS <- long %>% group_by(trait) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(value)))
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+   geom_vline(data = STATS, aes(xintercept=trait_mean, group = trait), color= 'red')+
+    facet_wrap(~trait, scales = "free") +
+   labs(title= "Histograms of Disease Traits Cycle 7 2019 Salina, KS")+
+  theme(strip.text = element_text(size = 8))
+
+#Export to data/Figures/Paper_Histogram2.pdf
+
+# Redo for paper
+## remove main heading, capitalize axis labels
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+   geom_vline(data = STATS, aes(xintercept=trait_mean, group = trait), color= 'red')+
+    facet_wrap(~trait, scales = "free") +
+   labs(x= "Phenotype Value", y="Count")+
+  theme(strip.text = element_text(size = 8))
+
+#Export to ~/data/Figures/Paper_Histogram3.pdf
+
+```
+
+#add annual wheat means as lines to histograms
+```{r wheat_line}
+pheno <- read.csv('data/Original_Files/plants.csv')
+pheno$Site <- gsub("_Fusarium.*", "", pheno$experiment_id) #Remove characters after first allele
+pheno$Site <- gsub(".*_","",pheno$Site) #Remove all before and up to "/"
+
+# Remove plant_ID 17FHB000233
+pheno <- pheno[!str_detect(pheno$plant_id, "17FHB000233"),]
+pheno <- pheno[!str_detect(pheno$plant_id, "20FHB000009"),]
+pheno <- pheno[!str_detect(pheno$plant_id, "20FHB000385"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "Volunteer"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "volunteer"),]
+pheno <- pheno[!str_detect(pheno$notes, "barley"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C8"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C9"),]
+pheno <- pheno[!str_detect(pheno$germplasm_id, "C11"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "np"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "no_plant"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "No Plant"),]
+pheno <- pheno[!str_detect(pheno$notes.1, "Looks like IWG"),]
+
+pheno$entry <- pheno$notes
+pheno$entry <- ifelse(pheno$notes == "ww_check", "Wheat", pheno$notes)
+pheno$entry <- ifelse(pheno$entry == "sw_check", "Wheat", pheno$entry)
+pheno$entry <- ifelse(pheno$entry == "iwg_check", "IWG", pheno$entry)
+pheno$entry <- ifelse(grepl("C10",pheno$entry), "IWG", 
+                      ifelse(grepl("C7", pheno$entry), "IWG", pheno$entry))
+pheno$entry <- ifelse(grepl("winter wheat",pheno$entry), "Wheat", 
+                      ifelse(grepl("spring wheat", pheno$entry), "Wheat", pheno$entry))
+pheno$entry[grepl("Original",pheno$entry)]<-"IWG"
+
+rownames(pheno) <- NULL
+pheno <- pheno[rowSums(is.na(pheno)) != ncol(pheno), ]
+
+#create separate tables for each cycle, year, location
+#Checks 
+overley <- pheno[str_detect(pheno$germplasm_id, "Overley"),] #
+bacup <- pheno[str_detect(pheno$germplasm_id, "Bacup"),] #
+roblin <- pheno[str_detect(pheno$germplasm_id, "Roblin"),] #
+everest <- pheno[str_detect(pheno$germplasm_id, "Everest"),] #
+
+#Year
+overley_2018 <- overley[str_detect(overley$phenotype_year, "2018"),]
+overley_2019 <- overley[str_detect(overley$phenotype_year, "2019"),]
+overley_2020 <- overley[str_detect(overley$phenotype_year, "2020"),]
+overley_2021 <- overley[str_detect(overley$phenotype_year, "2021"),]
+overley_2022 <- overley[str_detect(overley$phenotype_year, "2022"),]
+
+bacup_2018 <- bacup[str_detect(bacup$phenotype_year, "2018"),]
+bacup_2019 <- bacup[str_detect(bacup$phenotype_year, "2019"),]
+bacup_2020 <- bacup[str_detect(bacup$phenotype_year, "2020"),]
+bacup_2021 <- bacup[str_detect(bacup$phenotype_year, "2021"),]
+bacup_2022 <- bacup[str_detect(bacup$phenotype_year, "2022"),]
+
+roblin_2018 <- roblin[str_detect(roblin$phenotype_year, "2018"),]
+roblin_2019 <- roblin[str_detect(roblin$phenotype_year, "2019"),]
+roblin_2020 <- roblin[str_detect(roblin$phenotype_year, "2020"),]
+roblin_2021 <- roblin[str_detect(roblin$phenotype_year, "2021"),]
+roblin_2022 <- roblin[str_detect(roblin$phenotype_year, "2022"),]
+
+everest_2018 <- everest[str_detect(everest$phenotype_year, "2018"),]
+everest_2019 <- everest[str_detect(everest$phenotype_year, "2019"),]
+everest_2020 <- everest[str_detect(everest$phenotype_year, "2020"),]
+everest_2021 <- everest[str_detect(everest$phenotype_year, "2021"),]
+everest_2022 <- everest[str_detect(everest$phenotype_year, "2022"),]
+
+#Location
+overley_2018_S <- overley_2018[str_detect(overley_2018$Site, "SAL"),] #Salina
+overley_2019_S <- overley_2019[str_detect(overley_2019$Site, "SAL"),] #Salina
+overley_2020_S <- overley_2020[str_detect(overley_2020$Site, "SAL"),] #Salina
+overley_2021_O <- overley_2021[str_detect(overley_2021$Site, "OLA"),] #Olathe
+overley_2021_S <- overley_2021[str_detect(overley_2021$Site, "SAL"),] #Salina
+overley_2022_O <- overley_2022[str_detect(overley_2022$Site, "OLA"),] #Olathe
+overley_2022_S <- overley_2022[str_detect(overley_2022$Site, "SAL"),] #Salina
+
+bacup_2018_S <- bacup_2018[str_detect(bacup_2018$Site, "SAL"),] #Salina
+bacup_2019_S <- bacup_2019[str_detect(bacup_2019$Site, "SAL"),] #Salina
+bacup_2020_S <- bacup_2020[str_detect(bacup_2020$Site, "SAL"),] #Salina
+bacup_2021_O <- bacup_2021[str_detect(bacup_2021$Site, "OLA"),] #Olathe
+bacup_2021_S <- bacup_2021[str_detect(bacup_2021$Site, "SAL"),] #Salina
+bacup_2022_O <- bacup_2022[str_detect(bacup_2022$Site, "OLA"),] #Olathe
+bacup_2022_S <- bacup_2022[str_detect(bacup_2022$Site, "SAL"),] #Salina
+
+roblin_2018_S <- roblin_2018[str_detect(roblin_2018$Site, "SAL"),] #Salina
+roblin_2019_S <- roblin_2019[str_detect(roblin_2019$Site, "SAL"),] #Salina
+roblin_2020_S <- roblin_2020[str_detect(roblin_2020$Site, "SAL"),] #Salina
+roblin_2021_O <- roblin_2021[str_detect(roblin_2021$Site, "OLA"),] #Olathe
+roblin_2021_S <- roblin_2021[str_detect(roblin_2021$Site, "SAL"),] #Salina
+roblin_2022_O <- roblin_2022[str_detect(roblin_2022$Site, "OLA"),] #Olathe
+roblin_2022_S <- roblin_2022[str_detect(roblin_2022$Site, "SAL"),] #Salina
+
+everest_2018_S <- everest_2018[str_detect(everest_2018$Site, "SAL"),] #Salina
+everest_2019_S <- everest_2019[str_detect(everest_2019$Site, "SAL"),] #Salina
+everest_2020_S <- everest_2020[str_detect(everest_2020$Site, "SAL"),] #Salina
+everest_2021_O <- everest_2021[str_detect(everest_2021$Site, "OLA"),] #Olathe
+everest_2021_S <- everest_2021[str_detect(everest_2021$Site, "SAL"),] #Salina
+everest_2022_O <- everest_2022[str_detect(everest_2022$Site, "OLA"),] #Olathe
+everest_2022_S <- everest_2022[str_detect(everest_2022$Site, "SAL"),] #Salina
+
+overley_2019_S$phenotype_value <- as.numeric(overley_2019_S$phenotype_value)
+bacup_2019_S$phenotype_value <- as.numeric(bacup_2019_S$phenotype_value)
+roblin_2019_S$phenotype_value <- as.numeric(roblin_2019_S$phenotype_value)
+everest_2019_S$phenotype_value <- as.numeric(everest_2019_S$phenotype_value)
+
+STATS_overley<- overley_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_bacup<- bacup_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_roblin<- roblin_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_everest<- everest_2019_S %>% group_by(trait_id) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+
+#skip
+STATS_overley[1,1] <- "BACTERIAL LEAF STREAK SEVERITY"
+STATS_overley[2,1] <- "FHB DISEASE INDEX"
+
+STATS_bacup[1,1] <- "BACTERIAL LEAF STREAK SEVERITY"
+STATS_bacup[4,1] <- "FHB DISEASE INDEX"
+STATS_bacup[5,1] <- "DON (ppm)"
+STATS_bacup[7,1] <- "GLUME BLOTCH SEVERITY"
+STATS_bacup[8,1] <- "SPOT BLOTCH SEVERITY"
+
+STATS_roblin[1,1] <- "BACTERIAL LEAF STREAK SEVERITY"
+STATS_roblin[4,1] <- "FHB DISEASE INDEX"
+STATS_roblin[5,1] <- "DON (ppm)"
+STATS_roblin[7,1] <- "GLUME BLOTCH SEVERITY"
+STATS_roblin[8,1] <- "SPOT BLOTCH SEVERITY"
+
+STATS_everest[1,1] <- "BACTERIAL LEAF STREAK SEVERITY"
+STATS_everest[2,1] <- "GLUME BLOTCH SEVERITY"
+stats_overley <- as.data.frame(STATS_overley[c(1),]) #keep only FHB traits
+row <- c("FHB DISEASE INDEX", "NA")
+stats_overley <- rbind(stats_overley, row)
+row <- c("DON (ppm)", "NA")
+stats_overley <- rbind(stats_overley, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_overley <- rbind(stats_overley, row)
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_overley <- rbind(stats_overley, row)
+stats_overley$trait_mean <- as.numeric(stats_overley$trait_mean)
+
+stats_bacup <- STATS_bacup[c(5,4,7,1),]
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+stats_bacup <- rbind(stats_bacup, row)
+stats_bacup$trait_mean <- as.numeric(stats_bacup$trait_mean)
+stats_bacup$trait_id <- as.factor(stats_bacup$trait_id)
+colnames(stats_bacup)[1] <- "trait"
+s_bacup <- stats_bacup[c(1,2),]
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+s_bacup <- rbind(s_bacup, row)
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA")
+s_bacup <- rbind(s_bacup, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+s_bacup <- rbind(s_bacup, row)
+s_bacup$trait_mean <- as.numeric(s_bacup$trait_mean)
+
+stats_roblin <- STATS_roblin[c(5,4,1,8),]
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+stats_roblin <- rbind(stats_roblin, row)
+stats_roblin$trait_mean <- as.numeric(stats_roblin$trait_mean)
+stats_roblin$trait_id <- as.factor(stats_roblin$trait_id)
+colnames(stats_roblin)[1] <- "trait"
+s_roblin <- stats_roblin[c(1,2),]
+row <- c("GLUME BLOTCH SEVERITY", "NA")
+s_roblin <- rbind(s_roblin, row)
+row <- c("BACTERIAL LEAF STREAK SEVERITY", "NA")
+s_roblin <- rbind(s_roblin, row)
+row <- c("SPOT BLOTCH SEVERITY", "NA")
+s_roblin <- rbind(s_roblin, row)
+s_roblin$trait_mean <- as.numeric(s_roblin$trait_mean)
+
+#no data for Everest
+#no FHB data for Overley
+#can use Roblin and Bacup
+wl_roblin <- s_roblin
+wl_roblin <- wl_roblin %>%
+        mutate(Label = paste0("Roblin"))
+wl_bacup <- s_bacup
+wl_bacup <- wl_bacup %>%
+        mutate(Label = paste0("Bacup"))
+
+ggplot(long, aes(value)) + geom_histogram(color="black", fill="white") +
+    facet_wrap(~trait, scales = "free") +
+   geom_vline(data = s_bacup, aes(xintercept=trait_mean), color= '#F26419')+
+      geom_text(data = wl_bacup, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    geom_vline(data = s_roblin, aes(xintercept=trait_mean), color= '#33658A')+
+    geom_text(data = wl_roblin, aes(x=trait_mean, y = 25, label = Label, colour='black'), size = 2, hjust = -.1, angle=90) +
+    scale_fill_identity(name = 'the checks', guide = 'legend',labels = c('Bacup','Roblin'))+
+    scale_colour_manual(name = 'the checks', 
+         values =c('#F26419'='#F26419','#33658A'='#33658A'), labels = c('Bacup','Roblin'))+
+  labs(title= "Histograms of Disease Traits Cycle 7 2019 Salina, KS")+
+  theme(strip.text = element_text(size = 4))
+
+#Export to data/Figures/Paper_Histogram_2019.pdf
+
+
+```

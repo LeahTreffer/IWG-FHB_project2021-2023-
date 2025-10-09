@@ -1,0 +1,643 @@
+---
+title: "Chromosome Map View"
+output: html_document
+date: "2022-10-27"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+## Objective
+Visualize distribution of markers across chromosomes
+Use list of markers and position to create maps of each chromosome 
+Use list of significant markers to create maps of where sig associated loci are
+Use list of markers in FHB1 region to visualize distribution in this area
+
+https://cran.r-project.org/web/packages/LinkageMapView/vignettes/LinkageMapView.html
+
+```{r library}
+library(LinkageMapView)
+library(tidyr)
+library(tidyverse)
+```
+
+# List of all Markers
+```{r all markers}
+GM <- read.table('data/Intermediate_Files/SNP_Position.txt', head=TRUE)
+
+
+GM <- GM[,c(2,3,1)] #reorder
+colnames(GM)[1] <- "group"
+colnames(GM)[2] <- "postion"
+colnames(GM)[3] <- "locus"
+
+```
+
+# List of Sig Markers
+
+```{r Sig marker list}
+directories = c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+datalist = vector("list", length = 7)
+for(i in directories){
+  one = (paste0('output/FarmCPU/', i, '/GAPIT.Association.Filter_GWAS_results.csv'))
+  one <- read.csv(one, header=TRUE)
+  i <- paste0(i)
+  one$Year = i #add year
+  one$Trait = gsub('^.*.', '', one$traits) #split string and extract trait name
+  one$Trait = str_remove(one$traits, "FarmCPU.")
+  one$ID = paste0(one$Trait,"_",one$Year)
+  Table <- one[,c("SNP","Chr","Pos","ID")]
+  
+  datalist[[i]] <- Table # add it to your list
+}
+
+big_data = do.call(rbind, datalist)
+rownames(big_data) <- NULL 
+
+# write.csv(big_data, 'data/Intermediate_Files/SigM.csv', row.names = FALSE)
+Sig <- read.csv('data/Intermediate_Files/SigM.csv', head=TRUE)
+
+Sig <- Sig[,c("Chr","Pos","ID","SNP")]
+colnames(Sig)[1] <- "group"
+colnames(Sig)[2] <- "postion"
+colnames(Sig)[3] <- "id"
+colnames(Sig)[4] <- "locus"
+
+```
+
+# list of markers in FHB1 region
+
+```{r FHB1}
+FHB1 <- read.csv('data/Intermediate_Files/FHB1_markers.csv')
+
+FHB1 <- FHB1[,c(3,4,2)]
+colnames(FHB1)[1] <- "group"
+colnames(FHB1)[2] <- "postion"
+colnames(FHB1)[3] <- "locus"
+
+FHB1 = as.data.frame(FHB1)
+
+```
+
+# Make maps 
+
+```{r basic_all}
+chrom = GM$group
+chrom = unique(chrom)
+
+outfile = file.path('data/Figures', "Map_of_All_Markers.pdf")
+lmv.linkage.plot(GM,outfile,mapthese=chrom)
+  #takes a while to run
+```
+
+```{r sig_all}
+
+chrom = GM$group
+chrom = unique(chrom)
+
+sig = Sig$locus
+sig = unique(sig)
+
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers.pdf")
+lmv.linkage.plot(GM,outfile,mapthese=chrom,lcol="green",lcex=2,lfont=2,
+    rcol="red",rcex=2,rfont=3,
+    showonly= sig,
+    pdf.width = 150,
+    pdf.height = 100)
+
+```
+
+# Crazyness to get all Sig SNPs with trait name on map
+
+```{r}
+chrom = GM$group
+chrom = unique(chrom)
+
+data <- Sig[! str_detect(Sig$id, "ERGSEV"),] # remove ERGSEV
+rownames(data) <- NULL
+
+data$P <- data$postion / 1000000 # Position from 100,000,000 to 100.000000 Mbp
+data$pmbp <- round(data$P, digits=2) # change number of decimal places
+data$ID  = sub("\\_C.*", "", data$id) # remove _ and everything after from trait name
+data$MbpP <- paste0(data$ID,"_",data$pmbp) # new id of trait_mbp
+
+hm <- merge(GM, data[,c("locus", "MbpP")], all=TRUE)
+colnames(hm)[4] <- "qtl"
+
+hm$q <- hm$qtl
+  
+hm$q[is.na(hm$q)] <- hm$locus
+
+data <- arrange(data, group, postion)
+
+```
+
+
+```{r}
+# This one works but only has region around loci, not whole chromosome
+apple <- data[,c(1,2,8)]
+colnames(apple)[3] <- "locus"
+
+pineapple <- apple
+pineapple$locus <- sub("\\_.*", "", pineapple$locus) # remove _ and everything after from trait name
+
+# make a list to pass label options
+flist3 <- list()
+locus <- c("BLSSEV")
+font  <- c(2)   #bold
+col <- c("#490092") 
+flist3[[1]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBD3G")
+font  <- c(2)   #bold
+col <- c("#b6dbff")
+flist3[[2]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBD3G.DON")
+font  <- c(2)   #bold
+col <- c("#006ddb") 
+flist3[[3]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBDON")
+font  <- c(2)   #bold
+col <- c("#6db6ff")
+flist3[[4]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBSPKINC")
+font  <- c(2)   #bold
+col <- c("#004949")
+flist3[[5]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBZEA")
+font  <- c(2)   #bold
+col <- c("#009292")
+flist3[[6]] <- list(locus = locus, font = font, col = col)
+locus <- c("GLBLSEV" )
+font  <- c(2)   #bold
+col <- c("#332288")
+flist3[[7]] <- list(locus = locus, font = font, col = col)
+locus <- c("HDANG")
+font  <- c(2)   #bold
+col <- c("#db6d00")
+flist3[[8]] <- list(locus = locus, font = font, col = col)
+locus <- c("HSATIVLSEV")
+font  <- c(2)   #bold
+col <- c("#b66dff")
+flist3[[9]] <- list(locus = locus, font = font, col = col)
+locus <- c("PTHT")
+font  <- c(2)   #bold
+col <- c("#999933")
+flist3[[10]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKDEN")
+font  <- c(2)   #bold
+col <- c("#CC6677")
+flist3[[11]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKHD")
+font  <- c(2)   #bold
+col <- c("#ffb6db")
+flist3[[12]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKYLD")
+font  <- c(2)   #bold
+col <- c("#920000")
+flist3[[13]] <- list(locus = locus, font = font, col = col)
+locus <- c("STMANG")
+font  <- c(2)   #bold
+col <- c("#924900")
+flist3[[14]] <- list(locus = locus, font = font, col = col)
+locus <- c("ZDK")
+font  <- c(2)   #bold
+col <- c("#DDCC77")
+flist3[[15]] <- list(locus = locus, font = font, col = col)
+
+
+outfile = file.path('data/Figures', "Not_Saved_Map_of_all_Significant_Markers_qtl.pdf")
+lmv.linkage.plot(pineapple,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist3,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  pdf.height = 70,
+  pdf.width = 80
+)
+
+```
+
+```{r}
+#this also works
+#expands region shown to be length of chromosome from all markers
+
+#table of the first and last marker position for each chromosome
+p <- data.frame(group = c("J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07", "J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07"), postion = c("458758", "2397282", "20454271", "3677028", "6397515", "4741732", "1185812", "9586750", "596431", "197721", "4720279", "942693", "3113262", "1288062", "7732815", "84460", "604420", "133423", "466287", "842089", "601716", "547887188", "693814509", "662494763", "528885423", "601393879", "556126806", "686112919", "419538374", "506475509", "491756166", "376446715", "547837982", "408349506", "477025294", "573434801", "617486213", "526289443", "483867370", "590518588", "455545525", "750863519"), locus = c("NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO", "NO"))
+
+coconut <- rbind(pineapple, p) #bind first and last marker postions to the list of sig markers
+coconut$postion <- as.numeric(coconut$postion)
+coconut <- arrange(coconut, group, postion) #rearrange
+
+#font originall 2 for all, changed to 40 on Aug6 test
+flist4 <- list()
+locus <- c("BLSSEV")
+font  <- c(40)   #bold
+col <- c("#490092") 
+flist4[[1]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBD3G")
+font  <- c(40)   #bold
+col <- c("#b6dbff")
+flist4[[2]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBD3G.DON")
+font  <- c(40)   #bold
+col <- c("#006ddb") 
+flist4[[3]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBDON")
+font  <- c(40)   #bold
+col <- c("#6db6ff")
+flist4[[4]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBSPKINC")
+font  <- c(40)   #bold
+col <- c("#004949")
+flist4[[5]] <- list(locus = locus, font = font, col = col)
+locus <- c("FHBZEA")
+font  <- c(40)   #bold
+col <- c("#009292")
+flist4[[6]] <- list(locus = locus, font = font, col = col)
+locus <- c("GLBLSEV" )
+font  <- c(40)   #bold
+col <- c("#332288")
+flist4[[7]] <- list(locus = locus, font = font, col = col)
+locus <- c("HDANG")
+font  <- c(40)   #bold
+col <- c("#db6d00")
+flist4[[8]] <- list(locus = locus, font = font, col = col)
+locus <- c("HSATIVLSEV")
+font  <- c(40)   #bold
+col <- c("#b66dff")
+flist4[[9]] <- list(locus = locus, font = font, col = col)
+locus <- c("PTHT")
+font  <- c(40)   #bold
+col <- c("#999933")
+flist4[[10]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKDEN")
+font  <- c(40)   #bold
+col <- c("#CC6677")
+flist4[[11]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKHD")
+font  <- c(40)   #bold
+col <- c("#ffb6db")
+flist4[[12]] <- list(locus = locus, font = font, col = col)
+locus <- c("SPKYLD")
+font  <- c(40)   #bold
+col <- c("#920000")
+flist4[[13]] <- list(locus = locus, font = font, col = col)
+locus <- c("STMANG")
+font  <- c(40)   #bold
+col <- c("#924900")
+flist4[[14]] <- list(locus = locus, font = font, col = col)
+locus <- c("ZDK")
+font  <- c(40)   #bold
+col <- c("#DDCC77")
+flist4[[15]] <- list(locus = locus, font = font, col = col)
+locus <- c("NO")
+font  <- c(40)   #bold
+col <- c("white")
+flist4[[16]] <- list(locus = locus, font = font, col = col)
+
+
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl.pdf")
+lmv.linkage.plot(coconut,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  pdf.height = 70,
+  pdf.width = 80
+)
+
+#Adjusting size and font
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl_test.pdf")
+lmv.linkage.plot(coconut,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  cex.lgtitle = 6, # font size for linkage group titles
+  font.lgtitle = 2, # font for linkage group titles, 1 plain text 2 bold 3 italic 4 bold italic.
+  lcex = 2,
+  rcex = 3.5,
+  pdf.height = 85,
+  pdf.width = 140
+)
+
+coconutJ <- coconut[str_detect(coconut$group,"J"),] # make list of sig markers for J group
+coconutS <- coconut[str_detect(coconut$group,"S"),] # make list of sig markers for J group
+coconutV <- coconut[str_detect(coconut$group,"V"),] # make list of sig markers for J group
+
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl_test_Aug6_J.pdf")
+lmv.linkage.plot(coconutJ,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("J01", "J02", "J03", "J04", "J05", "J06", "J07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  cex.lgtitle = 6, # font size for linkage group titles
+  font.lgtitle = 2, # font for linkage group titles, 1 plain text 2 bold 3 italic 4 bold italic.
+  lcex = 8,
+  rcex = 12,
+  pdf.height = 106.25,
+  pdf.width = 175
+)
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl_test_Aug6_S.pdf")
+lmv.linkage.plot(coconutS,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("S01", "S02", "S03", "S04", "S05", "S06", "S07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  cex.lgtitle = 6, # font size for linkage group titles
+  font.lgtitle = 2, # font for linkage group titles, 1 plain text 2 bold 3 italic 4 bold italic.
+  lcex = 8,
+  rcex = 12,
+  pdf.height = 106.25,
+  pdf.width = 175
+)
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl_test_Aug6_V.pdf")
+lmv.linkage.plot(coconutV,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("V01", "V02", "V03", "V04", "V05", "V06", "V07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  cex.lgtitle = 6, # font size for linkage group titles
+  font.lgtitle = 2, # font for linkage group titles, 1 plain text 2 bold 3 italic 4 bold italic.
+  lcex = 8,
+  rcex = 12,
+  pdf.height = 106.25,
+  pdf.width = 175
+)
+
+```
+
+```{r}
+# Add in known QTL 
+# Adding position info for FHB1
+qtldf <- data.frame(
+  chr = character(),
+  qtl = character(),
+  so = numeric(),
+  si = numeric(),
+  ei = numeric(),
+  eo = numeric(),
+  col = character(),
+  stringsAsFactors = FALSE
+)
+qtldf <- rbind(qtldf,
+               data.frame(
+                 chr = c("J03", "S03", "V03"),
+                 qtl = "FHB1",
+                 so = c(50676750, 43496709, 18027299),
+                 si = c(50676750, 43496709, 18027299),
+                 ei = c(51198852, 43892886, 18318355),
+                 eo = c(51198852, 43892886, 18318355),
+                 col="red"
+               ))
+
+outfile = file.path('data/Figures', "Map_of_all_Significant_Markers_qtl_7.pdf")
+lmv.linkage.plot(coconut,outfile = outfile,
+  ruler = FALSE,
+  lgtitle = c("J01", "J02", "J03", "J04", "J05", "J06", "J07", "S01", "S02", "S03", "S04", "S05", "S06", "S07","V01", "V02", "V03", "V04", "V05", "V06", "V07"),
+  maxnbrcolsfordups = 3, 
+  markerformatlist = flist4,
+  lg.col = "lightgrey",
+  autoconnadj = FALSE,
+  pdf.height = 70,
+  pdf.width = 80,
+  qtldf=qtldf
+
+)
+
+```
+
+
+
+
+
+
+
+
+
+
+#FHB1 region
+
+```{r basic_FHB1}
+JS <- data.frame(Name="FHB1_start", Chromosome="J03", Position="50676750")
+JE <- data.frame(Name="FHB1_end", Chromosome="J03", Position="51198852")
+VS <- data.frame(Name="FHB1_start", Chromosome="V03", Position="18027299")
+VE <- data.frame(Name="FHB1_end", Chromosome="V03", Position="18318355")
+SS <- data.frame(Name="FHB1_start", Chromosome="S03", Position="43496709")
+SE <- data.frame(Name="FHB1_end", Chromosome="S03", Position="43892886")
+GMM <- rbind(JS,JE,VS,VE,SS,SE)
+GMM <- GMM[,c(2,3,1)]
+colnames(GMM)[1] <- "group"
+colnames(GMM)[2] <- "postion"
+colnames(GMM)[3] <- "locus"
+GMM <- rbind(GM,GMM)
+GMM$postion = as.numeric(GMM$postion)
+
+chrom = FHB1$group
+chrom = unique(chrom)
+
+sig = FHB1$locus
+sig = unique(sig)
+
+outfile = file.path('data/Figures', "Map_of_FHB1_Markers.pdf")
+lmv.linkage.plot(GMM,outfile,mapthese=chrom,lcol="green",lcex=2,lfont=2,
+    rcol="red",rcex=2,rfont=3,
+    showonly= sig,
+    pdf.width = 150,
+    pdf.height = 100)
+
+```
+
+```{r basic_FHB1}
+outfile = file.path('data/Figures', "Map_of_FHB1_J03_Markers.pdf")
+lmv.linkage.plot(FHB1,outfile,mapthese=c("J03"),
+                 pdf.width = 5,
+                 pdf.height = 25 )
+
+outfile = file.path('data/Figures', "Map_of_FHB1_S03_Markers.pdf")
+lmv.linkage.plot(FHB1,outfile,mapthese=c("S03"),
+                 pdf.width = 5,
+                 pdf.height = 25 )
+
+outfile = file.path('data/Figures', "Map_of_FHB1_V03_Markers.pdf")
+lmv.linkage.plot(FHB1,outfile,mapthese=c("V03"),
+                 pdf.width = 5,
+                 pdf.height = 25 )
+```
+
+# Kathryn wants map with color ledgend 
+
+```{r}
+
+# ggplot
+library(ggplot2)
+
+# My list of all markers
+GM <- read.table('data/Intermediate_Files/SNP_Position.txt', head=TRUE)
+
+GM <- GM[,c(2,3,1)] #reorder
+colnames(GM)[1] <- "group"
+colnames(GM)[2] <- "postion"
+colnames(GM)[3] <- "locus"
+
+# My list of significant SNPs
+Sig <- read.csv('data/Intermediate_Files/SigM.csv', head=TRUE)
+
+Sig <- Sig[,c("Chr","Pos","ID","SNP")]
+colnames(Sig)[1] <- "group"
+colnames(Sig)[2] <- "postion"
+colnames(Sig)[3] <- "id"
+colnames(Sig)[4] <- "locus"
+
+# Make tables
+#define data
+# Name of each chromosome and the size taken from phytozome
+dfChrSize2 <- data.frame(chrName=rep(c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')))
+dfChrSize2$chrSize <- as.numeric(dfChrSize2$chrSize)
+
+# take significant marker list and format to fit input style
+dfMarkPos2 <- Sig[,c('group', 'postion', 'id')]
+dfMarkPos2$markSize <- c(50000) #rand column in the tutorial table, so adding it to my table too
+colnames(dfMarkPos2)[1] <- "chrName"
+colnames(dfMarkPos2)[2] <- "markPos"
+colnames(dfMarkPos2)[3] <- "markName"
+dfMarkPos2$markName <- gsub("\\_C.*","",dfMarkPos2$markName) #remove characters after the trait name
+dfMarkPos2 <- dfMarkPos2[,c('chrName', 'markPos', 'markSize', 'markName')] # reorder
+
+```
+
+```{r}
+dat2 <- dfChrSize2
+colnames(dat2)[1] <- "chromosome"
+colnames(dat2)[2] <- "size"
+marks2 <- dfMarkPos2[,c(1,2,4)]
+colnames(marks2)[1] <- "Chromosome"
+colnames(marks2)[2] <- "Position"
+colnames(marks2)[3] <- "Type"
+```
+
+```{r}
+dfChrSize3 <- data.frame(chrName=rep(c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')))
+dfChrSize3$chrSize <- as.numeric(dfChrSize3$chrSize)
+dfChrSize3$chrName <- as.numeric(dfChrSize3$chrName)
+
+dat3 <- dfChrSize3
+colnames(dat3)[1] <- "chromosome"
+colnames(dat3)[2] <- "size"
+
+marks3 <- marks2
+marks3$Chromosome[marks3$Chromosome == "J01"] <- "1" #replace
+marks3$Chromosome[marks3$Chromosome == "J02"] <- "2" #replace
+marks3$Chromosome[marks3$Chromosome == "J03"] <- "3" #replace
+marks3$Chromosome[marks3$Chromosome == "J04"] <- "4" #replace
+marks3$Chromosome[marks3$Chromosome == "J05"] <- "5" #replace
+marks3$Chromosome[marks3$Chromosome == "J06"] <- "6" #replace
+marks3$Chromosome[marks3$Chromosome == "J07"] <- "7" #replace
+marks3$Chromosome[marks3$Chromosome == "S01"] <- "8" #replace
+marks3$Chromosome[marks3$Chromosome == "S02"] <- "9" #replace
+marks3$Chromosome[marks3$Chromosome == "S03"] <- "10" #replace
+marks3$Chromosome[marks3$Chromosome == "S04"] <- "11" #replace
+marks3$Chromosome[marks3$Chromosome == "S05"] <- "12" #replace
+marks3$Chromosome[marks3$Chromosome == "S06"] <- "13" #replace
+marks3$Chromosome[marks3$Chromosome == "S07"] <- "14" #replace
+marks3$Chromosome[marks3$Chromosome == "V01"] <- "15" #replace
+marks3$Chromosome[marks3$Chromosome == "V02"] <- "16" #replace
+marks3$Chromosome[marks3$Chromosome == "V03"] <- "17" #replace
+marks3$Chromosome[marks3$Chromosome == "V04"] <- "18" #replace
+marks3$Chromosome[marks3$Chromosome == "V05"] <- "19" #replace
+marks3$Chromosome[marks3$Chromosome == "V06"] <- "20" #replace
+marks3$Chromosome[marks3$Chromosome == "V07"] <- "21" #replace
+marks3$Chromosome <- as.numeric(marks3$Chromosome)
+
+marks4 <- marks3[!str_detect(marks3$Type, "ERGSEV"),] #remove ergot trait from list of significant markers
+colnames(marks4)[3] <- "Trait"
+```
+
+```{r}
+
+myColors2 <- c("#490092", "#b6dbff", "#006ddb", "#6db6ff", "#004949", "#009292", "#332288", "#db6d00", "#b66dff", "#999933", "#CC6677", "#ffb6db" , "#920000", "#924900", "#DDCC77") # in alphabetical order
+names(myColors2) <- levels(marks4$Trait)
+colScale2 <- scale_colour_manual(name = "Trait",values = myColors2)
+
+chromo_lables <- c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')
+
+p <- ggplot(data=dat3, aes(chromosome, size)) + geom_bar( stat="identity", fill="grey70") + theme_classic()
+p + geom_segment(data=marks4, aes(x=Chromosome-0.45, xend=Chromosome+0.45, y=Position, yend=Position, colour=Trait), linewidth=0.5) + colScale2 + labs(y = "position") + xlab("chromosome (J01-J07, S01-S07, V01-V07)") + labs(title = "Positions of Significant Loci") 
+
+###
+#breaks between each chromosome group
+
+dat4 <- data.frame(chrName=rep(c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')),
+                 chrGroup=rep(c('J', 'J', 'J', 'J', 'J', 'J', 'J', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'V', 'V', 'V', 'V', 'V', 'V', 'V')),
+                 chr=rep(c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')))
+                 
+dat4$chrSize <- as.numeric(dat4$chrSize)
+dat4$chrName <- as.numeric(dat4$chrName)
+
+colnames(dat4)[1] <- "chromosome"
+colnames(dat4)[2] <- "size"
+
+
+marks4$chrGroup <- marks4$Chromosome
+marks4$chrGroup[marks4$chrGroup == "21"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "20"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "19"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "18"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "17"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "16"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "15"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "14"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "13"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "12"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "11"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "10"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "9"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "8"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "7"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "6"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "5"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "4"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "3"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "2"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "1"] <- "J" #replace
+
+p <- ggplot(data=dat4, aes(chromosome, size)) + geom_bar( stat="identity", fill="grey70") + theme_classic()
+p + geom_segment(data=marks4, aes(x=Chromosome-0.45, xend=Chromosome+0.45, y=Position, yend=Position, colour=Trait), linewidth=0.5) + colScale2 + labs(y = "position") + xlab("chromosome") + labs(title = "Positions of Significant Loci") + theme(plot.title = element_text(hjust = 0.5), axis.ticks.x=element_blank(), axis.text.x=element_blank()) + facet_wrap(vars(chrGroup), scale = "free_x", strip.position = "bottom")+
+     geom_text(aes(label=chr), position=position_dodge(width=0.9), vjust=0, size=2)
+
+# Export > Save as PDF.. > Directory= '/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures' ; File Name = Map_of_all_Sig_Markers_by_group_legend
+
+# Re-formating for paper
+## Taking off title, uppercase axis labels
+
+p <- ggplot(data=dat4, aes(chromosome, size)) + geom_bar( stat="identity", fill="grey70") + theme_classic()
+p + geom_segment(data=marks4, aes(x=Chromosome-0.45, xend=Chromosome+0.45, y=Position, yend=Position, colour=Trait), linewidth=0.5) + colScale2 + labs(y = "Position") + xlab("Chromosome") + theme(plot.title = element_text(hjust = 0.5), axis.ticks.x=element_blank(), axis.text.x=element_blank()) + facet_wrap(vars(chrGroup), scale = "free_x", strip.position = "bottom")+
+     geom_text(aes(label=chr), position=position_dodge(width=0.9), vjust=0, size=2)
+
+# Export > Save as PDF.. > Directory= '/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures' ; File Name = Map_of_all_Sig_Markers_by_group_legend2 
+
+```
+

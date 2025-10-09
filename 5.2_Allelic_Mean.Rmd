@@ -1,0 +1,924 @@
+---
+title: "3.1_Allelic_Mean"
+output: html_document
+date: "2023-04-20"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Objectivee
+
+Make Box Plots for the allelic means of significant loci. Create box plots for significant loci for FHB related traits and other high confidence loci for other traits
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r include=FALSE}
+require(reshape2)
+library(tidyverse)
+library(tidyr)
+library(stringr)
+library(dplyr)
+install.packages("gplots")
+install.packages("scatterplot3d") #The downloaded link at: http://cran.r-project.org/package=scatterplot3d
+library(bigmemory)
+library(googlesheets4)
+library(googledrive)
+```
+
+
+# Box Plots for significant traits
+
+```{r box plots}
+FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+#make a copy of master file to work with
+GENO <- FHB_for_GS_GWAS
+geno <- GENO + 1 # change geno numeric format from -101 to 012
+
+PHENO <- read.delim('data/Intermediate_Files/Phenotypic_Format_wide_2.txt')
+
+#get list of significant markers for traits
+LIST <- read.csv('data/Final_Files/output_COMBINED.csv') #master list
+#make sig list of each year, this is helpful since phenotype values are stored in by-year files
+LIST18 <- LIST[str_detect(LIST$Plot, "2018"),]
+LIST19 <- LIST[str_detect(LIST$Plot, "2019"),]
+LIST20 <- LIST[str_detect(LIST$Plot, "2020"),]
+LIST21O <- LIST[str_detect(LIST$Plot, "OLA_2021"),]
+LIST21S <- LIST[str_detect(LIST$Plot, "SAL_2021"),]
+LIST22O <- LIST[str_detect(LIST$Plot, "OLA_2022"),]
+LIST22S <- LIST[str_detect(LIST$Plot, "SAL_2022"),]
+
+#make list with traits for each year
+#2018
+LIST_2018 <- split(LIST18, LIST18$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST18$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2018[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2018_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2018 <- PHENO[str_detect(PHENO$phenotype_year, "2018"),]
+PHENO2018 <- PHENO2018[,c(2,7:ncol(PHENO2018))]
+p2018 <- subset(PHENO2018[, colnames(PHENO2018) %in% new_str]) #traits that are in the significant trait list
+p2018 <- cbind(PHENO2018[,c(1)], p2018)
+colnames(p2018)[1] <- "taxa"
+
+#SPKDEN
+SM_SPKDEN_2018 <- p2018[,c("taxa", "SPKDEN")] #get taxa and trait values
+SM_SPKDEN_2018 <- left_join(FarmCPU.SPKDEN_2018_snps,SM_SPKDEN_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_SPKDEN_2018)[colnames(SM_SPKDEN_2018)=="SPKDEN"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_SPKDEN_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+a <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="SPKDEN_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_SPKDEN_2018,CSigMar_stk,FarmCPU.SPKDEN_2018_snps)
+#FBHDON
+SM_FHBDON_2018 <- p2018[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2018 <- left_join(FarmCPU.FHBDON_2018_snps,SM_FHBDON_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2018)[colnames(SM_FHBDON_2018)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+b <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2018,CSigMar_stk,FarmCPU.FHBDON_2018_snps)
+#HDANG
+SM_HDANG_2018 <- p2018[,c("taxa", "HDANG")] #get taxa and trait values
+SM_HDANG_2018 <- left_join(FarmCPU.HDANG_2018_snps,SM_HDANG_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HDANG_2018)[colnames(SM_HDANG_2018)=="HDANG"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HDANG_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+c <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HDANG_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HDANG_2018,CSigMar_stk,FarmCPU.HDANG_2018_snps)
+#STMANG
+SM_STMANG_2018 <- p2018[,c("taxa", "STMANG")] #get taxa and trait values
+SM_STMANG_2018 <- left_join(FarmCPU.STMANG_2018_snps,SM_STMANG_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_STMANG_2018)[colnames(SM_STMANG_2018)=="STMANG"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_STMANG_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+d <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="STMANG_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_STMANG_2018,CSigMar_stk,FarmCPU.STMANG_2018_snps)
+#FHBD3G.DON
+SM_FHBD3G.DON_2018 <- p2018[,c("taxa", "FHBD3G.DON")] #get taxa and trait values
+SM_FHBD3G.DON_2018 <- left_join(FarmCPU.FHBD3G.DON_2018_snps,SM_FHBD3G.DON_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBD3G.DON_2018)[colnames(SM_FHBD3G.DON_2018)=="FHBD3G.DON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBD3G.DON_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+e <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBD3G.DON_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBD3G.DON_2018,CSigMar_stk,FarmCPU.FHBD3G.DON_2018_snps)
+#SPKYLD
+SM_SPKYLD_2018 <- p2018[,c("taxa", "SPKYLD")] #get taxa and trait values
+SM_SPKYLD_2018 <- left_join(FarmCPU.SPKYLD_2018_snps,SM_SPKYLD_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_SPKYLD_2018)[colnames(SM_SPKYLD_2018)=="SPKYLD"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_SPKYLD_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+f <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="SPKYLD_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_SPKYLD_2018,CSigMar_stk,FarmCPU.SPKYLD_2018_snps)
+#PTHT
+SM_PTHT_2018 <- p2018[,c("taxa", "PTHT")] #get taxa and trait values
+SM_PTHT_2018 <- left_join(FarmCPU.PTHT_2018_snps,SM_PTHT_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_PTHT_2018)[colnames(SM_PTHT_2018)=="PTHT"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_PTHT_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+g <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="PTHT_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_PTHT_2018,CSigMar_stk,FarmCPU.PTHT_2018_snps)
+
+#2019
+LIST_2019 <- split(LIST19, LIST19$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST19$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2019[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2019_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2019 <- PHENO[str_detect(PHENO$phenotype_year, "2019"),]
+PHENO2019 <- PHENO2019[,c(2,7:ncol(PHENO2019))]
+p2019 <- subset(PHENO2019[, colnames(PHENO2019) %in% new_str]) #traits that are in the significant trait list
+p2019 <- cbind(PHENO2019[,c(1)], p2019)
+colnames(p2019)[1] <- "taxa"
+
+#FHBD3G.DON
+SM_FHBD3G.DON_2019 <- p2019[,c("taxa", "FHBD3G.DON")] #get taxa and trait values
+SM_FHBD3G.DON_2019 <- left_join(FarmCPU.FHBD3G.DON_2019_snps,SM_FHBD3G.DON_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBD3G.DON_2019)[colnames(SM_FHBD3G.DON_2019)=="FHBD3G.DON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBD3G.DON_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+h <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBD3G.DON_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBD3G.DON_2019,CSigMar_stk,FarmCPU.FHBD3G.DON_2019_snps)
+#HDANG
+SM_HDANG_2019 <- p2019[,c("taxa", "HDANG")] #get taxa and trait values
+SM_HDANG_2019 <- left_join(FarmCPU.HDANG_2019_snps,SM_HDANG_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HDANG_2019)[colnames(SM_HDANG_2019)=="HDANG"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HDANG_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+i <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HDANG_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HDANG_2019,CSigMar_stk,FarmCPU.HDANG_2019_snps)
+#ZDK
+SM_ZDK_2019 <- p2019[,c("taxa", "ZDK")] #get taxa and trait values
+SM_ZDK_2019 <- left_join(FarmCPU.ZDK_2019_snps,SM_ZDK_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_ZDK_2019)[colnames(SM_ZDK_2019)=="ZDK"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_ZDK_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+j <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="ZDK_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_ZDK_2019,CSigMar_stk,FarmCPU.ZDK_2019_snps)
+#HSATIVLSEV
+SM_HSATIVLSEV_2019 <- p2019[,c("taxa", "HSATIVLSEV")] #get taxa and trait values
+SM_HSATIVLSEV_2019 <- left_join(FarmCPU.HSATIVLSEV_2019_snps,SM_HSATIVLSEV_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HSATIVLSEV_2019)[colnames(SM_HSATIVLSEV_2019)=="HSATIVLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HSATIVLSEV_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+k <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HSATIVLSEV_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HSATIVLSEV_2019,CSigMar_stk,FarmCPU.HSATIVLSEV_2019_snps)
+#FHBDON
+SM_FHBDON_2019 <- p2019[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2019 <- left_join(FarmCPU.FHBDON_2019_snps,SM_FHBDON_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2019)[colnames(SM_FHBDON_2019)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+l <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2019,CSigMar_stk,FarmCPU.FHBDON_2019_snps)
+#GLBLSEV
+SM_GLBLSEV_2019 <- p2019[,c("taxa", "GLBLSEV")] #get taxa and trait values
+SM_GLBLSEV_2019 <- left_join(FarmCPU.GLBLSEV_2019_snps,SM_GLBLSEV_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_GLBLSEV_2019)[colnames(SM_GLBLSEV_2019)=="GLBLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_GLBLSEV_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+m <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="GLBLSEV_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_GLBLSEV_2019,CSigMar_stk,FarmCPU.GLBLSEV_2019_snps)
+#FHBD3G
+SM_FHBD3G_2019 <- p2019[,c("taxa", "FHBD3G")] #get taxa and trait values
+SM_FHBD3G_2019 <- left_join(FarmCPU.FHBD3G_2019_snps,SM_FHBD3G_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBD3G_2019)[colnames(SM_FHBD3G_2019)=="FHBD3G"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBD3G_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+n <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBD3G_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBD3G_2019,CSigMar_stk,FarmCPU.FHBD3G_2019_snps)
+
+#2020
+LIST_2020 <- split(LIST20, LIST20$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST20$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2020[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2020_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2020 <- PHENO[str_detect(PHENO$phenotype_year, "2020"),]
+PHENO2020 <- PHENO2020[,c(2,7:ncol(PHENO2020))]
+p2020 <- subset(PHENO2020[, colnames(PHENO2020) %in% new_str]) #traits that are in the significant trait list
+p2020 <- cbind(PHENO2020[,c(1)], p2020)
+colnames(p2020)[1] <- "taxa"
+
+#SPKHD
+SM_SPKHD_2020 <- p2020[,c("taxa", "SPKHD")] #get taxa and trait values
+SM_SPKHD_2020 <- left_join(FarmCPU.SPKHD_2020_snps,SM_SPKHD_2020, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_SPKHD_2020)[colnames(SM_SPKHD_2020)=="SPKHD"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_SPKHD_2020,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+o <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="SPKHD_2020", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_SPKHD_2020,CSigMar_stk,FarmCPU.SPKHD_2020_snps)
+#STMANG
+SM_STMANG_2020 <- p2020[,c("taxa", "STMANG")] #get taxa and trait values
+SM_STMANG_2020 <- left_join(FarmCPU.STMANG_2020_snps,SM_STMANG_2020, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_STMANG_2020)[colnames(SM_STMANG_2020)=="STMANG"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_STMANG_2020,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+p <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="STMANG_2020", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_STMANG_2020,CSigMar_stk,FarmCPU.STMANG_2020_snps)
+#FHBDON
+SM_FHBDON_2020 <- p2020[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2020 <- left_join(FarmCPU.FHBDON_2020_snps,SM_FHBDON_2020, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2020)[colnames(SM_FHBDON_2020)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2020,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+q <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2020", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2020,CSigMar_stk,FarmCPU.FHBDON_2020_snps)
+#HSATIVLSEV
+SM_HSATIVLSEV_2020 <- p2020[,c("taxa", "HSATIVLSEV")] #get taxa and trait values
+SM_HSATIVLSEV_2020 <- left_join(FarmCPU.HSATIVLSEV_2020_snps,SM_HSATIVLSEV_2020, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HSATIVLSEV_2020)[colnames(SM_HSATIVLSEV_2020)=="HSATIVLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HSATIVLSEV_2020,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+r <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HSATIVLSEV_2020", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HSATIVLSEV_2020,CSigMar_stk,FarmCPU.HSATIVLSEV_2020_snps)
+#HDANG
+SM_HDANG_2020 <- p2020[,c("taxa", "HDANG")] #get taxa and trait values
+SM_HDANG_2020 <- left_join(FarmCPU.HDANG_2020_snps,SM_HDANG_2020, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HDANG_2020)[colnames(SM_HDANG_2020)=="HDANG"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HDANG_2020,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+s <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HDANG_2020", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HDANG_2020,CSigMar_stk,FarmCPU.HDANG_2020_snps)
+
+#2021 OLA
+LIST_2021O <- split(LIST21O, LIST21O$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST21O$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2021O[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2021O_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2021O <- PHENO[str_detect(PHENO$Site, "OLA"),]
+PHENO2021O <- PHENO2021O[str_detect(PHENO2021O$phenotype_year, "2021"),]
+PHENO2021O <- PHENO2021O[,c(2,7:ncol(PHENO2021O))]
+p2021O <- subset(PHENO2021O[, colnames(PHENO2021O) %in% new_str]) #traits that are in the significant trait list
+p2021O <- cbind(PHENO2021O[,c(1)], p2021O)
+colnames(p2021O)[1] <- "taxa"
+
+#FHBSPKINC
+SM_FHBSPKINC_2021O <- p2021O[,c("taxa", "FHBSPKINC")] #get taxa and trait values
+SM_FHBSPKINC_2021O <- left_join(FarmCPU.FHBSPKINC_2021O_snps,SM_FHBSPKINC_2021O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBSPKINC_2021O)[colnames(SM_FHBSPKINC_2021O)=="FHBSPKINC"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBSPKINC_2021O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+t <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBSPKINC_2021_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBSPKINC_2021O,CSigMar_stk,FarmCPU.FHBSPKINC_2021O_snps)
+#FHBDON
+SM_FHBDON_2021O <- p2021O[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2021O <- left_join(FarmCPU.FHBDON_2021O_snps,SM_FHBDON_2021O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2021O)[colnames(SM_FHBDON_2021O)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2021O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+u <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2021_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2021O,CSigMar_stk,FarmCPU.FHBDON_2021O_snps)
+
+#2021 SAL
+LIST_2021S <- split(LIST21S, LIST21S$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST21S$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2021S[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2021S_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2021S <- PHENO[str_detect(PHENO$Site, "SAL"),]
+PHENO2021S <- PHENO2021S[str_detect(PHENO2021S$phenotype_year, "2021"),]
+PHENO2021S <- PHENO2021S[,c(2,7:ncol(PHENO2021S))]
+p2021S <- subset(PHENO2021S[, colnames(PHENO2021S) %in% new_str]) #traits that are in the significant trait list
+p2021S <- cbind(PHENO2021S[,c(1)], p2021S)
+colnames(p2021S)[1] <- "taxa"
+
+#FHBDON
+SM_FHBDON_2021S <- p2021S[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2021S <- left_join(FarmCPU.FHBDON_2021S_snps,SM_FHBDON_2021S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2021S)[colnames(SM_FHBDON_2021S)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2021S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+v <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2021_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2021S,CSigMar_stk,FarmCPU.FHBDON_2021S_snps)
+#GLBLSEV
+SM_GLBLSEV_2021S <- p2021S[,c("taxa", "GLBLSEV")] #get taxa and trait values
+SM_GLBLSEV_2021S <- left_join(FarmCPU.GLBLSEV_2021S_snps,SM_GLBLSEV_2021S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_GLBLSEV_2021S)[colnames(SM_GLBLSEV_2021S)=="GLBLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_GLBLSEV_2021S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+w <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="GLBLSEV_2021_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_GLBLSEV_2021S,CSigMar_stk,FarmCPU.GLBLSEV_2021S_snps)
+#PTHT
+SM_PTHT_2021S <- p2021S[,c("taxa", "PTHT")] #get taxa and trait values
+SM_PTHT_2021S <- left_join(FarmCPU.PTHT_2021S_snps,SM_PTHT_2021S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_PTHT_2021S)[colnames(SM_PTHT_2021S)=="PTHT"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_PTHT_2021S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+x <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="PTHT_2021_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_PTHT_2021S,CSigMar_stk,FarmCPU.PTHT_2021S_snps)
+#ZDK
+SM_ZDK_2021S <- p2021S[,c("taxa", "ZDK")] #get taxa and trait values
+SM_ZDK_2021S <- left_join(FarmCPU.ZDK_2021S_snps,SM_ZDK_2021S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_ZDK_2021S)[colnames(SM_ZDK_2021S)=="ZDK"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_ZDK_2021S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+y <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="ZDK_2021_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_ZDK_2021S,CSigMar_stk,FarmCPU.ZDK_2021S_snps)
+
+#2022 OLA
+LIST_2022O <- split(LIST22O, LIST22O$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST22O$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2022O[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2022O_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2022O <- PHENO[str_detect(PHENO$Site, "OLA"),]
+PHENO2022O <- PHENO2022O[str_detect(PHENO2022O$phenotype_year, "2022"),]
+PHENO2022O <- PHENO2022O[,c(2,7:ncol(PHENO2022O))]
+p2022O <- subset(PHENO2022O[, colnames(PHENO2022O) %in% new_str]) #traits that are in the significant trait list
+p2022O <- cbind(PHENO2022O[,c(1)], p2022O)
+colnames(p2022O)[1] <- "taxa"
+
+#ZDK
+SM_ZDK_2022O <- p2022O[,c("taxa", "ZDK")] #get taxa and trait values
+SM_ZDK_2022O <- left_join(FarmCPU.ZDK_2022O_snps,SM_ZDK_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_ZDK_2022O)[colnames(SM_ZDK_2022O)=="ZDK"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_ZDK_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+z <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="ZDK_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_ZDK_2022O,CSigMar_stk,FarmCPU.ZDK_2022O_snps)
+#HSATIVLSEV
+SM_HSATIVLSEV_2022O <- p2022O[,c("taxa", "HSATIVLSEV")] #get taxa and trait values
+SM_HSATIVLSEV_2022O <- left_join(FarmCPU.HSATIVLSEV_2022O_snps,SM_HSATIVLSEV_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HSATIVLSEV_2022O)[colnames(SM_HSATIVLSEV_2022O)=="HSATIVLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HSATIVLSEV_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+aa <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HSATIVLSEV_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HSATIVLSEV_2022O,CSigMar_stk,FarmCPU.HSATIVLSEV_2022O_snps)
+#BLSSEV
+SM_BLSSEV_2022O <- p2022O[,c("taxa", "BLSSEV")] #get taxa and trait values
+SM_BLSSEV_2022O <- left_join(FarmCPU.BLSSEV_2022O_snps,SM_BLSSEV_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_BLSSEV_2022O)[colnames(SM_BLSSEV_2022O)=="BLSSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_BLSSEV_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+bb <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="BLSSEV_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_BLSSEV_2022O,CSigMar_stk,FarmCPU.BLSSEV_2022O_snps)
+#FHBSPKINC
+SM_FHBSPKINC_2022O <- p2022O[,c("taxa", "FHBSPKINC")] #get taxa and trait values
+SM_FHBSPKINC_2022O <- left_join(FarmCPU.FHBSPKINC_2022O_snps,SM_FHBSPKINC_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBSPKINC_2022O)[colnames(SM_FHBSPKINC_2022O)=="FHBSPKINC"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBSPKINC_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+cc <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBSPKINC_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBSPKINC_2022O,CSigMar_stk,FarmCPU.FHBSPKINC_2022O_snps)
+#PTHT
+SM_PTHT_2022O <- p2022O[,c("taxa", "PTHT")] #get taxa and trait values
+SM_PTHT_2022O <- left_join(FarmCPU.PTHT_2022O_snps,SM_PTHT_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_PTHT_2022O)[colnames(SM_PTHT_2022O)=="PTHT"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_PTHT_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+dd <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="PTHT_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_PTHT_2022O,CSigMar_stk,FarmCPU.PTHT_2022O_snps)
+#FHBDON
+SM_FHBDON_2022O <- p2022O[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2022O <- left_join(FarmCPU.FHBDON_2022O_snps,SM_FHBDON_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2022O)[colnames(SM_FHBDON_2022O)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+ee <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2022O,CSigMar_stk,FarmCPU.FHBDON_2022O_snps)
+#FHBZEA
+SM_FHBZEA_2022O <- p2022O[,c("taxa", "FHBZEA")] #get taxa and trait values
+SM_FHBZEA_2022O <- left_join(FarmCPU.FHBZEA_2022O_snps,SM_FHBZEA_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBZEA_2022O)[colnames(SM_FHBZEA_2022O)=="FHBZEA"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBZEA_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+ff <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBZEA_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBZEA_2022O,CSigMar_stk,FarmCPU.FHBZEA_2022O_snps)
+
+#2022 SAL
+LIST_2022S <- split(LIST22S, LIST22S$Trait) # Split data frame to get lists for each chr
+trt <- unique(LIST22S$Trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2022S[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2022S_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2022S <- PHENO[str_detect(PHENO$Site, "SAL"),]
+PHENO2022S <- PHENO2022S[str_detect(PHENO2022S$phenotype_year, "2022"),]
+PHENO2022S <- PHENO2022S[,c(2,7:ncol(PHENO2022S))]
+p2022S <- subset(PHENO2022S[, colnames(PHENO2022S) %in% new_str]) #traits that are in the significant trait list
+p2022S <- cbind(PHENO2022S[,c(1)], p2022S)
+colnames(p2022S)[1] <- "taxa"
+
+#HSATIVLSEV
+SM_HSATIVLSEV_2022S <- p2022S[,c("taxa", "HSATIVLSEV")] #get taxa and trait values
+SM_HSATIVLSEV_2022S <- left_join(FarmCPU.HSATIVLSEV_2022S_snps,SM_HSATIVLSEV_2022S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_HSATIVLSEV_2022S)[colnames(SM_HSATIVLSEV_2022S)=="HSATIVLSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_HSATIVLSEV_2022S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+gg <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="HSATIVLSEV_2022_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_HSATIVLSEV_2022S,CSigMar_stk,FarmCPU.HSATIVLSEV_2022S_snps)
+#BLSSEV
+SM_BLSSEV_2022S <- p2022S[,c("taxa", "BLSSEV")] #get taxa and trait values
+SM_BLSSEV_2022S <- left_join(FarmCPU.BLSSEV_2022S_snps,SM_BLSSEV_2022S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_BLSSEV_2022S)[colnames(SM_BLSSEV_2022S)=="BLSSEV"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_BLSSEV_2022S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+hh <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="BLSSEV_2022_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_BLSSEV_2022S,CSigMar_stk,FarmCPU.BLSSEV_2022S_snps)
+#ZDK
+SM_ZDK_2022S <- p2022S[,c("taxa", "ZDK")] #get taxa and trait values
+SM_ZDK_2022S <- left_join(FarmCPU.ZDK_2022S_snps,SM_ZDK_2022S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_ZDK_2022S)[colnames(SM_ZDK_2022S)=="ZDK"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_ZDK_2022S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+ii <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="ZDK_2022_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_ZDK_2022S,CSigMar_stk,FarmCPU.ZDK_2022S_snps)
+#FHBDON
+SM_FHBDON_2022S <- p2022S[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2022S <- left_join(FarmCPU.FHBDON_2022S_snps,SM_FHBDON_2022S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2022S)[colnames(SM_FHBDON_2022S)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2022S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+jj <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2022_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2022S,CSigMar_stk,FarmCPU.FHBDON_2022S_snps)
+#FHBZEA
+SM_FHBZEA_2022S <- p2022S[,c("taxa", "FHBZEA")] #get taxa and trait values
+SM_FHBZEA_2022S <- left_join(FarmCPU.FHBZEA_2022S_snps,SM_FHBZEA_2022S, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBZEA_2022S)[colnames(SM_FHBZEA_2022S)=="FHBZEA"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBZEA_2022S,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+kk <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBZEA_2022_SAL", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBZEA_2022S,CSigMar_stk,FarmCPU.FHBZEA_2022S_snps)
+```
+
+```{r output}
+
+pdf("data/Figures/BoxPlots_Allelic_Mean.pdf", width = 10, height = 7)
+a
+b
+c
+d
+e
+f
+g
+h
+i
+j
+k
+l
+m
+n
+o
+p
+q
+r
+s
+t
+u
+v
+w
+x
+y
+z
+aa
+bb
+cc
+dd
+ee
+ff
+gg
+hh
+ii
+jj
+kk
+dev.off()
+
+```
+
+```{r efective_marker}
+FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+#make a copy of master file to work with
+GENO <- FHB_for_GS_GWAS
+geno <- GENO + 1 # change geno numeric format from -101 to 012
+
+PHENO <- read.delim('data/Intermediate_Files/Phenotypic_Format_wide.txt')
+
+#get list of significant markers for traits
+LIST <- read.csv('data/Final_Files/output_adjusted_threshold.csv') #master list
+LIST <- LIST[str_detect(LIST$trait, "FHB"),]
+rownames(LIST) <- NULL
+List_0.1 <- LIST[c(6:11),] #rows where threshold is 0.10
+#make sig list of each year, this is helpful since phenotype values are stored in by-year files
+LIST18 <- List_0.1[str_detect(List_0.1$Plot, "2018"),]
+LIST19 <- List_0.1[str_detect(List_0.1$Plot, "2019"),]
+LIST21O <- List_0.1[str_detect(List_0.1$Plot, "OLA_2021"),]
+LIST22O <- List_0.1[str_detect(List_0.1$Plot, "OLA_2022"),]
+
+#make list with traits for each year
+#2018
+LIST_2018 <- split(LIST18, LIST18$trait) # Split data frame to get lists for each chr
+trt <- unique(LIST18$trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2018[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2018_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2018 <- PHENO[str_detect(PHENO$phenotype_year, "2018"),]
+PHENO2018 <- PHENO2018[,c(2,7:ncol(PHENO2018))]
+p2018 <- subset(PHENO2018[, colnames(PHENO2018) %in% new_str, drop=FALSE]) #traits that are in the significant trait list
+p2018 <- cbind(PHENO2018[,c(1)], p2018)
+colnames(p2018)[1] <- "taxa"
+
+#FHBDON
+SM_FHBDON_2018 <- p2018[,c("taxa", "FHBDON")] #get taxa and trait values
+SM_FHBDON_2018 <- left_join(FarmCPU.FHBDON_2018_snps,SM_FHBDON_2018, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDON_2018)[colnames(SM_FHBDON_2018)=="FHBDON"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDON_2018,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+a <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDON_2018", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDON_2018,CSigMar_stk,FarmCPU.FHBDON_2018_snps)
+
+#2019
+LIST_2019 <- split(LIST19, LIST19$trait) # Split data frame to get lists for each chr
+trt <- unique(LIST19$trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2019[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2019_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2019 <- PHENO[str_detect(PHENO$phenotype_year, "2019"),]
+PHENO2019 <- PHENO2019[,c(2,7:ncol(PHENO2019))]
+p2019 <- subset(PHENO2019[, colnames(PHENO2019) %in% new_str, drop=FALSE]) #traits that are in the significant trait list
+p2019 <- cbind(PHENO2019[,c(1)], p2019)
+colnames(p2019)[1] <- "taxa"
+
+#FHBDISIND
+SM_FHBDISIND_2019 <- p2019[,c("taxa", "FHBDISIND")] #get taxa and trait values
+SM_FHBDISIND_2019 <- left_join(FarmCPU.FHBDISIND_2019_snps,SM_FHBDISIND_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDISIND_2019)[colnames(SM_FHBDISIND_2019)=="FHBDISIND"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDISIND_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+b <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDISIND_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDISIND_2019,CSigMar_stk,FarmCPU.FHBDISIND_2019_snps)
+#FHBD3G
+SM_FHBD3G_2019 <- p2019[,c("taxa", "FHBD3G")] #get taxa and trait values
+SM_FHBD3G_2019 <- left_join(FarmCPU.FHBD3G_2019_snps,SM_FHBD3G_2019, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBD3G_2019)[colnames(SM_FHBD3G_2019)=="FHBD3G"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBD3G_2019,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+c <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBD3G_2019", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBD3G_2019,CSigMar_stk,FarmCPU.FHBD3G_2019_snps)
+
+#2021 OLA
+rownames(LIST21O) <- LIST21O$trait
+LIST_2021O <- setNames(split(LIST21O, seq(nrow(LIST21O)), drop=TRUE), rownames(LIST21O))
+trt <- unique(LIST21O$trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2021O[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2021O_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2021O <- PHENO[str_detect(PHENO$Site, "OLA"),]
+PHENO2021O <- PHENO2021O[str_detect(PHENO2021O$phenotype_year, "2021"),]
+PHENO2021O <- PHENO2021O[,c(2,7:ncol(PHENO2021O))]
+p2021O <- subset(PHENO2021O[, colnames(PHENO2021O) %in% new_str, drop=FALSE]) #traits that are in the significant trait list
+p2021O <- cbind(PHENO2021O[,c(1)], p2021O)
+colnames(p2021O)[1] <- "taxa"
+
+#FHBSPKINC
+SM_FHBSPKINC_2021O <- p2021O[,c("taxa", "FHBSPKINC")] #get taxa and trait values
+SM_FHBSPKINC_2021O <- left_join(FarmCPU.FHBSPKINC_2021O_snps,SM_FHBSPKINC_2021O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBSPKINC_2021O)[colnames(SM_FHBSPKINC_2021O)=="FHBSPKINC"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBSPKINC_2021O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+d <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBSPKINC_2021_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBSPKINC_2021O,CSigMar_stk,FarmCPU.FHBSPKINC_2021O_snps)
+
+#2022 OLA
+rownames(LIST22O) <- LIST22O$trait
+LIST_2022O <- setNames(split(LIST22O, seq(nrow(LIST22O)), drop=TRUE), rownames(LIST22O))
+trt <- unique(LIST22O$trait) #list of all traits 
+for (i in trt){
+  temp = LIST_2022O[[i]] #table of infor for sig loci for one trait
+  new <- subset(geno[, colnames(geno) %in% temp$SNP, drop=FALSE])
+  new <- tibble::rownames_to_column(new, "taxa") #convert row names into first column of data
+  assign(paste0(i,'_2022O_snps'), new, envir=parent.frame()) #save table to environment 
+}
+#add phenotypic value scores to the geno matrix 
+new_str <- gsub('FarmCPU.','',trt)
+PHENO2022O <- PHENO[str_detect(PHENO$Site, "OLA"),]
+PHENO2022O <- PHENO2022O[str_detect(PHENO2022O$phenotype_year, "2022"),]
+PHENO2022O <- PHENO2022O[,c(2,7:ncol(PHENO2022O))]
+p2022O <- subset(PHENO2022O[, colnames(PHENO2022O) %in% new_str, drop=FALSE]) #traits that are in the significant trait list
+p2022O <- cbind(PHENO2022O[,c(1)], p2022O)
+colnames(p2022O)[1] <- "taxa"
+
+#FHBDISIND
+SM_FHBDISIND_2022O <- p2022O[,c("taxa", "FHBDISIND")] #get taxa and trait values
+SM_FHBDISIND_2022O <- left_join(FarmCPU.FHBDISIND_2022O_snps,SM_FHBDISIND_2022O, by="taxa") #combine the phenotypic values to genomic matrix
+colnames(SM_FHBDISIND_2022O)[colnames(SM_FHBDISIND_2022O)=="FHBDISIND"] <- "traitval" #trait name
+CSigMar_stk<-reshape2::melt(SM_FHBDISIND_2022O,id=c('traitval','taxa'))
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="variable"] <- "marker"
+colnames(CSigMar_stk)[colnames(CSigMar_stk)=="value"] <- "score"
+
+e <-ggplot(CSigMar_stk,aes(x=factor(score), y=traitval)) + 
+    geom_boxplot(varwidth = TRUE) +
+    facet_wrap(~marker, scales = "free") +
+    labs(title="FHBDISIND_2022_OLA", x="Allele", y="Phenotype Rating") + 
+    theme(strip.text.x = element_text(size = 6))
+rm(SM_FHBDISIND_2022O,CSigMar_stk,FarmCPU.FHBDISIND_2022O_snps)
+
+pdf("data/Figures/BoxPlots_Allelic_Mean_adjusted_threshold.pdf", width = 10, height = 7)
+a
+b
+c
+d
+e
+dev.off()
+```

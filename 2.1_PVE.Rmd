@@ -1,0 +1,303 @@
+---
+title: "GWAS_PVE"
+author: "Leah Treffer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Objective
+
+Calculate Percent Phenotypic Variance Explained
+  Calculate Adjusted P.value from GAPIT output
+  Obtain r-square of model by running lm model
+  Difference between the Rsquare of the model without SNP and Rsquare of model with SNP will be PVE
+  Create list of significant markers
+  Observe significant markers within certain range of each other 
+
+```{r}
+rm(list=ls(all=TRUE))
+#set current working directory
+#setwd()
+setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+```
+
+```{r packages, include=FALSE}
+library(readr)
+library(readxl)
+library(dplyr)
+library(data.table)
+library(reshape2)
+library(tibble)
+library(sjmisc)
+source('~/Downloads/rowr/R/rowr.R')
+source('scripts/QTL_range.R')
+#library(errorist)
+```
+
+# PVE using only the markers GAPIT says are significant 
+
+# if you want more markers, replace this:  
+temp = my_splits$FarmCPU.SPKDEN  # change to get table of one trait
+SNPnames = temp$SNP # list of markers in the one trait 
+SigMarkSel <- FarmCPUResults[FarmCPUResults$SNP %in% SNPnames,] #keep dataframe rows only if it is in a list
+# with this:  
+SigMarkSel=FarmCPUResults%>%
+  arrange(n)%>%
+  filter(n<0.05) 
+  
+############## Start here for each Cycle/Site/Year File #######################
+
+```{r}
+#C07_SAL_2018, C07_SAL_2019, C07_SAL_2020, C10_OLA_2021, C10_OLA_2022, C10_SAL_2021, C10_SAL_2022: 
+myY <- read.table("data/Intermediate_Files/C10_OLA_2022_pheno.txt", head=TRUE)
+myGD <- read.delim("data/Intermediate_Files/C10_OLA_2022_numeric.txt", head=TRUE)
+
+Sig_Rslt <- read.csv("output/FarmCPU/C10_OLA_2022/GAPIT.Association.Filter_GWAS_results.csv") # list of SNP hits from each traits
+traits <- Sig_Rslt$traits #make table of traits
+traits <- unique(traits) #make sure trait names are unique 
+my_splits <- split(Sig_Rslt, Sig_Rslt$traits)    # Split data frame in list
+
+Full_Table <- data.frame() #set up empty table to be used at end to combine all traits in this Cycle/Site/Year
+full_table <- data.frame()
+
+```
+
+############## Start here for each individual trait ###########################
+
+```{r}
+print(traits)
+
+#read in and run following code for each of the printed traits
+Trait = c("HSATIVLSEV") # change for each of the printed traits
+
+#Get results for trait with pvalues from GAPIT FarmCPU results 
+FarmCPUResults <- read.csv("output/FarmCPU/C10_OLA_2022/GAPIT.Association.GWAS_Results.FarmCPU.HSATIVLSEV.csv") # change for each trait
+
+temp = my_splits$FarmCPU.HSATIVLSEV  # change to get table of one trait
+SNPnames = temp$SNP # list of markers in the one trait 
+SigMarkSel <- FarmCPUResults[FarmCPUResults$SNP %in% SNPnames,] #keep dataframe rows only if it is in a list
+
+#Benjamini and Hochberg method : adjusting P.value by controlling for false discovery rate (FDR)
+P_values = SigMarkSel$P.value
+FDR_Adjusted_P.values = p.adjust(P_values, method="fdr", n=length(P_values))
+
+#Create column of adjusted pvales but named something easier for R to use 
+SigMarkSel$n = FDR_Adjusted_P.values
+
+#get BLUP file for trait; this is value from myY 
+SMBLUPS <- myY[,c('taxa','HSATIVLSEV')] #change for each trait; 1=taxa n=column with desired trait
+
+#create by combining GD,SNPs, and BLUPs
+sigMark<-myGD[,c("taxa", paste0(SNPnames))] #only have SNPs of interest in GD format
+SIGMARKERS<-left_join(sigMark,SMBLUPS, by="taxa") #add trait values into sigMark file
+colnames(SIGMARKERS)[colnames(SIGMARKERS)=="HSATIVLSEV"] <- "sm" #this means that whenever sm is used in future code, it actually means the "trait", this means I only have to change this line for each trait instead of changing each sm throughout code
+
+#create list of all SNPs with plus sign in between each to be used to fill code later
+out<- "sm"
+vari <- c(paste(SNPnames)) #variable=SNPs
+
+k <- as.formula(
+  paste(out, 
+        paste(vari, collapse = " + "), 
+        sep = " ~ "))
+print(k)
+# prints somethings like this: sm ~ S6A_606355944 + S4A_4240825 + S4A_709867569 + S1A_572577972 + S2A_49501485 + S1A_487471000 + S5B_64267235 + S7A_728427937 +  S4A_648906766
+
+
+# Run lm model; x1, x2,and finally x to see if leaving a snp out makes the model better (ex. basically is there a better model than these 9? Maybe 5 of them in a certain combo make a better model than these 9)
+#look at AIC values, lower is better, if any are significantly higher than the others will probably remove them from set. First run with and without those high AICs to see if it changes model. If yes, remove. 
+#get R-squared of whole model aka with SNP from x2
+x1<-lm(sm~1, data = SIGMARKERS) # intercept 
+x2 <- eval(bquote(   lm(.(k), data = SIGMARKERS) )) # multiple regression 
+summary(x2) # significant pvalue among all original markers selected
+  #summary(x2)$r.squared
+  #summary(x2)$adj.r.squared
+x=step(x1,scope=list(lower=x1,upper=x2),direction = 'both') # both directions stepwisee multiple regression
+summary(x) # significant pvalue among the variables that best explain the model 
+  #summary(x)$r.squared #if higher than summary(x2) then this better explains model 
+  #summary(x)$adj.r.squared #if higher than summary(x2) then this better explains model 
+x$anova #markers that best explain the model 
+x$coefficients #estimated change in phenotype ; one unit 
+
+Whole = summary(x2)$adj.r.squared # Adjusted R-squared of whole model; change for each run
+
+Whole2 = as.data.frame(x$coefficients[-1])
+Whole2 = rownames_to_column(Whole2, var = "SNP")
+model = summary(x)$adj.r.squared
+Whole2 = cbind.fill(Whole2, model)
+Whole2 = Whole2[,c(1,3)]
+colnames(Whole2)[2] <- "model"
+
+#Only run when Whole2 is zero 0: 
+adjR2 <- c("NA")
+adjR2 <- as.data.frame(adjR2)
+colnames(adjR2)[1] <- "V1"
+SNPnames2 <- Whole2$SNP
+pve_table=cbind.fill(SNPnames2, Whole2) # if stepwise linear regression gave 0 for r.square then skip to line 206 
+pve_table=cbind(pve_table, adjR2)
+pve_table <- pve_table[,c(2:4)]
+colnames(pve_table)[2] <- "whole" 
+colnames(pve_table)[3] <- "indiv" 
+pve_table$whole <- as.numeric(pve_table$whole)
+
+
+#Run lm model individually with snps of interest to see their contribution
+#last step removes SNP from model to show what that SNP's contribution would be
+outcome <- "sm"
+allmods=list()
+for (i in 1:length(SNPnames)){
+  namaste=SNPnames[-i]
+  
+  variables <- c(paste(namaste))
+  
+  f <- as.formula(
+    paste(outcome, 
+          paste(variables, collapse = " + "), 
+          sep = " ~ "))
+  ummm<- eval(bquote(   lm(.(f), data = SIGMARKERS) ))
+  allmods[[i]]<-ummm
+}
+names(allmods) <- SNPnames 
+
+adjR = matrix(nrow=2, ncol=1) #create empty matrix that will be filled with adjusted R square values. Set rows to the number of significant snps being used (number of elements in allmods)
+#List of R-squares for each SNP removed from model 
+for (j in 1:length(allmods)){
+outputthis <- summary(allmods[[j]])
+adjR[j,1] <- outputthis$adj.r.squared
+}
+
+#Make table for each trait 
+PVE_Table=cbind.fill(SNPnames, Trait) #bind Significant SNPs and the trait they were significant for into table 
+PVE_Table=cbind.fill(PVE_Table, Whole) #bind table to list of R-square for whole model
+PVE_Table=cbind(PVE_Table, adjR) #bind table to list of R-square without each SNP in the model
+colnames(PVE_Table)[1] <- "SNP" #Significant SNP
+colnames(PVE_Table)[2] <- "Trait" #Name of Trait 
+colnames(PVE_Table)[3] <- "Whole" # Adjusted R-square of whole model
+colnames(PVE_Table)[4] <- "Indiv" # Adjusted R-square without the SNP in the model
+PVE_Table$Whole <- as.numeric(PVE_Table$Whole) #make one column numeric 
+PVE_Table$PVE = (PVE_Table$Whole - PVE_Table$Indiv) # PVE = Rsquare of model - Rsquare without SNP
+
+#Combine table
+Full_Table <- rbind(Full_Table, PVE_Table) #bind the table for each trait into a final table of all traits
+
+#Repeat with smaller subset of markers
+##if there were zero markers:
+pve_table$pve <- "NA"
+##if only one marker: 
+SNPnames2 <- Whole2$SNP
+adjR2 <- data.frame(Whole2$model)
+colnames(adjR2)[1] <- "V1"
+##if more than one marker:
+outcome2 <- "sm"
+SNPnames2 <- Whole2$SNP
+allmods2=list()
+for (i in 1:length(SNPnames2)){
+  namaste2=SNPnames2[-i]
+  
+  variables2 <- c(paste(namaste2))
+  
+  f2 <- as.formula(
+    paste(outcome2, 
+          paste(variables2, collapse = " + "), 
+          sep = " ~ "))
+  ummm2<- eval(bquote(   lm(.(f2), data = SIGMARKERS) ))
+  allmods2[[i]]<-ummm2
+}
+names(allmods2) <- SNPnames2 
+adjR2 = matrix(nrow=2, ncol=1)
+  #List of R-squares for each SNP removed from model 
+for (j in 1:length(allmods2)){
+outputthis2 <- summary(allmods2[[j]])
+adjR2[j,1] <- outputthis2$adj.r.squared
+}
+
+#Make table for each trait 
+pve_table=cbind.fill(SNPnames2, Whole2) # if stepwise linear regression gave 0 for r.square then skip to line 231 
+pve_table=cbind(pve_table, adjR2)
+pve_table <- pve_table[,c(2:4)]
+colnames(pve_table)[2] <- "whole" 
+colnames(pve_table)[3] <- "indiv" 
+pve_table$whole <- as.numeric(pve_table$whole) 
+pve_table$pve = (pve_table$whole - pve_table$indiv)
+
+#Combine table
+table <- left_join(PVE_Table, pve_table, by="SNP") # use if stepwise linear regression gave better r.square than linear regression
+  table <- cbind(PVE_Table, pve_table) # use if stepwise linear regression gave 0 for r.square
+      colnames(table)[6] <- "whole" 
+      colnames(table)[7] <- "indiv" 
+      colnames(table)[8] <- "pve" 
+      table$pve[table$pve == "0"] <- "NA" #replace
+full_table <- rbind(full_table, table)
+
+#clean up
+rm(adjR, adjR2, allmods, allmods2, FarmCPUResults, outputthis, outputthis2, pve_table, PVE_Table, sigMark, SIGMARKERS, SigMarkSel, SMBLUPS, table, temp, ummm, ummm2, Whole2, x, x1, x2, f, f2, FDR_Adjusted_P.values, i, j, k, model, namaste, namaste2, out, outcome, outcome2, P_values, SNPnames, SNPnames2, Trait, vari, variables, variables2, Whole)
+
+```
+
+```{r}
+#save file
+write.csv(full_table, 'data/Intermediate_Files/PVE_C10_OLA_2022.csv') #added stepwise multiple regression
+
+```
+
+```{r clean_up}
+#clean up between environments 
+rm(full_table, Full_Table, my_splits, myGD, myY, traits)
+```
+
+Make list of sig markers
+```{r list}
+#running list
+listy <- data.table()
+
+list <- Sig_Rslt[,c(2,7)]
+list$Plot <- "C10_OLA_2022"
+listy <- rbind(listy,list)
+
+rm(Sig_Rslt,list)
+
+write.table(listy, 'data/Intermediate_Files/SigMarkerlist_C10.txt')
+
+rm(listy)
+```
+
+```{r list_combine}
+li <- read.table('data/Intermediate_Files/SigMarkerlist_C07.txt')
+st <- read.table('data/Intermediate_Files/SigMarkerlist_C10.txt')
+list <- rbind(li,st)
+write.table(list,'data/Intermediate_Files/SigMarkerlist.txt')
+
+rm(li,list,st)
+```
+
+```{r snp_eval}
+#look at SNP list to see any trends
+#SNPs significant in more than one trait or year
+
+list <- read.table('data/Intermediate_Files/SigMarkerlist.txt')
+
+#SNPs within certain value range of each other
+list$CHR <- sub("*S","",list$SNP) #create column called CHR, remove 'S' from before the chromosome ID
+list$CHR <- gsub("\\_.*","",list$CHR) #remove characters after the chromosome name
+list$Pos <- gsub(".*_","",list$SNP) #create column called Pos, Remove all before and up to "_"
+list$Pos <- as.numeric(list$Pos) #make position column numeric so distance between positions can be calculated
+  #my_splits <- split(list, list$CHR) # Split data frame to get lists for each chr
+
+#exact match
+#these are a part of qtl.comparison but not similar.region
+list4 <- list[duplicated(list$SNP)|duplicated(list$SNP, fromLast=TRUE),] #Extract duplicate records in dataframe
+list4 <- arrange(list4, SNP, Plot) #order/arrange list first by SNP then Plot
+
+  
+similar.region(list, 100000) # run function ; individual lists for each chromosome of snps that are within a designated range of each other, but not the exact same position 
+qtl.comparison(list, 100000, order=TRUE, space=TRUE) # run function ; one list (qtl_list) of snps that were exact matches and snps that were within a designated range of each other, order: default is FALSE, will order the output table by chromosome
+
+#save table
+write.csv(qtl_list, 'data/Final_Files/SigMarkers_close_together_100000.csv')
+```
