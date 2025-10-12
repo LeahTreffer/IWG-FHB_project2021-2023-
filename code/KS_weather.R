@@ -342,3 +342,21 @@ ttest_table_function(
   table_name = "MonthlyPrecip_ttest"
 )
 
+# Monthly Temperature (using DailyAverageDryBulbTemperature)
+
+DailyAvTemp_summary <- file %>%
+  mutate(
+    DATE = as.Date(DATE),
+    DailyAvTemp = as.numeric(gsub("T|s", "", DailyAverageDryBulbTemperature))  # Convert and clean
+  ) %>%
+  filter(!is.na(DailyAvTemp)) %>%  # Remove all NA (including converted "T", "s")
+  select(STATION, DATE, DailyAvTemp) %>%
+  arrange(DATE, STATION)
+
+ttest_table_function(
+  data = DailyAvTemp_summary,
+  value_col = "DailyAvTemp",
+  table_name = "MonthlyAvTemp_ttest"
+)
+
+
