@@ -5,6 +5,10 @@ date: "2023-07-01"
 output: html_document
 ---
 
+```{r}
+library(dplyr)
+```
+
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -174,5 +178,127 @@ print(p)
 LD plot by subgenome (J, S, V)
 
 ```{r}
+file_J <- file %>%
+  filter(grepl("^J0", Locus1))
 
+# C values range from about 0.5 to 2, start with 0.1
+Cstart_J <- c(C=0.1)
+
+# Fit a non linear model using the arbitrary C value
+# N is the number of the genotypes that have the SNP site
+
+modelC_J <- nls(rsq ~ ( (10+C*dist)/( (2+C*dist) * (11+C*dist) ) ) *
+                (1+( (3+C*dist) * (12+12*C*dist+(C*dist)^2) ) / ( 2*N*(2+C*dist) * (11+C*dist) ) ),
+              data=file_J, start=Cstart_J, control=nls.control(maxiter = 100))
+
+
+# Extract rho, the recombination parameter in 4Nr
+rho_J <- summary(modelC_J)$parameters[1]
+
+# Feed in the new value of rho to obtain LD values adjusted for their distance along the chromosome/genome 
+newrsq_J <- ( (10+rho_J*file_J$dist) / ( (2+rho_J*file_J$dist) * (11+rho_J*file_J$dist) ) ) *
+  ( 1 + ( (3+rho_J * file_J$dist) * (12+12*rho_J*file_J$dist + (rho_J*file_J$dist)^2) ) /
+      (2*file_J$N*(2+rho_J*file_J$dist) * (11+rho_J*file_J$dist) ) )
+
+newfile_J <- data.frame(file_J$dist, newrsq_J)
+
+maxld_J <- max(newfile_J$newrsq,na.rm=TRUE) #using max LD value from adjusted data
+
+halfdecay_J = maxld_J*0.5
+
+halfdecaydist_J <- newfile_J$file_J.dist[which.min(abs(newfile_J$newrsq-halfdecay_J))]
+
+newfile_J <- newfile_J[order(newfile_J$file_J.dist),]
+
+mar.default <- c(5,4,4,2) + 0.1
+par(mar = mar.default + c(0,4,0,0))
+plot(file_J$dist, file_J$rsq, pch=".", cex=2, xlab="Distance (bp)", ylab=expression(LD ~ (r^2)), col="grey")
+lines(newfile_J$file_J.dist, newfile_J$newrsq, col="red", lwd=2)
+abline(h=0.1, col="blue") # if you need to add horizontal line
+abline(v=halfdecaydist_J, col="green")
+mtext(round(halfdecaydist_J,2), side=1, line=0.05, at=halfdecaydist_J, cex=0.75, col="green")
+```
+
+```{r}
+file_S <- file %>%
+  filter(grepl("^S0", Locus1))
+
+# C values range from about 0.5 to 2, start with 0.1
+Cstart_S <- c(C=0.1)
+
+# Fit a non linear model using the arbitrary C value
+# N is the number of the genotypes that have the SNP site
+
+modelC_S <- nls(rsq ~ ( (10+C*dist)/( (2+C*dist) * (11+C*dist) ) ) *
+                (1+( (3+C*dist) * (12+12*C*dist+(C*dist)^2) ) / ( 2*N*(2+C*dist) * (11+C*dist) ) ),
+              data=file_S, start=Cstart_S, control=nls.control(maxiter = 100))
+
+
+# Extract rho, the recombination parameter in 4Nr
+rho_S <- summary(modelC_S)$parameters[1]
+
+# Feed in the new value of rho to obtain LD values adjusted for their distance along the chromosome/genome 
+newrsq_S <- ( (10+rho_S*file_S$dist) / ( (2+rho_S*file_S$dist) * (11+rho_S*file_S$dist) ) ) *
+  ( 1 + ( (3+rho_S * file_S$dist) * (12+12*rho_S*file_S$dist + (rho_S*file_S$dist)^2) ) /
+      (2*file_S$N*(2+rho_S*file_S$dist) * (11+rho_S*file_S$dist) ) )
+
+newfile_S <- data.frame(file_S$dist, newrsq_S)
+
+maxld_S <- max(newfile_S$newrsq,na.rm=TRUE) #using max LD value from adjusted data
+
+halfdecay_S = maxld_S*0.5
+
+halfdecaydist_S <- newfile_S$file_S.dist[which.min(abs(newfile_S$newrsq-halfdecay_S))]
+
+newfile_S <- newfile_S[order(newfile_S$file_S.dist),]
+
+mar.default <- c(5,4,4,2) + 0.1
+par(mar = mar.default + c(0,4,0,0))
+plot(file_S$dist, file_S$rsq, pch=".", cex=2, xlab="Distance (bp)", ylab=expression(LD ~ (r^2)), col="grey")
+lines(newfile_S$file_S.dist, newfile_S$newrsq, col="red", lwd=2)
+abline(h=0.1, col="blue") # if you need to add horizontal line
+abline(v=halfdecaydist_S, col="green")
+mtext(round(halfdecaydist_S,2), side=1, line=0.05, at=halfdecaydist_S, cex=0.75, col="green")
+```
+
+```{r}
+file_V <- file %>%
+  filter(grepl("^V0", Locus1))
+
+# C values range from about 0.5 to 2, start with 0.1
+Cstart_V <- c(C=0.1)
+
+# Fit a non linear model using the arbitrary C value
+# N is the number of the genotypes that have the SNP site
+
+modelC_V <- nls(rsq ~ ( (10+C*dist)/( (2+C*dist) * (11+C*dist) ) ) *
+                (1+( (3+C*dist) * (12+12*C*dist+(C*dist)^2) ) / ( 2*N*(2+C*dist) * (11+C*dist) ) ),
+              data=file_V, start=Cstart_V, control=nls.control(maxiter = 100))
+
+
+# Extract rho, the recombination parameter in 4Nr
+rho_V <- summary(modelC_V)$parameters[1]
+
+# Feed in the new value of rho to obtain LD values adjusted for their distance along the chromosome/genome 
+newrsq_V <- ( (10+rho_V*file_V$dist) / ( (2+rho_V*file_V$dist) * (11+rho_V*file_V$dist) ) ) *
+  ( 1 + ( (3+rho_V * file_V$dist) * (12+12*rho_V*file_V$dist + (rho_V*file_V$dist)^2) ) /
+      (2*file_V$N*(2+rho_V*file_V$dist) * (11+rho_V*file_V$dist) ) )
+
+newfile_V <- data.frame(file_V$dist, newrsq_V)
+
+maxld_V <- max(newfile_V$newrsq,na.rm=TRUE) #using max LD value from adjusted data
+
+halfdecay_V = maxld_V*0.5
+
+halfdecaydist_V <- newfile_V$file_V.dist[which.min(abs(newfile_V$newrsq-halfdecay_V))]
+
+newfile_V <- newfile_V[order(newfile_V$file_V.dist),]
+
+mar.default <- c(5,4,4,2) + 0.1
+par(mar = mar.default + c(0,4,0,0))
+plot(file_V$dist, file_V$rsq, pch=".", cex=2, xlab="Distance (bp)", ylab=expression(LD ~ (r^2)), col="grey")
+lines(newfile_V$file_V.dist, newfile_V$newrsq, col="red", lwd=2)
+abline(h=0.1, col="blue") # if you need to add horizontal line
+abline(v=halfdecaydist_V, col="green")
+mtext(round(halfdecaydist_V,2), side=1, line=0.05, at=halfdecaydist_V, cex=0.75, col="green")
 ```

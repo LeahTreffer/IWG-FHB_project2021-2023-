@@ -52,14 +52,14 @@ General Formula:
 Broad-Sense Heritability (H^2) = genotypic variance^2 / phenotypic variance^2
 $$H^2 = \frac{σ_g^2}{σ_p^2}$$
 
-Heritability estiamte from Bajgain et al 2025 (https://onlinelibrary.wiley.com/doi/abs/10.1002/csc2.70126):
+IWG trait Heritability estimate from Bajgain et al 2025 (https://onlinelibrary.wiley.com/doi/abs/10.1002/csc2.70126):
 $$H^2 = \frac{σ_g^2 }{(σ_g^2 + \frac{σ_{gl}^2}{l} + \frac{σ_{gy}^2}{y} + \frac{σ_e^2}{ly})}$$
 
-where σg2 is the genetic variance, σgl2 is the genotype × location variance, σgy2 is the genotype × year variance, σe2 is the residual variance, l is the number of locations, and y is the number of years. Variance components used to estimate H2 were obtained by fitting a linear model using the aov function in R.
+where $σ_g^2$ is the genetic variance, $σ_{gl}^2$ is the genotype × location variance, $σ_{gy}^2$ is the genotype × year variance, $σ_e^2$ is the residual variance, l is the number of locations, and y is the number of years. Variance components used to estimate $H^2$ were obtained by fitting a linear model using the aov function in R.
 
 most genotypes aren’t repeated across sites so there was an issue where no plant_id:Site interaction was dropped from a few of the models. In those cases, variance for that interaction set to 0
 
-####### H2 (C07 + C10) has no residual error varience !!! #########
+####### H2 (C07 + C10) has no residual error variance !!! #########
 
 ```{r H2}
 # FHBDISIND
@@ -278,19 +278,15 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # H^2:
 ## FHBDISIND
-# 
 # C07: 0.166386462161804
 # C10: 0.297051012222231
 ## FHBSPKINC
-#
 # C07: 0.160506085066806
 # C10: 0.000001168072062
 ## FHBDON
-#
 # C07: 0.134445416512519
 # C10: 0.105843551060923
 ## FHBD3G.DON
-#
 # C07: 0.305932572300649
 # C10: 0.442746333116891
 ```
@@ -307,7 +303,7 @@ While FarmCPU was used, there is minimal discussion on population structure, LD 
 
 The FarmCPU model, as stated, is designed to control for both fixed (Q matrix, PCs) and random (K matrix, kinship) effects. The authors must clarify if a kinship matrix was incorporated into their FarmCPU model, and if not, justify this omission or acknowledge it as a major limitation.
 
-* LD is analyized in 0.7_Linkage_Disequalibrium.Rmd 
+* LD is analyzed in 0.7_Linkage_Disequalibrium.Rmd 
 
 # PCA for Population Structure
 
