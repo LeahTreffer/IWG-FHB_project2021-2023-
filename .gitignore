@@ -21,3 +21,9 @@ data/Original_Files/FHB_Imputed_sorted.vcf
 data/Original_Files/FHB_for_GS_GWAS.txt
 data/Original_Files/FHB_Imputed.hmp.txt
 data/Original_Files/FHB_Imputed_sorted.hmp.txt
+data/Original_Files/FHB_Imputed_sorted.vcf
+data/Original_Files/FHB_for_GS_GWAS.txt
+data/Original_Files/FHB_Imputed.hmp.txt
+data/Original_Files/FHB_Imputed_sorted.hmp.txt
+data/Intermediate_Files/TASSEL_LD_out.txt
+data/Intermediate_Files/FHB_gwaspoly.hmp.csv
