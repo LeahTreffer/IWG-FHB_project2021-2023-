@@ -1,6 +1,11 @@
-.Rproj.user
-.Rhistory
+./data/Intermediate_Files/FHB_gwaspoly.hmp.csv
+./data/Intermediate_Files/TASSEL_LD_out.txt
+./data/Original_Files/FHB_for_GS_GWAS.txt
+./data/Original_Files/FHB_Imputed_sorted.hmp.txt
+./data/Original_Files/FHB_Imputed_sorted.vcf
+./data/Original_Files/FHB_Imputed.hmp.txt
 .RData
+.Rhistory
+.Rproj.user
 .Ruserdata
-data/Intermediate_Files/
 data/Intermediate_Files/
