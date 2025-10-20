@@ -11,6 +11,8 @@ library(rrBLUP)
 #install.packages("pheatmap")
 library(pheatmap)
 library(factoextra)
+library(stringr)
+library(dplyr)
 ```
 
 ```{r setup, include=FALSE}
@@ -27,16 +29,270 @@ geno <- GENO + 1 # change geno numeric format from -101 to 012
 geno <- geno[, !grepl('SUN', colnames(geno), ignore.case = TRUE) ]
 ```
 
+```{r}
+#load in phenotype tables
+pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt') #read in file with all cycles and years and locations
+pheno$plant_id <- as.factor(pheno$plant_id)
+pheno$phenotype_year <- as.factor(pheno$phenotype_year)
+pheno$Site <- as.factor(pheno$Site)
+pheno$Time <- as.factor(pheno$Time)
+#create separate tables for each cycle, year, location
+#Cycle 
+C07 <- pheno[str_detect(pheno$Cycle, "C7"),] #keep only data from C7 population
+C10 <- pheno[str_detect(pheno$Cycle, "C10"),] #keep only data from C10 population
+```
+
 # Broad Sense Heritability
 
 How much of observed variance is due to genetics
 
 Reviewer 2 comment:The manuscript has multiple-year evaluations (“three years from 2018-2020 for Cycle 7 and two years from 2021-2022 for Cycle 10”). Since you have replicated observations across years for each population, can you please report the broad-sense heritability for the traits? This would help assess how much of the observed variation is genetic versus environmental.
 
+General Formula:
 Broad-Sense Heritability (H^2) = genotypic variance^2 / phenotypic variance^2
+$$H^2 = \frac{σ_g^2}{σ_p^2}$$
 
-```{r}
+Heritability estiamte from Bajgain et al 2025 (https://onlinelibrary.wiley.com/doi/abs/10.1002/csc2.70126):
+$$H^2 = \frac{σ_g^2 }{(σ_g^2 + \frac{σ_{gl}^2}{l} + \frac{σ_{gy}^2}{y} + \frac{σ_e^2}{ly})}$$
 
+where σg2 is the genetic variance, σgl2 is the genotype × location variance, σgy2 is the genotype × year variance, σe2 is the residual variance, l is the number of locations, and y is the number of years. Variance components used to estimate H2 were obtained by fitting a linear model using the aov function in R.
+
+most genotypes aren’t repeated across sites so there was an issue where no plant_id:Site interaction was dropped from a few of the models. In those cases, variance for that interaction set to 0
+
+####### H2 (C07 + C10) has no residual error varience !!! #########
+
+```{r H2}
+# FHBDISIND
+# C07 fit linear model using aov 
+C07_FHBDISIND <- pheno[str_detect(C07$trait_id, "FHBDISIND"),]
+model_C07_FHBDISIND <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBDISIND)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C07_FHBDISIND)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C07_FHBDISIND$Site)
+y <- nlevels(C07_FHBDISIND$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C07_FHBDISIND <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# C10 fit linear model using aov 
+C10_FHBDISIND <- pheno[str_detect(C10$trait_id, "FHBDISIND"),]
+model_C10_FHBDISIND <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBDISIND)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C10_FHBDISIND)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C10_FHBDISIND$Site)
+y <- nlevels(C10_FHBDISIND$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C10_FHBDISIND <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# NEEDS WORK
+H2_FHBDISIND <- pheno[str_detect(pheno$trait_id, "FHBDISIND"),]
+H2_model_FHBDISIND <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=H2_FHBDISIND)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(H2_model_FHBDISIND)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(H2_FHBDISIND$Site)
+y <- nlevels(H2_FHBDISIND$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_FHBDISIND <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# FHBSPKINC
+# C07 fit linear model using aov 
+C07_FHBSPKINC <- pheno[str_detect(C07$trait_id, "FHBSPKINC"),]
+model_C07_FHBSPKINC <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBSPKINC)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C07_FHBSPKINC)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C07_FHBSPKINC$Site)
+y <- nlevels(C07_FHBSPKINC$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C07_FHBSPKINC <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# C10 fit linear model using aov 
+C10_FHBSPKINC <- pheno[str_detect(C10$trait_id, "FHBSPKINC"),]
+model_C10_FHBSPKINC <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBSPKINC)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C10_FHBSPKINC)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C10_FHBSPKINC$Site)
+y <- nlevels(C10_FHBSPKINC$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C10_FHBSPKINC <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# FHBDON
+# C07 fit linear model using aov 
+C07_FHBDON <- pheno[str_detect(C07$trait_id, "FHBDON"),]
+model_C07_FHBDON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBDON)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C07_FHBDON)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C07_FHBDON$Site)
+y <- nlevels(C07_FHBDON$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C07_FHBDON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# C10 fit linear model using aov 
+C10_FHBDON <- pheno[str_detect(C10$trait_id, "FHBDON"),]
+model_C10_FHBDON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBDON)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C10_FHBDON)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C10_FHBDON$Site)
+y <- nlevels(C10_FHBDON$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C10_FHBDON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# FHBD3G:DON
+# C07 fit linear model using aov 
+C07_FHBD3G.DON <- pheno[str_detect(C07$trait_id, "FHBD3G.DON"),]
+model_C07_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBD3G.DON)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C07_FHBD3G.DON)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C07_FHBD3G.DON$Site)
+y <- nlevels(C07_FHBD3G.DON$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C07_FHBD3G.DON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# C10 fit linear model using aov 
+C10_FHBD3G.DON <- pheno[str_detect(C10$trait_id, "FHBD3G.DON"),]
+model_C10_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBD3G.DON)
+# extract the mean squares (MS) from the ANOVA table
+anova_table <- summary(model_C10_FHBD3G.DON)[[1]] # extract summary stats
+# Estimate variance components
+MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
+MSg <- unname(MS["plant_id"])
+MSgl <- unname(MS["plant_id:Site"])
+# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgy <- unname(MS["plant_id:Time"])
+MSe <- unname(MS["Residuals"])
+# number of locations and years
+l <- nlevels(C10_FHBD3G.DON$Site)
+y <- nlevels(C10_FHBD3G.DON$Time)
+# variance components
+sigma_g  <- (MSg - MSgl - MSgy + MSe) / (l*y)
+sigma_gl <- (MSgl - MSe) / y
+sigma_gy <- (MSgy - MSe) / l
+sigma_e  <- MSe
+H2_C10_FHBD3G.DON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + (sigma_e / l*y))
+rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
+
+# FHBZEA
+# Only observed in one year (2021)
+
+# H^2:
+## FHBDISIND
+# 
+# C07: 0.166386462161804
+# C10: 0.297051012222231
+## FHBSPKINC
+#
+# C07: 0.160506085066806
+# C10: 0.000001168072062
+## FHBDON
+#
+# C07: 0.134445416512519
+# C10: 0.105843551060923
+## FHBD3G.DON
+#
+# C07: 0.305932572300649
+# C10: 0.442746333116891
 ```
 
 # Analysis of Varience

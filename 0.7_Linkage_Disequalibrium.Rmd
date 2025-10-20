@@ -170,3 +170,9 @@ p <- ggplot() +
 print(p)
 
 ```
+
+LD plot by subgenome (J, S, V)
+
+```{r}
+
+```
