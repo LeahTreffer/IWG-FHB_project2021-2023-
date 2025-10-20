@@ -1,0 +1,176 @@
+---
+title: "Revision_Additions"
+author: "Leah Treffer"
+date: "2025-10-20"
+output: html_document
+---
+
+```{r libraries, include=FALSE}
+library(here)
+library(rrBLUP)
+#install.packages("pheatmap")
+library(pheatmap)
+library(factoextra)
+```
+
+```{r setup, include=FALSE}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r}
+FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+#make a copy of master file to work with
+GENO <- FHB_for_GS_GWAS
+geno <- GENO + 1 # change geno numeric format from -101 to 012
+
+#remove unstructured chromosomes from mapping 245 markers
+geno <- geno[, !grepl('SUN', colnames(geno), ignore.case = TRUE) ]
+```
+
+# Broad Sense Heritability
+
+How much of observed variance is due to genetics
+
+Reviewer 2 comment:The manuscript has multiple-year evaluations (“three years from 2018-2020 for Cycle 7 and two years from 2021-2022 for Cycle 10”). Since you have replicated observations across years for each population, can you please report the broad-sense heritability for the traits? This would help assess how much of the observed variation is genetic versus environmental.
+
+Broad-Sense Heritability (H^2) = genotypic variance^2 / phenotypic variance^2
+
+```{r}
+
+```
+
+# Analysis of Varience
+
+Reviewer 2 comment: Figures 1a and 1b show differences in disease levels between C07 and C10. Are these differences statistically significant? Should it be a concern for the breeding program? Some statistical support (e.g., mixed models) would strengthen the interpretation. 
+
+# Population Structure 
+
+Reviewer Comment: The authors' explanation is insufficient. This requires much deeper investigation. For instance, were sensitivity analyses performed with different GWAS models, kinship matrices, or subsets of data? Could these represent strong linkage disequilibrium (LD) blocks containing major-effect genes, or are they statistical artifacts? 
+
+While FarmCPU was used, there is minimal discussion on population structure, LD decay, or kinship matrix, which could influence false-positive associations. Please provide additional analysis or information about the population structure and LD decay to better contextualize the reliability of the GWAS hits.
+
+The FarmCPU model, as stated, is designed to control for both fixed (Q matrix, PCs) and random (K matrix, kinship) effects. The authors must clarify if a kinship matrix was incorporated into their FarmCPU model, and if not, justify this omission or acknowledge it as a major limitation.
+
+* LD is analyized in 0.7_Linkage_Disequalibrium.Rmd 
+
+# PCA for Population Structure
+
+```{r pca}
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SNPRelate")
+
+library(SNPRelate)
+
+# Convert your genotype to GDS format
+snpgdsVCF2GDS("data/Original_Files/FHB_Imputed_sorted.vcf", "FHB_Imputed_sorted.gds", method="biallelic.only")
+genofile <- snpgdsOpen("FHB_Imputed_sorted.gds")
+
+# principal component analysis (PCA)
+pca <- snpgdsPCA(genofile, autosome.only=FALSE) #PCA
+pc.percent <- pca$varprop*100 #proportions to percentages
+# autosome.only=FALSE : all chromosomes are used
+# pca$eigenvect contains the coordinates of each sample on the PCs
+# pca$varprop gives the proportion of total genetic variance explained by each PC
+
+plot(pca$eigenvect[,1], pca$eigenvect[,2], 
+     xlab=paste0("PC1 (", round(pc.percent[1],1), "%)"),
+     ylab=paste0("PC2 (", round(pc.percent[2],1), "%)"),
+     pch=19, col="blue")
+
+# PC1 (first principal component) : explains the largest variance in your genotypes
+# PC2 : explains the second largest variance
+# Each point is one genotype (individual/sample)
+# Clusters of points = samples with similar genetic backgrounds
+# Distance between points : genetic differentiation (more distant = more genetically different)
+# % in axis labels : how much of total genetic variance captured by that PC
+# changing pca$eigenvect[,1] and pca$eigenvect[,2] changes the PC plotted
+
+# PC1 capturing 2.3% of total varience is low. This could be due to a highly diverse dataset and/or no strong population structure
+# gradual differentiation rather than discrete subpopulations
+```
+
+```{r pca2, echo=FALSE}
+# Another way to visualize Pop Structure / PC
+
+#get realized relationship matrix
+A <- A.mat(geno) #estimate the realized relationship matrix (Gmatrix)
+
+#PCA on genotype matrix
+prmarker <- prcomp(geno)
+
+fviz_eig(prmarker, addlabels = TRUE, title= 'Eigen Value') #Plot the eigenvalues/variances against the number of dimensions
+#Eigenvalues correspond to the amount of the variation explained by each principal component (PC).
+
+#look for population structure
+eig.result <- eigen(A) #get Eigen values from the A matrix
+lambda <- eig.result$values #extract variance explained
+
+rm(A,eig.result,prmarker,lambda)
+```
+
+# Kinship Matrix 
+
+```{r}
+# Using Base R
+K <- A.mat(as.matrix(geno))  # additive relationship matrix
+
+any(is.na(K))       
+any(is.nan(K))
+any(is.infinite(K))
+K[is.na(K)] <- 0
+K[is.nan(K)] <- 0
+
+#heatmap(K, symm = TRUE, main = "Kinship matrix") 
+# Error: C stack usage  7953720 is too close to the limit
+
+image(K, axes=FALSE, col = heat.colors(100))
+title("Kinship matrix")
+```
+
+```{r}
+# Using GAPIT to visualize
+
+# GAPIT - Genomic Association and Prediction Integrated Tool
+# Designed by Zhiwu Zhang
+# Written by Zhiwu Zhang, Alex Lipka, Feng Tian, You Tang and Jiabo Wang
+# Last update: Nov 15, 2021 for version 3
+
+#Install packages (Do this section only for new installation of R)
+#-------------------------------------------------------------------------------
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install(version = "3.18")
+
+#Gapit Source
+source("http://zzlab.net/GAPIT/GAPIT.library.R")
+source("http://zzlab.net/GAPIT/gapit_functions.txt")
+```
+
+```{r}
+# Using GAPIT to visualize
+genotype_data <- cbind(rownames(geno), data.frame(geno, row.names=NULL)) #rownames into first column 
+colnames(genotype_data)[1]  <-  "taxa" 
+
+K <- GAPIT.K(Y=NULL, GD=genotype_data)
+heatmap(K$Kinship, symm=TRUE)
+```
+
+
+```{r}
+# Using rrBLUP
+K <- A.mat(as.matrix(geno))  # additive relationship matrix
+
+any(is.na(K))       
+any(is.nan(K))
+any(is.infinite(K))
+K[is.na(K)] <- 0
+K[is.nan(K)] <- 0
+
+pheatmap(K)
+
+pheatmap(K, cluster_rows = TRUE, cluster_cols = TRUE,
+         main = "Kinship matrix")
+```

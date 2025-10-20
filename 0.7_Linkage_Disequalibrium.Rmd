@@ -24,7 +24,8 @@ In Tassel:
 
 File>Open As
 open file: /Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Original_Files/FHB_Imputed.hmp.txt
-  
+New location: Github/IWG-FHB_project2021-2023/data/Original_Files/FHB_Imputed.hmp.txt
+
 Analysis>Diversity>Linkage Disequalibrium
   
 run analysis
@@ -32,25 +33,42 @@ run analysis
 Results>Table
   
 saved as: /Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Intermediate_Files/TASSEL_LD_out.txt
+New location: Github/IWG-FHB_project2021-2023/data/Intermediate_Files/TASSEL_LD_out.txt
+
+Making VCF Format Through Tassel5 Command Line (Oct 2025)
+Navigate to Finder and search for Tassel5
+Two Finger / Right click > New Terminal at Folder
+
+perl run_pipeline.pl -SortGenotypeFilePlugin \
+    -inputFile /Users/leahtreffer/GitHub/IWG-FHB_project2021-2023/data/Original_Files/FHB_Imputed.hmp.txt \
+    -outputFile /Users/leahtreffer/GitHub/IWG-FHB_project2021-2023/data/Original_Files/FHB_Imputed_sorted.hmp.txt
+
+perl run_pipeline.pl -fork1 -h /Users/leahtreffer/GitHub/IWG-FHB_project2021-2023/data/Original_Files/FHB_Imputed_sorted.hmp.txt -export /Users/leahtreffer/GitHub/IWG-FHB_project2021-2023/data/Original_Files/FHB_Imputed_sorted.vcf -exportType VCF -runfork1
 
 Resources used:
 https://www.youtube.com/watch?v=h0K40E-II_Y
 https://github.com/mohsinali1990/My_scripts/blob/main/LD%20decay%20Plot%20from%20TASSEL%20LDoutput.R
-
+https://www.bytebucket.org/tasseladmin/tassel-5-source/wiki/docs/Tassel5PipelineCLI.pdf
+and ChatGPT (2025)
 
 ```{r read_file}
-ld <- read.table('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Intermediate_Files/TASSEL_LD_out.txt', stringsAsFactors = FALSE, header = TRUE, sep = "\t")
+ld <- read.table('data/Intermediate_Files/TASSEL_LD_out.txt', stringsAsFactors = FALSE, header = TRUE, sep = "\t")
 str(ld)
 ```
 
 ```{r cleanup}
 # Remove sites that have NaN for distance or r2
-ld_sub <- ld[ld$R.2 !="NaN",]
+ld_sub <- ld[!is.na(ld$R.2), ]
+#ld_sub <- ld[ld$R.2 !="NaN",]
 ld_sub$dist <- as.numeric(ld_sub$Dist_bp)
-ld_sub2 <- ld_sub[ld_sub$dist != "NaN",]
+ld_sub2 <- ld_sub[!is.na(ld_sub$Dist_bp), ]
+#ld_sub2 <- ld_sub[ld_sub$dist != "NaN",]
 ld_sub2$rsq <- ld_sub2$R.2
 
-file <- ld_sub2[,c(1,2,7,8,15:19)]
+file <- ld_sub2[,c(1,2,7,8,13:19)]
+
+# remove NAs from file
+file <- file[!is.na(file$dist) & !is.na(file$rsq) & !is.na(file$N), ]
 ```
 
 ```{r}
@@ -63,6 +81,7 @@ Cstart <- c(C=0.1)
 modelC <- nls(rsq ~ ( (10+C*dist)/( (2+C*dist) * (11+C*dist) ) ) *
                 (1+( (3+C*dist) * (12+12*C*dist+(C*dist)^2) ) / ( 2*N*(2+C*dist) * (11+C*dist) ) ),
               data=file, start=Cstart, control=nls.control(maxiter = 100))
+
 
 # Extract rho, the recombination parameter in 4Nr
 rho <- summary(modelC)$parameters[1]
@@ -83,9 +102,9 @@ halfdecaydist <- newfile$file.dist[which.min(abs(newfile$newrsq-halfdecay))]
 newfile <- newfile[order(newfile$file.dist),]
 ```
 
-```{r plots}
+```{r plots, eval=FALSE, include=FALSE}
 # Plotting the values
-pdf("/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS/data/Figures/LD_decay.pdf", height = 5, width = 5)
+pdf("output/Figures/LD_decay.pdf", height = 5, width = 5)
 mar.default <- c(5,4,4,2) + 0.1
 par(mar = mar.default + c(0,4,0,0))
 plot(file$dist, file$rsq, pch=".", cex=2, xlab="Distance (bp)", ylab=expression(LD ~ (r^2)), col="grey")
@@ -94,4 +113,60 @@ abline(h=0.1, col="blue") # if you need to add horizontal line
 abline(v=halfdecaydist, col="green")
 mtext(round(halfdecaydist,2), side=1, line=0.05, at=halfdecaydist, cex=0.75, col="green")
 dev.off()
+
+# x-axis : physical distance between markers
+# y-axis : r² values (measure of linkage disequilibrium; 0 = no correlation, 1 = perfect correlation/complete linkage)
+# Each point represents the correlation (observed r² values) between two SNPs at a given distance
+
+#Red line for fitted decay ; expected r² decay with increasing distance based on the Hill & Weir model
+#Red area : LD decay curve
+#Horizontal line at r² = 0.1 (common threshold)
+#Vertical line at half-decay distance (how far along the chromosome alleles are correlated (r²) above half of the maximum observed LD); 
+
+# LD structure: The overall shape of the curve shows whether population has strong structure (slow decay = long-range LD, typical of inbred or structured populations) or is more outcrossing/heterogeneous (fast decay)
+
+# plot with concentration towards both 0 and 1 showing that there are markers at both short and long distances have strong linkage. 
+# distance at which LD decays to half of its maximum is 19 bp ???
+
+
+
+
+# Assuming 'file' has your raw LD data
+# file$dist = distance between SNPs (bp)
+# file$rsq = pairwise LD (r^2)
+# newfile$newrsq = smoothed LD decay values
+# newfile$file.dist = corresponding distances
+
+# Define maximum distance to plot (e.g., 500 kb)
+max_dist <- 500000  # 500 kb
+
+# Subset data for plotting
+plot_data <- file[file$dist <= max_dist, ]
+decay_data <- newfile[newfile$file.dist <= max_dist, ]
+
+# Half-decay distance
+halfdecaydist <- newfile$file.dist[which.min(abs(newfile$newrsq-halfdecay))]
+
+# Create plot
+p <- ggplot() +
+  geom_point(data = plot_data, aes(x = dist, y = rsq), color = "grey50", alpha = 0.5, size = 1) +
+  geom_line(data = decay_data, aes(x = file.dist, y = newrsq), color = "red", linewidth = 1.2) +
+  geom_hline(yintercept = 0.1, color = "blue", linetype = "dashed", linewidth = 0.8) +
+  geom_vline(xintercept = halfdecaydist, color = "green", linetype = "dashed", linewidth = 0.8) +
+  annotate("text", x = halfdecaydist, y = 0.05, label = paste0("Half decay: ", round(halfdecaydist/1000,1), " kb"), 
+           color = "green", angle = 90, vjust = -0.5, hjust = 0) +
+  scale_x_continuous(labels = scales::comma) +
+  labs(x = "Distance between SNPs (bp)", y = expression(LD~(r^2)),
+       title = "Linkage Disequilibrium Decay") +
+  theme_bw(base_size = 14) +
+  theme(panel.grid.major = element_line(color = "grey90"),
+        panel.grid.minor = element_blank(),
+        plot.title = element_text(hjust = 0.5, face = "bold"))
+
+# Save figure
+#ggsave("output/Figures/LD_decay_plot2.png", plot = p, width = 6, height = 4, dpi = 300)
+
+# Show plot
+print(p)
+
 ```

@@ -20,7 +20,7 @@ Principle Component Analysis
 rm(list=ls(all=TRUE))
 #set current working directory
 #setwd()
-setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+#setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
 ```
 
 ```{r include=FALSE}
