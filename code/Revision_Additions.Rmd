@@ -13,6 +13,13 @@ library(pheatmap)
 library(factoextra)
 library(stringr)
 library(dplyr)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SNPRelate")
+
+library(SNPRelate)
 ```
 
 ```{r setup, include=FALSE}
@@ -308,14 +315,6 @@ The FarmCPU model, as stated, is designed to control for both fixed (Q matrix, P
 # PCA for Population Structure
 
 ```{r pca}
-
-if (!requireNamespace("BiocManager", quietly = TRUE))
-    install.packages("BiocManager")
-
-BiocManager::install("SNPRelate")
-
-library(SNPRelate)
-
 # Convert your genotype to GDS format
 snpgdsVCF2GDS("data/Original_Files/FHB_Imputed_sorted.vcf", "FHB_Imputed_sorted.gds", method="biallelic.only")
 genofile <- snpgdsOpen("FHB_Imputed_sorted.gds")
