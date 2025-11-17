@@ -13,6 +13,8 @@ library(pheatmap)
 library(factoextra)
 library(stringr)
 library(dplyr)
+library(lmerTest)
+library(emmeans)
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -301,6 +303,59 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 # Analysis of Varience
 
 Reviewer 2 comment: Figures 1a and 1b show differences in disease levels between C07 and C10. Are these differences statistically significant? Should it be a concern for the breeding program? Some statistical support (e.g., mixed models) would strengthen the interpretation. 
+
+```{r}
+# get both cycles for a given trait
+FHBD3G.DON <- rbind(C07_FHBD3G.DON, C10_FHBD3G.DON)
+FHBDISIND <- rbind(C07_FHBDISIND, C10_FHBDISIND)
+FHBDON <- rbind(C07_FHBDON, C10_FHBDON)
+FHBSPKINC <- rbind(C07_FHBSPKINC, C10_FHBSPKINC)
+
+FHBD3G.DON$Cycle <- as.factor(FHBD3G.DON$Cycle)
+FHBDISIND$Cycle <- as.factor(FHBDISIND$Cycle)
+FHBDON$Cycle <- as.factor(FHBDON$Cycle)
+FHBSPKINC$Cycle <- as.factor(FHBSPKINC$Cycle)
+
+# Liklihood Ratio Test - Finding better fitting model
+model1 <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBD3G.DON)
+model2 <- lmer(phenotype_value ~ Cycle + (1|Site), data=FHBD3G.DON)
+anova(model1,model2)
+model1 <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBDISIND)
+model2 <- lmer(phenotype_value ~ Cycle + (1|Site), data=FHBDISIND)
+anova(model1,model2)
+model1 <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBDON)
+model2 <- lmer(phenotype_value ~ Cycle + (1|Site), data=FHBDON)
+anova(model1,model2)
+model1 <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBSPKINC)
+model2 <- lmer(phenotype_value ~ Cycle + (1|Site), data=FHBSPKINC)
+anova(model1,model2)
+
+# mixed model - are cycles sig different from each other?
+model_D3G.DON <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBD3G.DON)
+summary(model_D3G.DON)
+emmeans(model_D3G.DON, pairwise ~ Cycle) #estimates of the difference between cycles
+# C07 and C10 are sig different (p.value = <2e-16)
+# C07 has a significantly lower D3G.DON value compared with C10 by 55.678 units (after controlling for Site)
+# large confidence interval indicating uncertainty, however difference was still significant (p.value <.0001)
+
+model_FHBDISIND <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBDISIND)
+summary(model_FHBDISIND)
+emmeans(model_FHBDISIND, pairwise ~ Cycle) #estimates of the difference between cycles
+# C07 and C10 are sig different (p.value = <2e-16)
+# C07 has a significantly lower FHBDISIND value compared with C10 by 67.935 units (after controlling for Site)
+
+model_FHBDON <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBDON)
+summary(model_FHBDON)
+emmeans(model_FHBDON, pairwise ~ Cycle) #estimates of the difference between cycles
+# C07 and C10 are sig different (p.value = <2e-16)
+# C07 has a significantly lower FHBDISIND value compared with C10 by 33.2420 units (after controlling for Site)
+
+model_FHBSPKINC <- lmer(phenotype_value ~ Cycle * Time + (1|Site), data=FHBSPKINC)
+summary(model_FHBSPKINC)
+emmeans(model_FHBSPKINC, pairwise ~ Cycle) #estimates of the difference between cycles
+# C07 and C10 are sig different (p.value = <2e-16)
+# C07 has a significantly higher FHBSPKINC value compared with C10 by 24.476 units (after controlling for Site)
+```
 
 # Population Structure 
 
