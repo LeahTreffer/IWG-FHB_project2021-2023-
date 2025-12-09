@@ -1,0 +1,2 @@
+SNP,Chromosome,Position,P.value,MAF,nobs,effect,Phenotype_Variance_Explained(%)
+SV01_442280490,15,442280490,1.6286925870597e-08,0.161392405063291,316,2.07184126022742,0

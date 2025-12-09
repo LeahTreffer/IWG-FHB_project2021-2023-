@@ -1,0 +1,246 @@
+---
+title: "1.6_GWAS_FarmCPU_2025"
+author: "Leah Treffer"
+date: "2025-12-09"
+output: html_document
+---
+
+# Objective
+
+Run a GWAS analysis for measured traits 
+	C7 Salina 2018, 2019, 2020
+	C10 Salina 2021, 2022
+	C10 Olathe 2021, 2022
+	
+In re-runs, can skip to 'GAPIT Input' and load in intermediate files
+
+```{r include=FALSE}
+library(bigmemory)
+require(reshape2)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(rglwidget)
+library(rgl)
+require(rrBLUP)
+require(factoextra)
+#install.packages("errorist")
+#library(errorist)
+
+library(here)
+#install.packages("pheatmap")
+library(pheatmap)
+library(lmerTest)
+library(emmeans)
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("SNPRelate")
+
+library(SNPRelate)
+
+#install.packages("devtools")
+library(devtools)
+devtools::install_github("jiabowang/GAPIT",force=TRUE)
+library(GAPIT)
+```
+
+```{r}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r}
+here::i_am("1.6_GWAS_FarmCPU_2025.Rmd")
+```
+
+```{r load_data, include=FALSE}
+
+# Genotype Files: 
+  # taken from beocat directory (Jan 2023), after Jared filtered for MAF > 0.01 and less than 70% missing (minimum of 30% of the individuals had a particular SNP called)
+    # data set has ~32067 markers and ~2165 individuals
+  # FHB_for_GS_GWAS.txt is the imputed (all data) calls changed to a -1, 0, 1 format 
+  # FHB_Imputed.hmp.txt has the allele calls (A, C, G, T, etc.)
+
+FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+#make a copy of master file to work with
+GENO <- FHB_for_GS_GWAS
+GENO <- GENO + 1 # change geno numeric format from -101 to 012
+
+FHB_Hap.hmp <- read.delim("data/Original_Files/FHB_Imputed.hmp.txt", header=FALSE) #Imputed and Filtered File from Jared (Jan 2023)
+
+# Phenotype File:
+  #pheno file Retrieve from Database (toxin traits added manually in excel) and further filtered in Phenotypic_Analysis.R to C7 and C10 taxa and duplicates of C10 taken out in excel
+    #Phenotypic_Format_long.txt (long format) or Phenotypic_Format_wide.txt (wide format)
+
+PHENO <- read.delim(file = 'data/Intermediate_Files/Phenotypic_Format_wide_2.txt', header = TRUE) 
+
+# change
+#	C07 Salina 2018, 2019, 2020
+#	C10 Salina 2021, 2022
+#	C10 Olathe 2021, 2022
+pheno <- PHENO[str_detect(PHENO$Cycle, "C07"),] #keep only one cycle #C07 #C10
+pheno <- pheno[str_detect(pheno$Site, "SAL"),] #keep only one site #SAL #OLA
+pheno <- pheno[str_detect(pheno$phenotype_year, "2018"),] #keep only one year #2018 #2019 #2020 #2021 #2022
+
+
+#Remove empty columns 
+empty_columns <- colSums(is.na(pheno) | pheno == "") == nrow(pheno)
+pheno <- pheno[, !empty_columns]
+#make sure no taxa have two rows, no duplicates
+duplicated(pheno$plant_id) #prints out if plant_id is duplicated
+#pheno <- distinct(pheno, plant_id, phenotype_year, Site, .keep_all= TRUE) #remove duplicate rows based on multiple columns
+
+#make sure pheno and geno file match
+geno <- GENO 
+
+pheno <- pheno[pheno$plant_id %in% rownames(geno),] #get all phenotypes that is also genotypes
+
+geno <- geno[rownames(geno) %in% pheno$plant_id,] #get all genotypes
+
+pheno <- pheno[, c(colnames(pheno)[colSums(is.na(pheno)) < 150])] #remove columns with lots of missing data (requires at least 170 observations for GWAS)
+
+all(pheno$plant_id %in% rownames(geno)) #check that all phenotypes have been genotyped
+
+geno <- geno[match( pheno$plant_id,rownames(geno)), ] #match names between geno and phenotype files
+
+all(pheno$plant_id == rownames(geno)) #check that all phenotypes have been genotyped
+
+
+
+#clean up
+rm(empty_columns)
+
+```
+
+# Set up GWAS
+
+```{r rrBLUP_GWAS_population_structure, echo=FALSE}
+#get realized relationship matrix
+A <- A.mat(geno) #estimate the realized relationship matrix (Gmatrix)
+
+#PCA on genotype matrix
+prmarker <- prcomp(geno)
+
+pdf("data/Figures/PC_C10_SAL.pdf", width = 5, height = 3.5)
+fviz_eig(prmarker, addlabels = TRUE, title= 'Eigen Value') #Plot the eigenvalues/variances against the number of dimensions
+dev.off()
+#Eigenvalues correspond to the amount of the variation explained by each principal component (PC).
+
+#look for population structure
+eig.result <- eigen(A) #get Eigen values from the A matrix
+lambda <- eig.result$values #extract variance explained
+
+rm(A,eig.result,prmarker,lambda)
+```
+
+Format input files
+  
+```{r format_files, eval=FALSE, echo=FALSE}
+##Genotypic Data
+###Numeric Format
+###Numeric Genotype file
+
+#remove unstructured chromosomes from mapping 245 markers
+geno <- geno[, !grepl('SUN', colnames(geno), ignore.case = TRUE) ] 
+
+geno <- cbind(rownames(geno), data.frame(geno, row.names=NULL)) #rownames into first column 
+colnames(geno)[1]  <-  "taxa" 
+
+write.table(geno, file = "data/Intermediate_Files/C10_OLA_2022_numeric.txt", sep = '\t', quote = FALSE, row.names = TRUE)
+myGD <- read.delim(here("data", "Intermediate_Files","C07_SAL_2019_numeric.txt"), head=TRUE)
+
+###Position of Each SNP Along the Genome file
+
+#GWAS fit geno file for gwas
+rr_gwas <- t(geno) #transpose
+
+#format marker names
+markers <- as.data.frame(rownames(rr_gwas)) #extract maker names
+colnames(markers)[1] <- 'marker_name' #rename first column 
+markers$pos <- gsub('^.*_', '', markers$marker_name) #split string and extract marker position
+markers$pos <- as.numeric(markers$pos) #convert to numeric
+markers$chrom <- gsub('_.*$', '', markers$marker_name) #split string and extract chromosome
+markers$chrom <- sub('S', '', markers$chrom) #remove string 
+markers <- markers[order(markers$chrom, markers$pos),] #orders markers by chromosome and position
+markers$marker <- 1:nrow(markers) #add marker name as numeric
+markers <- markers[ , c(4:1)] #rearrange columns
+
+markers <- subset(markers, chrom != 'taxa') #find 'taxa' row and remove
+
+GM <- markers[, c(4,2,3)] #move to order required for GAPIT hapmap (Name, chromosome, position)
+
+colnames(GM)[1]  <-  "Name" 
+colnames(GM)[2]  <-  "Chromosome" 
+colnames(GM)[3]  <-  "Position" 
+
+write.table(GM, file = 'data/Intermediate_Files/C10_OLA_2022_SNPposition.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+myGM <- read.table(here("data","Intermediate_Files","C07_SAL_2019_SNPposition.txt"), head=TRUE)
+
+##Phenotypic Data
+
+#make pheno file a tab delimited text
+colnames(pheno)[2]  <-  "taxa" #2 in original pheno file, changed to 1 in the transformed file
+pheno <- pheno[,c(2,7:ncol(pheno))] #run this for original pheno file 
+  pheno <- pheno[,c(1,2,4:ncol(pheno))] # take out FHBD3G from 2020 because all values were zero
+
+write.table(pheno, file = 'data/Intermediate_Files/C10_OLA_2022_pheno.txt', sep = '\t', quote = FALSE, row.names = FALSE)
+myY <- read.table(here("data", "Intermediate_Files", "C07_SAL_2019_pheno.txt"), head=TRUE)
+
+#clean up
+rm(markers, GM, rr_gwas)
+
+```
+
+GAPIT Input
+
+C07 Salina 2018, 2019, 2020
+C10 Salina 2021, 2022
+C10 Olathe 2021, 2022
+
+```{r}
+myGD <- read.delim(here("data", "Intermediate_Files","C10_OLA_2022_numeric.txt"), head=TRUE)
+myGM <- read.table(here("data","Intermediate_Files","C10_OLA_2022_SNPposition.txt"), head=TRUE)
+myY <- read.table(here("data", "Intermediate_Files", "C10_OLA_2022_pheno.txt"), head=TRUE)
+```
+
+```{r GRM, echo=FALSE}
+# Code from Jared to create GRM
+
+#just a bunch of formatting work to get marker matrix set up
+require(rrBLUP)
+genom <- myGD
+rownames(genom) <- genom$taxa
+genom <- genom[, -1]
+genom <- genom - 1
+
+grm <- A.mat(genom) #makes GRM
+myKI <- cbind.data.frame(rownames(grm), grm) #formats grm for GAPIT as myKI
+```
+
+GAPIT
+
+```{r gwas_FarmCPU_numeric, echo=FALSE}
+
+#get list of just trait IDs
+traits <- colnames(myY)[2:ncol(myY)] #get trait IDs from pheno file
+traits <- unique(traits) #make sure trait names are unique 
+
+setwd(here('output', 'FarmCPU_2025', 'C10_OLA_2022'))
+
+# Run GAPIT
+myGAPIT <- GAPIT(
+Y=myY,
+GD=myGD,
+KI=myKI, #add in here- JC
+GM=myGM,
+PCA.total=2,
+model=c("FarmCPU")
+)
+```
+
+```{r, clean_up}
+rm(myGAPIT, myGD, myGM, myY, myKI, traits, genom, grm)
+```
+
+
