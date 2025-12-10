@@ -1,0 +1,156 @@
+---
+title: "2.5_PVE_2025"
+author: "Leah Treffer"
+date: "2025-12-09"
+output: html_document
+---
+
+# Objective
+
+  Create list of significant markers
+  get PVE from GAPIT
+  Observe significant markers within certain range of each other 
+
+```{r}
+library(here)
+knitr::opts_knit$set(root.dir = here::here())
+here::i_am("2.5_PVE_2025.Rmd")
+```
+
+```{r packages, include=FALSE}
+library(readr)
+library(readxl)
+library(dplyr)
+library(data.table)
+library(reshape2)
+library(tibble)
+library(sjmisc)
+source('~/Downloads/rowr-master/R/rowr.R')
+source(here('scripts','QTL_range.R'))
+```
+
+# PVE using only the markers GAPIT says are significant 
+  
+############## Make list of sig markers #######################
+
+```{r}
+listy <- data.table()
+#C07_SAL_2018, C07_SAL_2019, C07_SAL_2020, C10_OLA_2021, C10_OLA_2022, C10_SAL_2021, C10_SAL_2022: 
+myY <- read.table(here("data","Intermediate_Files","C10_OLA_2022_pheno.txt"), head=TRUE)
+myGD <- read.delim(here("data","Intermediate_Files","C10_OLA_2022_numeric.txt"), head=TRUE)
+
+Sig_Rslt <- read.csv(here("output","FarmCPU_2025","C10_OLA_2022","GAPIT.Association.Filter_GWAS_results.csv")) # list of SNP hits from each traits
+Sig_Rslt$traits <- substr(Sig_Rslt$traits, 1, nchar(Sig_Rslt$traits) - 5) # remove (NYC) from end of trait names
+traits <- Sig_Rslt$traits #make table of traits
+traits <- unique(traits) #make sure trait names are unique 
+
+#running list
+list <- Sig_Rslt[,c(2,7)]
+list$Plot <- "C10_OLA_2022"
+listy <- rbind(listy,list)
+
+rm(myY,myGD,Sig_Rslt,traits,list)
+
+# after running for all cycle-site-years
+
+write.table(listy, file= here("data","Intermediate_Files","SigMarkerlist_2025.txt"))
+```
+
+############## Combine GAPIT PVE with Results ###########################
+
+```{r}
+
+csy <- unique(listy$Plot) # unique cycle-site-year
+Full_table <- data.frame()
+
+for(i in csy){
+  full_table <- data.frame()
+  trait_list <- unique(listy$traits[grepl(i, listy$Plot)])
+  for(j in trait_list){
+    #sigloci_trait <- listy[listy$traits == j, ]
+    sigloci_trait <- listy[listy$Plot == i & listy$traits == j, ]
+    
+    SNPnames <- sigloci_trait$SNP
+    file_name1 <- paste0("GAPIT.Association.GWAS_Results.",j,"(NYC).csv")
+    file_name2 <- paste0("GAPIT.Association.PVE.",j,"(NYC).csv")
+    
+    FarmCPUResults <- read.csv(here("output","FarmCPU_2025",i,file_name1))
+    SigMarkSel <- FarmCPUResults[FarmCPUResults$SNP %in% SNPnames,]
+    FarmCPUResultsPVE <- read.csv(here("output","FarmCPU_2025",i,file_name2))
+    
+    together <- merge(SigMarkSel,FarmCPUResultsPVE[,c("SNP", "Phenotype_Variance_Explained...")], by="SNP")
+    together$trait <- paste0(j)
+    together$plot <- paste0(i)
+    full_table <- rbind(full_table,together)
+  }
+  Full_table <- rbind(Full_table,full_table)
+}
+```
+
+```{r}
+## issue where some SNPS in the GAPIT.Association.Filter_GWAS_results.csv are not listed in GAPIT.Association.PVE.TRAIT(NYC).csv
+listy[! listy$SNP %in% Full_table$SNP, ]
+# add these rows in and leave PVE empty
+fourtyeight <- read.csv(here("output","FarmCPU_2025","C07_SAL_2019","GAPIT.Association.GWAS_Results.FarmCPU.FHBD3G.DON(NYC).csv")) %>%
+  filter(SNP == "SS01_322704032")%>%
+  mutate(Phenotype_Variance_Explained... = " ")%>%
+  mutate(trait = "FarmCPU.FHBD3G.DON")%>%
+  mutate(plot = "C07_SAL_2019")
+onethirty <- read.csv(here("output","FarmCPU_2025","C10_SAL_2021","GAPIT.Association.GWAS_Results.FarmCPU.PTHT(NYC).csv")) %>%
+  filter(SNP == "SS06_243762540")%>%
+  mutate(Phenotype_Variance_Explained... = " ")%>%
+  mutate(trait = "FarmCPU.PTHT")%>%
+  mutate(plot = "C10_SAL_2021")
+twohundred <- read.csv(here("output","FarmCPU_2025","C10_OLA_2022","GAPIT.Association.GWAS_Results.FarmCPU.FHBZEA(NYC).csv")) %>%
+  filter(SNP == "SJ02_550994220")%>%
+  mutate(Phenotype_Variance_Explained... = " ")%>%
+  mutate(trait = "FarmCPU.FHBZEA")%>%
+  mutate(plot = "C10_OLA_2022")
+twohundrednine <- read.csv(here("output","FarmCPU_2025","C10_OLA_2022","GAPIT.Association.GWAS_Results.FarmCPU.FHBDON(NYC).csv")) %>%
+  filter(SNP == "SS03_447957443")%>%
+  mutate(Phenotype_Variance_Explained... = " ")%>%
+  mutate(trait = "FarmCPU.FHBDON")%>%
+  mutate(plot = "C10_OLA_2022")
+twotwentythree <- read.csv(here("output","FarmCPU_2025","C10_OLA_2022","GAPIT.Association.GWAS_Results.FarmCPU.BLSSEV(NYC).csv")) %>%
+  filter(SNP == "SS04_283559355")%>%
+  mutate(Phenotype_Variance_Explained... = " ")%>%
+  mutate(trait = "FarmCPU.BLSSEV")%>%
+  mutate(plot = "C10_OLA_2022")
+rest <- rbind(fourtyeight,onethirty,twohundred,twohundrednine,twotwentythree)
+PVE_table <- rbind(Full_table,rest)
+PVE_table <- PVE_table %>% arrange(trait,plot,SNP)
+```
+
+```{r}
+#save file
+write.csv(PVE_table, here('data','Intermediate_Files','SigLocilist_2025.csv'))
+```
+
+############ significant markers within certain range of each other ############ 
+
+```{r snp_eval}
+#look at SNP list to see any trends
+#SNPs significant in more than one trait or year
+
+list <- read.table(here('data','Intermediate_Files','SigMarkerlist_2025.txt'))
+
+#SNPs within certain value range of each other
+list$CHR <- sub("*S","",list$SNP) #create column called CHR, remove 'S' from before the chromosome ID
+list$CHR <- gsub("\\_.*","",list$CHR) #remove characters after the chromosome name
+list$Pos <- gsub(".*_","",list$SNP) #create column called Pos, Remove all before and up to "_"
+list$Pos <- as.numeric(list$Pos) #make position column numeric so distance between positions can be calculated
+  #my_splits <- split(list, list$CHR) # Split data frame to get lists for each chr
+
+#exact match
+#these are a part of qtl.comparison but not similar.region
+list4 <- list[duplicated(list$SNP)|duplicated(list$SNP, fromLast=TRUE),] #Extract duplicate records in dataframe
+list4 <- arrange(list4, SNP, Plot) #order/arrange list first by SNP then Plot
+
+  
+similar.region(list, 100000) # run function ; individual lists for each chromosome of snps that are within a designated range of each other, but not the exact same position 
+qtl.comparison(list, 100000, order=TRUE, space=TRUE) # run function ; one list (qtl_list) of snps that were exact matches and snps that were within a designated range of each other, order: default is FALSE, will order the output table by chromosome
+
+#save table
+write.csv(qtl_list, here('data','Final_Files','SigMarkers_close_together_2025_100000.csv'))
+```
+
