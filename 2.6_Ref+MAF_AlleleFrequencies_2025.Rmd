@@ -1,0 +1,344 @@
+---
+title: "2.6_Ref+MAF+AlleleFrequencies_2025.Rmd"
+author: "Leah Treffer"
+date: "2025-12-10"
+output: html_document
+---
+
+```{r}
+library(here)
+knitr::opts_knit$set(root.dir = here::here())
+here::i_am("2.6_Ref+MAF+AlleleFrequencies_2025.Rmd")
+```
+
+```{r include=FALSE}
+require(reshape2)
+library(tidyr)
+library(stringr)
+library(dplyr)
+library(data.table)
+install.packages("gplots")
+install.packages("scatterplot3d") #The downloaded link at: http://cran.r-project.org/package=scatterplot3d
+library(bigmemory)
+```
+
+Look at only traits with significant SNPs and add ref+alleles to these trait tables
+
+Reference allele was computed using Bedtools on beocat: 
+% module load BEDTools #load module BEDTools/2.29.1-GCC-8.3.0 
+% bedtools getfasta -fi /homes/jcrain/IWG/Thinopyrum_intermedium_V3_release/Thinopyrum_intermedium/sequences/Thinopyrum_intermedium.fasta -bed BedTools_Reference.bed -tab -name -fo FHB_Reference_Allele.bed 
+
+```{r}
+#Add Ref and Alleles to table
+refall <- read.table(here("data","Original_Files","FHB_Reference_Allele.bed"),header = FALSE, sep="\t",stringsAsFactors=FALSE, quote="") #load reference list 
+colnames(refall)[1] <- "rs" #rename snp column to rs to match hapmap format
+
+hapmap <- read.table(here('data','Original_Files','FHB_Imputed.hmp.txt'), header = TRUE, check.names = FALSE)
+hm <- hapmap[,c(1:4)] #get snp block  
+colnames(hm)[1] <- "SNP"
+
+rs <- as.data.frame(gsub("\\:.*","",refall$rs)) #remove characters after the snp: section 
+colnames(rs)[1] <- "SNP" #rename snp column to rs to match hapmap format
+rs <- cbind(refall, rs) #combine the snp block to the map block
+rs <- rs[,c(3,2)] #reorder
+colnames(rs)[2] <- "Ref" #rename 
+hmm <- merge(rs, hm, by="SNP", all=TRUE) #merge files
+
+rm(hm)
+```
+
+Add Reference and Alt alleles to sig loci list
+
+```{r separatePheno}
+#Use list of Significant SNPs
+#get traits that had significant p.values
+trait <- read.csv(here('data','Intermediate_Files','SigLocilist_2025.csv'), head=TRUE)
+
+# merge
+addAllele <- merge(trait, hmm[,c(1:3)], by="SNP")
+```
+
+Use geno files and Ref Allele list retrieved from jcrain beocat to determine which allele is major and minor in numeric format geno file 
+
+```{r}
+geno <- read.table(here(file = 'data','Original_Files','FHB_for_GS_GWAS.txt'), header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls, slow
+
+plants <- read.csv(here(file = 'data','Original_Files','plants.csv')) #load ID list
+plantC07 <- plants[str_detect((plants$source_id), "17SGH"),] #keep only data from one population
+plantC10 <- plants[str_detect((plants$source_id), "20SGH"),] #keep only data from one population
+plantC10SAL <- plants[str_detect((plants$experiment_id), "20_SAL"),] #keep only data from one site
+plantC10SAL <- plantC10SAL[str_detect((plantC10SAL$source_id), "20SGH"),] #keep only data from one site
+plantC10OLA <- plantC10[str_detect((plantC10$experiment_id), "20_OLA"),] #keep only data from one site
+```
+
+```{r}
+#Reference Alleles
+#make table of snp, ref, and alleles 
+rss <- hmm[,c(1:3)]
+
+#Hapmap remove unnecessary columns, get just C7s
+hapm <- hapmap[,c(1,12:ncol(hapmap))]
+hh <- hapm[,c(2:ncol(hapm))]
+a <- hapm[,c(1)]
+
+#get map block for just C7 population
+hh07 <- hh[ , grep("17SGH", colnames(hh))] 
+#get map block for just C10 population 
+pSAL <- c(na.omit(unique(plantC10SAL$source_id))) #in C10 pop, get only one site
+names.useS <- names(hh)[(names(hh) %in% pSAL)] # make list of names from p that are in hh
+hh10S <- hh[, names.useS] #subset
+pOLA <- c(na.omit(unique(plantC10OLA$source_id))) #in C10 pop, get only one site
+names.useO <- names(hh)[(names(hh) %in% pOLA)] # make list of names from p that are in hh
+hh10O <- hh[, names.useO] #subset
+
+hpmp07 <- cbind(a, hh07) #combine the snp block to the map block
+rownames(hpmp07) <- hpmp07$a #make first column into row names
+hpmp07 <- hpmp07[,-1] #remove first column 
+
+hpmp10S <- cbind(a, hh10S) #combine the snp block to the map block
+rownames(hpmp10S) <- hpmp10S$a #make first column into row names
+hpmp10S <- hpmp10S[,-1] #remove first column 
+hpmp10O <- cbind(a, hh10O) #combine the snp block to the map block
+rownames(hpmp10O) <- hpmp10O$a #make first column into row names
+hpmp10O <- hpmp10O[,-1] #remove first column 
+
+#Get hapmap in same orientation as geno file
+#get just the SNPs that are in our QTL set, this will reduce the size of files 
+trait7 <- trait[str_detect((trait$plot),"C07"),]
+trait10S <- trait[str_detect((trait$plot), "C10_SAL"),]
+trait10O <- trait[str_detect((trait$plot), "C10_OLA"),]
+list7 <- unique(trait7$SNP) #remove duplicate snps so each is unique 
+list10S <- unique(trait10S$SNP) #remove duplicate snps so each is unique 
+list10O <- unique(trait10O$SNP) #remove duplicate snps so each is unique 
+
+#C07 genotype list
+g <- as.data.frame(rownames(geno))
+#C10 genotype lists
+g10S <- geno[rownames(geno) %in% pSAL, ]
+g10S <- as.data.frame(rownames(g10S))
+g10O <- geno[rownames(geno) %in% pOLA, ]
+g10O <- as.data.frame(rownames(g10O))
+
+colnames(g)[1] <- "taxa"
+colnames(g10S)[1] <- "taxa"
+colnames(g10O)[1] <- "taxa"
+
+
+#C07
+#loop through each significant snp that is in our QTL list into it's own row, transpose, and put table back together by merging 
+for (j in list7){ 
+  row <- hpmp07[j,]
+  data2 <- tibble::rownames_to_column(row, "row_names") #convert row names into first column of data
+  data2 <- rbind(colnames(data2), data2) #make copy of header columns and adds them as the first row
+  colnames(data2) <- paste0('V', seq_len(ncol(data2))) #changes header to 'V1..'
+  data2 <- as.data.frame(t(data2)) # flip table 
+  colnames(data2) <- data2[1, ] #make first row into header
+  data2 = data2[-1,] #remove first row
+  colnames(data2)[1] <- "taxa" 
+  g <- merge(data2, g, by="taxa", all=TRUE) #merge files
+}
+
+#clean up
+rm(data2, row)
+
+#C10 SAL
+#loop each snp that is in our QTL list into it's own row, transpose, and put table back together by merging 
+for (j in list10S){ 
+  row <- hpmp10S[j,]
+  data2 <- tibble::rownames_to_column(row, "row_names") #convert row names into first column of data
+  data2 <- rbind(colnames(data2), data2) #make copy of header columns and adds them as the first row
+  colnames(data2) <- paste0('V', seq_len(ncol(data2))) #changes header to 'V1..'
+  data2 <- as.data.frame(t(data2)) # flip table 
+  colnames(data2) <- data2[1, ] #make first row into header
+  data2 = data2[-1,] #remove first row
+  colnames(data2)[1] <- "taxa" 
+  g10S <- merge(data2, g10S, by="taxa", all=TRUE) #merge files
+}
+
+#clean up
+rm(data2, row)
+
+#C10 OLA
+#loop each snp that is in our QTL list into it's own row, transpose, and put table back together by merging 
+for (j in list10O){ 
+  row <- hpmp10O[j,]
+  data2 <- tibble::rownames_to_column(row, "row_names") #convert row names into first column of data
+  data2 <- rbind(colnames(data2), data2) #make copy of header columns and adds them as the first row
+  colnames(data2) <- paste0('V', seq_len(ncol(data2))) #changes header to 'V1..'
+  data2 <- as.data.frame(t(data2)) # flip table 
+  colnames(data2) <- data2[1, ] #make first row into header
+  data2 = data2[-1,] #remove first row
+  colnames(data2)[1] <- "taxa" 
+  g10O <- merge(data2, g10O, by="taxa", all=TRUE) #merge files
+}
+
+#clean up
+rm(data2, row)
+```
+
+```{r convert}
+#convert coded hapmap format to specific allele
+#Genotype:Code
+## AA:A
+## CC:C
+## GG:G
+## TT:T
+## AG:R
+## CT:Y
+## CG:S
+## AT:W
+## GT:K
+## AC:M
+## missing:N
+
+#replace one letter code with the genotype 
+g[g == "A"] <- "AA" #replace
+g[g == "C"] <- "CC" #replace
+g[g == "G"] <- "GG" #replace
+g[g == "T"] <- "TT" #replace
+g[g == "R"] <- "AG" #replace
+g[g == "Y"] <- "CT" #replace
+g[g == "S"] <- "CG" #replace
+g[g == "W"] <- "AT" #replace
+g[g == "K"] <- "GT" #replace
+g[g == "M"] <- "AC" #replace
+g[g == "N"] <- "NN" #replace
+#replace one letter code with the genotype 
+g10S[g10S == "A"] <- "AA" #replace
+g10S[g10S == "C"] <- "CC" #replace
+g10S[g10S == "G"] <- "GG" #replace
+g10S[g10S == "T"] <- "TT" #replace
+g10S[g10S == "R"] <- "AG" #replace
+g10S[g10S == "Y"] <- "CT" #replace
+g10S[g10S == "S"] <- "CG" #replace
+g10S[g10S == "W"] <- "AT" #replace
+g10S[g10S == "K"] <- "GT" #replace
+g10S[g10S == "M"] <- "AC" #replace
+g10S[g10S == "N"] <- "NN" #replace
+#replace one letter code with the genotype 
+g10O[g10O == "A"] <- "AA" #replace
+g10O[g10O == "C"] <- "CC" #replace
+g10O[g10O == "G"] <- "GG" #replace
+g10O[g10O == "T"] <- "TT" #replace
+g10O[g10O == "R"] <- "AG" #replace
+g10O[g10O == "Y"] <- "CT" #replace
+g10O[g10O == "S"] <- "CG" #replace
+g10O[g10O == "W"] <- "AT" #replace
+g10O[g10O == "K"] <- "GT" #replace
+g10O[g10O == "M"] <- "AC" #replace
+g10O[g10O == "N"] <- "NN" #replace
+```
+
+```{r}
+#find what allele is major for each SNP
+
+# add populations to a list
+test <- list(g, g10S, g10O)
+names(test) <- c('C07', 'C10SAL', 'C10OLA') #rename list
+
+# loop through each population to find major allele based on allele summaries
+for(k in names(test)){
+  count <- test[[k]] #make copy of test to work with 
+  count <- as.data.frame(count)
+  rownames(count) <- count$taxa #make first column into row names
+  count <- count[,-1] #remove first column
+
+  #Table with count of each SNP's allele summary 
+  # compute unique levels in data frame
+  lvls <- unique(unlist(count))
+  # apply the summation per value 
+  freq <- sapply(count, 
+                 function(x) table(factor(x, levels = lvls, 
+                                         ordered = TRUE)))
+
+  #Table of SNPs, Reference, Alleles, and Frequencies 
+  freq2 <- as.data.frame(t(freq)) #transpose and change to dataframe
+  freq2 <- tibble::rownames_to_column(freq2, "rs") #convert row names into first column of data
+  colnames(rss)[1] <- "rs"
+  freq2 <- merge(freq2, rss, by="rs") #merge to add in ref allele 
+  freq2 <- freq2[,c(1,12,13,2:11)] #reorder
+
+  freq2$total <- rowSums(freq2[,c(4:13)]) #Total taxa with genotypes
+
+  #Genotype Frequency = AA / Total = (# of individuals with genotype) / (total individuals)
+  Genotypefrequency <- cbind(freq2,
+    fCT <- ((freq2$CT) / (freq2$total)),
+    fCC <- ((freq2$CC) / (freq2$total)),
+    fTT <- ((freq2$TT) / (freq2$total)),
+    fAT <- ((freq2$AT) / (freq2$total)),
+    fAA <- ((freq2$AA) / (freq2$total)),
+    fAG <- ((freq2$AG) / (freq2$total)),
+    fGG <- ((freq2$GG) / (freq2$total)),
+    fCG <- ((freq2$CG) / (freq2$total)),
+    fAC <- ((freq2$AC) / (freq2$total)),
+    fGT <- ((freq2$GT) / (freq2$total))
+  )
+  #change column names
+  colnames(Genotypefrequency)[15] <- "fCT"
+  colnames(Genotypefrequency)[16] <- "fCC"
+  colnames(Genotypefrequency)[17] <- "fTT"
+  colnames(Genotypefrequency)[18] <- "fAT"
+  colnames(Genotypefrequency)[19] <- "fAA"
+  colnames(Genotypefrequency)[20] <- "fAG"
+  colnames(Genotypefrequency)[21] <- "fGG"
+  colnames(Genotypefrequency)[22] <- "fCG"
+  colnames(Genotypefrequency)[23] <- "fAC"
+  colnames(Genotypefrequency)[24] <- "fGT"
+
+  #Allelic Frequency (AF)
+  #GF= genotype frequencies
+  GF <- Genotypefrequency #create copy with shorter name
+  #Allelic Frequency = genomic frequency of homozygous + 1/2 genomic frequency heterozygous for specific Base  
+  #AF= GF(XX) + 1/2GF(Xx) 
+  MAfrequency <- cbind(freq2,
+  fA <- ((GF$fAA + (GF$fAT / 2) + (GF$fAC / 2) + (GF$fAG / 2))),
+  fT <- ((GF$fTT + (GF$fAT / 2) + (GF$fCT / 2) + (GF$fGT / 2))),
+  fG <- ((GF$fGG + (GF$fAG / 2) + (GF$fCG / 2) + (GF$fGT / 2))),
+  fC <- ((GF$fCC + (GF$fCT / 2) + (GF$fAC / 2) + (GF$fCG / 2)))
+  )
+  #change column names
+  colnames(MAfrequency)[15] <- "A"
+  colnames(MAfrequency)[16] <- "T"
+  colnames(MAfrequency)[17] <- "G"
+  colnames(MAfrequency)[18] <- "C"
+
+  freqs <- merge(Genotypefrequency,MAfrequency[,c(1,15:18)], by="rs")
+  colnames(freqs)[1] <- "SNP"
+  colnames(freqs)[15] <- "genotypic_frequency CT"
+  colnames(freqs)[16] <- "genotypic_frequency CC"
+  colnames(freqs)[17] <- "genotypic_frequency TT"
+  colnames(freqs)[18] <- "genotypic_frequency AT"
+  colnames(freqs)[19] <- "genotypic_frequency AA"
+  colnames(freqs)[20] <- "genotypic_frequency AG"
+  colnames(freqs)[21] <- "genotypic_frequency GG"
+  colnames(freqs)[22] <- "genotypic_frequency CG"
+  colnames(freqs)[23] <- "genotypic_frequency AC"
+  colnames(freqs)[24] <- "genotypic_frequency GT"
+  colnames(freqs)[25] <- "allelic_frequency A"
+  colnames(freqs)[26] <- "allelic_frequency T"
+  colnames(freqs)[27] <- "allelic_frequency G"
+  colnames(freqs)[28] <- "allelic_frequency C"
+
+  name_freqs <- paste0(k,"_Frequencies")
+  
+  assign(name_freqs, freqs) # save
+}
+
+rm(count,freq,freq2,freqs,Genotypefrequency,GF,MAfrequency,lvls,j,fA,fAA,fAC,fAG,fAT,fC,fCC,fCG,fCT,fG,fGG,fGT,fT,fTT,test,rss,hh)
+```
+
+```{r}
+# output is C07_Freqnecies, C10SAL_Frequencies, C10OLA_Frequencies
+# how to save? 
+Frequency_table <- rbind(C07_Frequencies,C10OLA_Frequencies,C10SAL_Frequencies) #219 rows
+Ref_MAF_Freq <- merge(addAllele, Frequency_table[,c("SNP","GG","AG","AA","CG","CC","TT","GT","CT","AT","AC","genotypic_frequency CT","genotypic_frequency CC","genotypic_frequency TT","genotypic_frequency AT","genotypic_frequency AA","genotypic_frequency AG","genotypic_frequency GG","genotypic_frequency CG","genotypic_frequency AC","genotypic_frequency GT","allelic_frequency A","allelic_frequency T","allelic_frequency G","allelic_frequency C")], by="SNP")
+# merged table has 228 obs but the significant loci list has 226. Issue is SV02_452036252 has duplicate rows and two different frequencies for the same trait-plot. In the individual cycle's frequency tables, alleles have different frequencies between olathe and salina locations indicating the genotypes present at the two locations have different allele frequencies. 
+# issues is that the merge dosn't know this and copies both frequencies lists into the SNPS instead of matching to the specific trait-plot. 
+Ref_MAF_Freq <- Ref_MAF_Freq[-c(183,184),]
+```
+
+```{r}
+# save
+# write.csv(Ref_MAF_Freq, here('data','Intermediate_Files','SigLociAlleles_2025.csv'))
+```
+

@@ -59,7 +59,7 @@ sigtrait <- unique(SigMk$Trait) # list of traits with significant markers
 
 for (i in sigtrait){
   i = paste0(i)
-  temp <- SigMk[str_detect((SigMk$Trait), i),] #keep only data from one site
+  temp <- SigMk[str_detect((SigMk$Trait), i),] #keep only data from one trait
   
   xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
   

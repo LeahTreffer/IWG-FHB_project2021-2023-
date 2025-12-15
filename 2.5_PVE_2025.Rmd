@@ -53,7 +53,7 @@ rm(myY,myGD,Sig_Rslt,traits,list)
 
 # after running for all cycle-site-years
 
-write.table(listy, file= here("data","Intermediate_Files","SigMarkerlist_2025.txt"))
+# write.table(listy, file= here("data","Intermediate_Files","SigMarkerlist_2025.txt"))
 ```
 
 ############## Combine GAPIT PVE with Results ###########################
@@ -123,7 +123,7 @@ PVE_table <- PVE_table %>% arrange(trait,plot,SNP)
 
 ```{r}
 #save file
-write.csv(PVE_table, here('data','Intermediate_Files','SigLocilist_2025.csv'))
+# write.csv(PVE_table, here('data','Intermediate_Files','SigLocilist_2025.csv'))
 ```
 
 ############ significant markers within certain range of each other ############ 
@@ -151,6 +151,6 @@ similar.region(list, 100000) # run function ; individual lists for each chromoso
 qtl.comparison(list, 100000, order=TRUE, space=TRUE) # run function ; one list (qtl_list) of snps that were exact matches and snps that were within a designated range of each other, order: default is FALSE, will order the output table by chromosome
 
 #save table
-write.csv(qtl_list, here('data','Final_Files','SigMarkers_close_together_2025_100000.csv'))
+# write.csv(qtl_list, here('data','Final_Files','SigMarkers_close_together_2025_100000.csv'))
 ```
 

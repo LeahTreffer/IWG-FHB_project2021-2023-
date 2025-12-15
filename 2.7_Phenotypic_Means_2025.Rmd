@@ -1,0 +1,836 @@
+---
+title: "2.7_Phenotypic_Means_2025"
+author: "Leah Treffer"
+date: "2025-12-15"
+output: html_document
+---
+
+```{r}
+library(here)
+knitr::opts_knit$set(root.dir = here::here())
+here::i_am("2.7_Phenotypic_Means_2025.Rmd")
+```
+
+```{r libraries}
+install.packages("bindr")
+install.packages("purrr")
+library("purrr")
+library("stringr")
+library("dplyr")
+source(here("code","pheno_mean.R"))
+source(here("code","freqphenomean.R"))
+packages <- c("openxlsx", "readxl", "magrittr", "purrr", "ggplot2")
+if (!require(install.load)) {
+  install.packages("install.load")
+}
+install.load::install_load(packages)
+rm(packages)
+```
+
+Calculate Phenotypic Means and add to Summary table (read.csv(here('data','Intermediate_Files','SigLociAlleles_2025.csv')))
+
+## Phenotypic Mean of traits with Significant SNPs
+
+```{r}
+#All sig markers info:
+SigMkr <- read.csv(here('data','Intermediate_Files','SigLociAlleles_2025.csv'))
+SigMkr$trait <- sub("^FarmCPU\\.", "", SigMkr$trait)
+```
+
+# C07 2018
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C07_SAL_2018_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C07_SAL_2018_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C07_SAL_2018", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C07 2018: 
+# "SPKDEN"     "FHBDON"     "HDANG"      "STMANG"     "FHBD3G.DON" "SPKYLD"     "PTHT" 
+pheno_mean(SPKDEN,snp_SPKDEN,"mean_SPKDEN") #function
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(HDANG,snp_HDANG,"mean_HDANG") #function
+pheno_mean(STMANG,snp_STMANG,"mean_STMANG") #function
+pheno_mean(FHBD3G.DON,snp_FHBD3G.DON,"mean_FHBD3G.DON") #function
+pheno_mean(SPKYLD,snp_SPKYLD,"mean_SPKYLD") #function
+pheno_mean(PTHT,snp_PTHT,"mean_PTHT") #function
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"SPKDEN",mean_SPKDEN,"phenotypic_mean_SPKDEN") #function 
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"HDANG",mean_HDANG,"phenotypic_mean_HDANG") #function 
+freqphenomean(Frequencies,"STMANG",mean_STMANG,"phenotypic_mean_STMANG") #function 
+freqphenomean(Frequencies,"FHBD3G.DON",mean_FHBD3G.DON,"phenotypic_mean_FHBD3G.DON") #function 
+freqphenomean(Frequencies,"SPKYLD",mean_SPKYLD,"phenotypic_mean_SPKYLD") #function 
+freqphenomean(Frequencies,"PTHT",mean_PTHT,"phenotypic_mean_PTHT") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C07_2018 <- rbind(phenotypic_mean_SPKDEN, phenotypic_mean_FHBDON, phenotypic_mean_HDANG, phenotypic_mean_STMANG, phenotypic_mean_FHBD3G.DON, phenotypic_mean_SPKYLD, phenotypic_mean_PTHT)
+```
+
+```{r}
+# clean up
+rm(FHBD3G.DON,FHBDON,Frequencies,HDANG,mean_FHBD3G.DON,mean_FHBDON,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_STMANG,myGD,myY,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,PTHT,SigMk,SPKDEN,SPKYLD,STMANG, sigtrait, snp_FHBD3G.DON, snp_FHBDON, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_STMANG, traits, new, n)
+```
+
+# C07 2019
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C07_SAL_2019_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C07_SAL_2019_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C07_SAL_2019", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C07 2019: 
+# "FHBD3G.DON" "HDANG"      "ZDK"        "HSATIVLSEV" "FHBDON"     "GLBLSEV"    "FHBD3G" 
+pheno_mean(FHBD3G.DON,snp_FHBD3G.DON,"mean_FHBD3G.DON") #function
+pheno_mean(HDANG,snp_HDANG,"mean_HDANG") #function
+pheno_mean(ZDK,snp_ZDK,"mean_ZDK") #function
+pheno_mean(HSATIVLSEV,snp_HSATIVLSEV,"mean_HSATIVLSEV") #function
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(GLBLSEV,snp_GLBLSEV,"mean_GLBLSEV") #function
+pheno_mean(FHBD3G,snp_FHBD3G,"mean_FHBD3G") #function
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"FHBD3G.DON",mean_FHBD3G.DON,"phenotypic_mean_FHBD3G.DON") #function 
+freqphenomean(Frequencies,"HDANG",mean_HDANG,"phenotypic_mean_HDANG") #function 
+freqphenomean(Frequencies,"ZDK",mean_ZDK,"phenotypic_mean_ZDK") #function 
+freqphenomean(Frequencies,"HSATIVLSEV",mean_HSATIVLSEV,"phenotypic_mean_HSATIVLSEV") #function 
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"GLBLSEV",mean_GLBLSEV,"phenotypic_mean_GLBLSEV") #function 
+freqphenomean(Frequencies,"FHBD3G",mean_FHBD3G,"phenotypic_mean_FHBD3G") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C07_2019 <- rbind(phenotypic_mean_FHBD3G.DON, phenotypic_mean_HDANG, phenotypic_mean_ZDK, phenotypic_mean_HSATIVLSEV, phenotypic_mean_FHBDON, phenotypic_mean_GLBLSEV, phenotypic_mean_FHBD3G)
+```
+
+```{r}
+# clean up
+rm(FHBD3G.DON,FHBD3G,FHBDON,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_FHBD3G.DON,mean_FHBDON,mean_FHBD3G,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_STMANG,myGD,myY,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,SigMk,SPKDEN,SPKYLD,STMANG, sigtrait, snp_FHBD3G.DON, snp_FHBDON, snp_FHBD3G, snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+# C07 2020
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C07_SAL_2020_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C07_SAL_2020_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C07_SAL_2020", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C07 2020: 
+# "ERGSEV"     "SPKHD"      "STMANG"     "FHBDON"     "HSATIVLSEV" "HDANG" 
+pheno_mean(ERGSEV,snp_ERGSEV,"mean_ERGSEV") #function
+pheno_mean(SPKHD,snp_SPKHD,"mean_SPKHD") #function
+pheno_mean(STMANG,snp_STMANG,"mean_STMANG") #function
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(HSATIVLSEV,snp_HSATIVLSEV,"mean_HSATIVLSEV") #function
+pheno_mean(HDANG,snp_HDANG,"mean_HDANG") #function
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"ERGSEV",mean_ERGSEV,"phenotypic_mean_ERGSEV") #function 
+freqphenomean(Frequencies,"SPKHD",mean_SPKHD,"phenotypic_mean_SPKHD") #function 
+freqphenomean(Frequencies,"STMANG",mean_STMANG,"phenotypic_mean_STMANG") #function 
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"HSATIVLSEV",mean_HSATIVLSEV,"phenotypic_mean_HSATIVLSEV") #function 
+freqphenomean(Frequencies,"HDANG",mean_HDANG,"phenotypic_mean_HDANG") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C07_2020 <- rbind(phenotypic_mean_ERGSEV, phenotypic_mean_SPKHD, phenotypic_mean_STMANG, phenotypic_mean_FHBDON, phenotypic_mean_HSATIVLSEV, phenotypic_mean_HDANG)
+```
+
+```{r}
+# clean up
+rm(ERGSEV,FHBD3G.DON,FHBD3G,FHBDON,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_ERGSEV,mean_FHBD3G.DON,mean_FHBDON,mean_FHBD3G,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_SPKHD,mean_STMANG,myGD,myY,phenotypic_mean_ERGSEV,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKHD,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,SigMk,SPKDEN,SPKYLD,SPKHD,STMANG, sigtrait, snp_ERGSEV, snp_FHBD3G.DON, snp_FHBDON, snp_FHBD3G, snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_SPKHD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+# C10 OLA 2021
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C10_OLA_2021_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C10_OLA_2021_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C10_OLA_2021", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C10 OLA 2021: 
+# "FHBSPKINC" "FHBDON" 
+pheno_mean(FHBSPKINC,snp_FHBSPKINC,"mean_FHBSPKINC") #function
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"FHBSPKINC",mean_FHBSPKINC,"phenotypic_mean_FHBSPKINC") #function 
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C10_OLA_2021 <- rbind(phenotypic_mean_FHBSPKINC, phenotypic_mean_FHBDON)
+```
+
+```{r}
+# clean up
+rm(ERGSEV,FHBD3G.DON,FHBD3G,FHBDON,FHBSPKINC,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_ERGSEV,mean_FHBD3G.DON,mean_FHBDON,mean_FHBSPKINC,mean_FHBD3G,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_SPKHD,mean_STMANG,myGD,myY,phenotypic_mean_ERGSEV,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_FHBSPKINC,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKHD,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,SigMk,SPKDEN,SPKYLD,SPKHD,STMANG, sigtrait, snp_ERGSEV, snp_FHBD3G.DON, snp_FHBDON, snp_FHBD3G, snp_FHBSPKINC,snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_SPKHD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+# C10 OLA 2022
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C10_OLA_2022_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C10_OLA_2022_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C10_OLA_2022", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C10 OLA 2022: 
+# "FHBDON"     "FHBZEA"     "ZDK"        "HSATIVLSEV" "BLSSEV"     "FHBSPKINC"  "PTHT" 
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(FHBZEA,snp_FHBZEA,"mean_FHBZEA") #function
+pheno_mean(ZDK,snp_ZDK,"mean_ZDK") #function
+pheno_mean(HSATIVLSEV,snp_HSATIVLSEV,"mean_HSATIVLSEV") #function
+pheno_mean(BLSSEV,snp_BLSSEV,"mean_BLSSEV") #function
+pheno_mean(FHBSPKINC,snp_FHBSPKINC,"mean_FHBSPKINC") #function
+pheno_mean(PTHT,snp_PTHT,"mean_PTHT") #function
+
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"FHBZEA",mean_FHBZEA,"phenotypic_mean_FHBZEA") #function 
+freqphenomean(Frequencies,"ZDK",mean_ZDK,"phenotypic_mean_ZDK") #function 
+freqphenomean(Frequencies,"HSATIVLSEV",mean_HSATIVLSEV,"phenotypic_mean_HSATIVLSEV") #function 
+freqphenomean(Frequencies,"BLSSEV",mean_BLSSEV,"phenotypic_mean_BLSSEV") #function 
+freqphenomean(Frequencies,"FHBSPKINC",mean_FHBSPKINC,"phenotypic_mean_FHBSPKINC") #function 
+freqphenomean(Frequencies,"PTHT",mean_PTHT,"phenotypic_mean_PTHT") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C10_OLA_2022 <- rbind(phenotypic_mean_FHBDON, phenotypic_mean_FHBZEA, phenotypic_mean_ZDK, phenotypic_mean_HSATIVLSEV, phenotypic_mean_BLSSEV, phenotypic_mean_FHBSPKINC, phenotypic_mean_PTHT)
+```
+
+```{r}
+# clean up
+rm(BLSSEV,ERGSEV,FHBD3G.DON,FHBD3G,FHBDON,FHBZEA,FHBSPKINC,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_BLSSEV,mean_ERGSEV,mean_FHBD3G.DON,mean_FHBDON,mean_FHBSPKINC,mean_FHBD3G,mean_FHBZEA,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_SPKHD,mean_STMANG,myGD,myY,phenotypic_mean_BLSSEV,phenotypic_mean_ERGSEV,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_FHBZEA,phenotypic_mean_FHBSPKINC,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKHD,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,PTHT,SigMk,SPKDEN,SPKYLD,SPKHD,STMANG, sigtrait, snp_BLSSEV,snp_ERGSEV, snp_FHBD3G.DON, snp_FHBDON, snp_FHBZEA,snp_FHBD3G, snp_FHBSPKINC,snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_SPKHD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+# C10 SAL 2021
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C10_SAL_2021_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C10_SAL_2021_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C10_SAL_2021", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C10 SAL 2021: 
+# "FHBDON"  "GLBLSEV" "PTHT"    "ZDK" 
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(GLBLSEV,snp_GLBLSEV,"mean_GLBLSEV") #function
+pheno_mean(PTHT,snp_PTHT,"mean_PTHT") #function
+pheno_mean(ZDK,snp_ZDK,"mean_ZDK") #function
+
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"GLBLSEV",mean_GLBLSEV,"phenotypic_mean_GLBLSEV") #function 
+freqphenomean(Frequencies,"PTHT",mean_PTHT,"phenotypic_mean_PTHT") #function 
+freqphenomean(Frequencies,"ZDK",mean_ZDK,"phenotypic_mean_ZDK") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C10_SAL_2021 <- rbind(phenotypic_mean_FHBDON, phenotypic_mean_GLBLSEV, phenotypic_mean_PTHT, phenotypic_mean_ZDK)
+```
+
+```{r}
+# clean up
+rm(BLSSEV,ERGSEV,FHBD3G.DON,FHBD3G,FHBDON,FHBZEA,FHBSPKINC,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_BLSSEV,mean_ERGSEV,mean_FHBD3G.DON,mean_FHBDON,mean_FHBSPKINC,mean_FHBD3G,mean_FHBZEA,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_SPKHD,mean_STMANG,myGD,myY,phenotypic_mean_BLSSEV,phenotypic_mean_ERGSEV,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_FHBZEA,phenotypic_mean_FHBSPKINC,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKHD,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,PTHT,SigMk,SPKDEN,SPKYLD,SPKHD,STMANG, sigtrait, snp_BLSSEV,snp_ERGSEV, snp_FHBD3G.DON, snp_FHBDON, snp_FHBZEA,snp_FHBD3G, snp_FHBSPKINC,snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_SPKHD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+# C10 SAL 2022
+
+```{r Set_Up}
+myY <- read.table(here('data','Intermediate_Files','C10_SAL_2022_pheno.txt'), head = TRUE) 
+traits <- (colnames(myY[,c(2:ncol(myY))])) #make table of traits
+
+myGD <- read.delim(here('data','Intermediate_Files','C10_SAL_2022_numeric.txt'), head=TRUE)
+new <- myGD  #make copy to work with
+
+n <- t(new)
+colnames(n) <- n[1, ] #make first row into header
+n = n[-1,] #remove first row
+n <- as.data.frame(n) #must be dataframe to semi_join
+n <- tibble::rownames_to_column(n, "SNP") #convert row names into first column of data
+
+#For sig markers for each trait within site-year:
+SigMk <- SigMkr[SigMkr$plot == "C10_SAL_2022", ]
+```
+
+```{r}
+#shouldn't need to change anything, just run
+# makes list/string of significant SNPs for each trait 
+
+sigtrait <- unique(SigMk$trait) # list of traits with significant markers
+
+for (i in sigtrait){
+  i = paste0(i)
+  temp <- SigMk[SigMk$trait == i, ] #keep only data from one trait
+  
+  xx <- as.numeric(nrow(temp)) # count number of rows (markers) for given trait 
+  
+  if (xx > 1){
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab <-  tab[-1,] #remove first row
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  } else {
+  tab <- semi_join(n, temp, by="SNP")
+  tab <- as.data.frame(t(tab)) #transpose
+  colnames(tab) <- tab[1, ] #make first row into header
+  tab$EMPTY <- "NA" #create empty column to keep table from being converted to list since it is only one column 
+  tab <- tab[-1,] #remove first row
+  tab$EMPTY = NULL #delete column from data.frame
+  tab <- tibble::rownames_to_column(tab, "taxa") #convert row names into first column of data
+  
+  #Create pheno table for trait
+  tbl <- merge(myY[,c("taxa",i)], tab, by="taxa") #merge
+  
+  table_name <- paste0(i)
+  snp_name <- paste0('snp_',i)
+  
+  assign(paste0(table_name), tbl) #assign the table the trait name of i 
+  assign(paste0(snp_name), temp$SNP)
+  }
+
+}
+
+rm(xx,i,temp,tab,tbl,table_name,snp_name)
+```
+
+```{r}
+#run pheno_mean function to get table of phenotypic mean values for each allele state by trait
+print(sigtrait) #change inputs to function for each of these traits
+# C10 SAL 2022: 
+# "FHBDON"     "HSATIVLSEV" "FHBZEA"     "BLSSEV"     "ZDK"
+pheno_mean(FHBDON,snp_FHBDON,"mean_FHBDON") #function
+pheno_mean(HSATIVLSEV,snp_HSATIVLSEV,"mean_HSATIVLSEV") #function
+pheno_mean(FHBZEA,snp_FHBZEA,"mean_FHBZEA") #function
+pheno_mean(BLSSEV,snp_BLSSEV,"mean_BLSSEV") #function
+pheno_mean(ZDK,snp_ZDK,"mean_ZDK") #function
+```
+
+Add information about Major Allele to the Phenotypic Mean table
+
+```{r warning=FALSE, include=FALSE}
+#add ref and allele columns then also find and include which of those alleles is minor (0) and major (2)
+
+Frequencies <- SigMk # create copy to work with
+#remove random X columns 
+Frequencies <- Frequencies[,c(2,4:ncol(Frequencies))]
+
+print(sigtrait) #change inputs to function for each of these traits
+
+options(warn = -1) #ignore warning messages
+freqphenomean(Frequencies,"FHBDON",mean_FHBDON,"phenotypic_mean_FHBDON") #function 
+freqphenomean(Frequencies,"HSATIVLSEV",mean_HSATIVLSEV,"phenotypic_mean_HSATIVLSEV") #function 
+freqphenomean(Frequencies,"FHBZEA",mean_FHBZEA,"phenotypic_mean_FHBZEA") #function 
+freqphenomean(Frequencies,"BLSSEV",mean_BLSSEV,"phenotypic_mean_BLSSEV") #function 
+freqphenomean(Frequencies,"ZDK",mean_ZDK,"phenotypic_mean_ZDK") #function 
+options(warn = 0) #return warning behavior to default
+```
+
+```{r}
+PHENO_MEAN_C10_SAL_2022 <- rbind(phenotypic_mean_FHBDON, phenotypic_mean_HSATIVLSEV, phenotypic_mean_FHBZEA, phenotypic_mean_BLSSEV, phenotypic_mean_ZDK)
+```
+
+```{r}
+# clean up
+rm(BLSSEV,ERGSEV,FHBD3G.DON,FHBD3G,FHBDON,FHBZEA,FHBSPKINC,Frequencies,GLBLSEV,HSATIVLSEV,HDANG,mean_BLSSEV,mean_ERGSEV,mean_FHBD3G.DON,mean_FHBDON,mean_FHBSPKINC,mean_FHBD3G,mean_FHBZEA,mean_GLBLSEV,mean_HSATIVLSEV,mean_ZDK,mean_HDANG,mean_PTHT,mean_SPKDEN,mean_SPKYLD,mean_SPKHD,mean_STMANG,myGD,myY,phenotypic_mean_BLSSEV,phenotypic_mean_ERGSEV,phenotypic_mean_FHBD3G.DON,phenotypic_mean_FHBDON,phenotypic_mean_FHBD3G,phenotypic_mean_FHBZEA,phenotypic_mean_FHBSPKINC,phenotypic_mean_GLBLSEV,phenotypic_mean_HSATIVLSEV,phenotypic_mean_ZDK,ZDK,phenotypic_mean_HDANG,phenotypic_mean_PTHT,phenotypic_mean_SPKDEN,phenotypic_mean_SPKHD,phenotypic_mean_SPKYLD,phenotypic_mean_STMANG,PTHT,SigMk,SPKDEN,SPKYLD,SPKHD,STMANG, sigtrait, snp_BLSSEV,snp_ERGSEV, snp_FHBD3G.DON, snp_FHBDON, snp_FHBZEA,snp_FHBD3G, snp_FHBSPKINC,snp_GLBLSEV, snp_HSATIVLSEV, snp_HDANG, snp_PTHT, snp_SPKDEN, snp_SPKYLD, snp_SPKHD, snp_STMANG, snp_ZDK, traits, new, n)
+```
+
+
+# Make full table
+
+```{r}
+PHENO_MEAN <- rbind(PHENO_MEAN_C07_2018, PHENO_MEAN_C07_2019, PHENO_MEAN_C07_2020, PHENO_MEAN_C10_OLA_2021, PHENO_MEAN_C10_OLA_2022, PHENO_MEAN_C10_SAL_2021, PHENO_MEAN_C10_SAL_2022)
+
+# write.csv(PHENO_MEAN, here('data','Final_Files','SigMarkers_Summary.csv'))
+```
+
+
+
+
