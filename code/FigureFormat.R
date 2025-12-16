@@ -4,16 +4,24 @@ library(readxl)
 library(officer)
 
 Figure_3 <- read_excel("data/Intermediate_Files/Figure 3_Sig Loci.xlsx", 
-                       sheet = "Table 1")
+                       sheet = "Table 2")
 colnames(Figure_3)[6] <- "PVAL"
+Figure_3$PVAL <- as.numeric(Figure_3$PVAL)
+Figure_3$MAF <- as.numeric(Figure_3$MAF)
+Figure_3$Effect <- as.numeric(Figure_3$Effect)
+Figure_3$PVE <- as.numeric(Figure_3$PVE)
+
 Figure_3$p.value <- formatC(Figure_3$PVAL, format = "e", digits = 3)
 Figure_3$MAF <- formatC(Figure_3$MAF, digits = 4)
 Figure_3$PVE <- formatC(Figure_3$PVE, digits = 6)
 Figure_3$Effect <- formatC(Figure_3$Effect, digits = 6)
-Figure_3$`NCBI Per.Ident` <- as.numeric(Figure_3$`NCBI Per.Ident`)
+
+#Figure_3$`NCBI Per.Ident` <- as.numeric(Figure_3$`NCBI Per.Ident`)
 Figure_3$`NCBI Per.Ident` <- as.character(Figure_3$`NCBI Per.Ident`)
-Figure_3[c(1:2,9:10), 12:14] <- "No Significant Hits"
-Figure_3[1:2, 10:11] <- "No Proximal IWG Genes"
+Figure_3$`NCBI Query` <- as.character(Figure_3$`NCBI Query`)
+
+Figure_3[c(1:6,9,12), 12:14] <- "No Significant Hits"
+Figure_3[1:7, 10:11] <- "No Proximal IWG Genes"
 Figure_3 <- Figure_3[,c(1:5,7,15,8:14)]
 
 myft <- flextable(Figure_3) 
@@ -38,25 +46,19 @@ myft <- flextable(Figure_3) %>%
   merge_at(
     i = 1:2, j = 5)%>%
   merge_at(
-    i = 1:2, j = 6)%>%
-  merge_at(
     i = 3:4, j = 4)%>%
   merge_at(
     i = 3:4, j = 5)%>%
-  merge_at(
-    i = 3:4, j = 6)%>%
   merge_at(
     i = 5:6, j = 4)%>%
   merge_at(
     i = 5:6, j = 5)%>%
   merge_at(
-    i = 5:6, j = 6)%>%
-  merge_at(
-    i = 1:8, j = 10:11)%>%
+    i = 1:7, j = 10:11)%>%
   #merge_at(
     #i = 1:8, j = 11)%>%
   merge_at(
-    i = 1:8, j = 12:14)%>%
+    i = 1:6, j = 12:14)%>%
   #merge_at(
     #i = 1:8, j = 13)%>%
   #merge_at(
@@ -64,29 +66,39 @@ myft <- flextable(Figure_3) %>%
   merge_at(
     i = 9, j=12:14)%>%
   merge_at(
-    i = 10, j=12:14)%>%
-  merge_at(
-    i = 12:13, j = 1) %>%
-  merge_at(
-    i = 12:13, j = 3) %>%
-  merge_at(
-    i = 12:13, j = 4) %>%
-  merge_at(
-    i = 12:13, j = 5) %>%
-  merge_at(
-    i = 12:13, j = 6) %>%
-  merge_at(
-    i = 12:13, j = 10) %>%
-  merge_at(
-    i = 12:13, j = 11) %>%
-  merge_at(
-    i = 12:13, j = 12) %>%
-  merge_at(
-    i = 12:13, j = 13) %>%
-  merge_at(
-    i = 12:13, j = 14) %>%
-  align(j = 1:14, align = "left", part = "all") %>%  # Align headers to the left
-  padding(padding.top = 0, padding.bottom = 0, padding.left = 2.5, padding.right=0,part = "all")%>%
+    i = 12, j=12:14)%>%
+  #merge_at(
+   # i = 12:13, j = 1) %>%
+  #merge_at(
+   # i = 12:13, j = 3) %>%
+  #merge_at(
+   # i = 12:13, j = 4) %>%
+  #merge_at(
+   # i = 12:13, j = 5) %>%
+  #merge_at(
+   # i = 12:13, j = 6) %>%
+  #merge_at(
+   # i = 12:13, j = 10) %>%
+  #merge_at(
+   # i = 12:13, j = 11) %>%
+  #merge_at(
+   # i = 12:13, j = 12) %>%
+  #merge_at(
+   # i = 12:13, j = 13) %>%
+  #merge_at(
+   # i = 12:13, j = 14) %>%
+  border(
+    border.left = fp_border(width = 1),
+    part = "all"
+  ) %>%
+  align(j = 1:14, align = "left", part = "all") %>%
+  padding(
+    padding.top = 0,
+    padding.bottom = 0,
+    padding.left = 2.5,
+    padding.right = 0,
+    part = "all"
+  )%>%
   plot
 #export as image 1450x550
 
