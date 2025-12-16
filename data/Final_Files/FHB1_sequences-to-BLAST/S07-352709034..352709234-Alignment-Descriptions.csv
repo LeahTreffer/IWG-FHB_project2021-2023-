@@ -1,0 +1,18 @@
+Description,Scientific Name,Max Score,Total Score,Query Cover,E value,Per. ident,Acc. Len,Accession  
+"PREDICTED: Triticum aestivum 50S ribosomal protein L24, chloroplastic (LOC123164951), mRNA",Triticum aestivum,320,320,100%,6e-86,96.02,875,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_044582570.1?report=genbank&log$=nucltop&blast_rank=1&RID=M1JYFPER014"",""XM_044582570.1"")"
+"PREDICTED: Triticum aestivum 50S ribosomal protein L24, chloroplastic (LOC123156051), mRNA",Triticum aestivum,315,315,100%,3e-84,94.15,912,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_044574219.1?report=genbank&log$=nucltop&blast_rank=2&RID=M1JYFPER014"",""XM_044574219.1"")"
+"PREDICTED: Triticum dicoccoides 50S ribosomal protein L24, chloroplastic-like (LOC119336573), mRNA",Triticum dicoccoides,315,315,100%,3e-84,94.15,912,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_037608620.1?report=genbank&log$=nucltop&blast_rank=3&RID=M1JYFPER014"",""XM_037608620.1"")"
+"PREDICTED: Triticum aestivum 50S ribosomal protein L24, chloroplastic (LOC123148951), mRNA",Triticum aestivum,304,304,100%,5e-81,93.14,860,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_044568477.1?report=genbank&log$=nucltop&blast_rank=4&RID=M1JYFPER014"",""XM_044568477.1"")"
+"PREDICTED: Triticum dicoccoides 50S ribosomal protein L24, chloroplastic-like (LOC119328731), mRNA",Triticum dicoccoides,304,304,100%,5e-81,93.14,913,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_037601706.1?report=genbank&log$=nucltop&blast_rank=5&RID=M1JYFPER014"",""XM_037601706.1"")"
+"Triticum aestivum cDNA, clone: WT003_B21, cultivar: Chinese Spring",Triticum aestivum,267,267,84%,1e-69,94.22,856,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/AK332088.1?report=genbank&log$=nucltop&blast_rank=6&RID=M1JYFPER014"",""AK332088.1"")"
+"Triticum aestivum mRNA, clone: tplb0010o19, cultivar Chinese Spring",Triticum aestivum,261,261,83%,5e-68,94.12,815,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/AK455932.1?report=genbank&log$=nucltop&blast_rank=7&RID=M1JYFPER014"",""AK455932.1"")"
+"PREDICTED: Hordeum vulgare subsp. vulgare 50S ribosomal protein L24, chloroplastic (LOC123407735), mRNA",Hordeum vulgare subsp. vulgare,226,226,100%,1e-57,85.17,901,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_045100935.1?report=genbank&log$=nucltop&blast_rank=8&RID=M1JYFPER014"",""XM_045100935.1"")"
+"Hordeum vulgare subsp. vulgare cDNA clone: FLbaf74f05, mRNA sequence",Hordeum vulgare subsp. vulgare,222,222,100%,4e-56,84.69,901,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/AK250479.1?report=genbank&log$=nucltop&blast_rank=9&RID=M1JYFPER014"",""AK250479.1"")"
+"Hordeum vulgare subsp. vulgare mRNA for predicted protein, complete cds, clone: NIASHv1100K16",Hordeum vulgare subsp. vulgare,214,214,98%,7e-54,84.39,824,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/AK359680.1?report=genbank&log$=nucltop&blast_rank=10&RID=M1JYFPER014"",""AK359680.1"")"
+"Hordeum vulgare subsp. vulgare mRNA for predicted protein, complete cds, clone: NIASHv1101J15",Hordeum vulgare subsp. vulgare,213,213,98%,2e-53,84.31,946,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/AK359723.1?report=genbank&log$=nucltop&blast_rank=11&RID=M1JYFPER014"",""AK359723.1"")"
+
+
+
+		
+
+

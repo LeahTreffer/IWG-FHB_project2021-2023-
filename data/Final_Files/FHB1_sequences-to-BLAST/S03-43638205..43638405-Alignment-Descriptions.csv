@@ -1,0 +1,15 @@
+Description,Scientific Name,Max Score,Total Score,Query Cover,E value,Per. ident,Acc. Len,Accession  
+"Triticum aestivum chromosome 3B-specific BAC library, contig ctg0954b",Triticum aestivum,239,239,88%,6e-61,91.01,3109948,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/FN564434.1?report=genbank&log$=nucltop&blast_rank=1&RID=M18UKJWH014"",""FN564434.1"")"
+"Triticum aestivum chromosome arm 3DS-specific BAC library, contig ctg447",Triticum aestivum,226,226,87%,5e-57,89.94,1264820,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/HE774676.1?report=genbank&log$=nucltop&blast_rank=2&RID=M18UKJWH014"",""HE774676.1"")"
+"PREDICTED: Triticum aestivum uncharacterized protein (LOC123073670), mRNA",Triticum aestivum,226,226,87%,5e-57,89.94,1275,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_044496730.1?report=genbank&log$=nucltop&blast_rank=3&RID=M18UKJWH014"",""XM_044496730.1"")"
+"PREDICTED: Triticum dicoccoides uncharacterized LOC119274192 (LOC119274192), mRNA",Triticum dicoccoides,198,198,79%,1e-48,89.31,885,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_037554856.1?report=genbank&log$=nucltop&blast_rank=4&RID=M18UKJWH014"",""XM_037554856.1"")"
+"PREDICTED: Triticum dicoccoides uncharacterized LOC119274357 (LOC119274357), mRNA",Triticum dicoccoides,180,180,81%,4e-43,86.55,2266,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_037555034.1?report=genbank&log$=nucltop&blast_rank=5&RID=M18UKJWH014"",""XM_037555034.1"")"
+"PREDICTED: Triticum aestivum putative pentatricopeptide repeat-containing protein At5g52630 (LOC123068239), transcript variant X3, misc_RNA",Triticum aestivum,180,180,81%,4e-43,86.55,4649,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XR_006431625.1?report=genbank&log$=nucltop&blast_rank=6&RID=M18UKJWH014"",""XR_006431625.1"")"
+"PREDICTED: Triticum aestivum putative pentatricopeptide repeat-containing protein At5g52630 (LOC123068239), transcript variant X2, misc_RNA",Triticum aestivum,180,180,81%,4e-43,86.55,4735,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XR_006431624.1?report=genbank&log$=nucltop&blast_rank=7&RID=M18UKJWH014"",""XR_006431624.1"")"
+"PREDICTED: Triticum aestivum uncharacterized protein (LOC123067142), mRNA",Triticum aestivum,178,178,80%,1e-42,86.47,903,"=HYPERLINK(""https://www.ncbi.nlm.nih.gov/nucleotide/XM_044490064.1?report=genbank&log$=nucltop&blast_rank=8&RID=M18UKJWH014"",""XM_044490064.1"")"
+
+
+
+		
+
+

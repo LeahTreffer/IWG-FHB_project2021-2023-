@@ -393,44 +393,30 @@ threshold$HPos <- threshold$Pos + 100
 
 threshold$Phytozome <- paste(threshold$Chr,":",threshold$LPos,"..",threshold$HPos)
 
-#### Then go to jBrowser and find this region
+#### Then go to jBrowser and find each region
+# https://phytozome-next.jgi.doe.gov/jbrowse/index.html?data=genomes%2FTintermedium_v3_1&loc=J03%3A51106461..51106610&tracks=Transcripts%2CAlt_Transcripts%2CPASA_assembly%2CBlatx_Grass%2CBlastx_protein%2CDNA%2Clifted%2CMapped%20Models%20From%20Tintermedium_v2_1%2CBlatx_BasalMonocot%2CBlatx_Dicots&highlight=
+  
+threshold$T.inter_Genes <- c("No IWG transcript", "Thint.S03G047000 (PAC:55872180)", "No IWG transcript", "Thint.S03G047000 (PAC:55872180)", "Thint.S03G047000 (PAC:55872180)", "Thint.J03G037000 (PAC:55768806)", "No IWG transcript", "Thint.S03G047000 (PAC:55872180)", "No IWG transcript", "Thint.J03G037000 (PAC:55768806)", "Thint.J03G037000 (PAC:55768806)")
+threshold$T.inter_Description <- c(" ", "SGNH hydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", " ", "SGNH hydrolase, Alpha-L-fucoside fucohydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", "SGNH hydrolase, Alpha-L-fucoside fucohydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", "SGNH hydrolase, Alpha-L-fucoside fucohydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", " ", "SGNH hydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", " ", "SGNH hydrolase, Alpha-L-fucoside fucohydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds", "SGNH hydrolase, Alpha-L-fucoside fucohydrolase, GDSL lipase/esterase; hydrolase activity, acting on ester bonds")
 
-threshold$T.inter_Genes <- c("NA", "Thintv31194873m.g", "NA", "Thintv31194873m.g", "Thintv31194873m.g", "Thintv31047566m.g", "NA", "Thintv31194873m.g", "NA", "Thintv31047566m.g", "Thintv31047566m.g")
-threshold$T.inter_Description <- c("NA", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "NA", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "NA", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "NA", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN", "Alpha-L-fucosidase ; GDSL-like Lipase/Acylhydrolase ; ZINC FINGER FYVE DOMAIN CONTAINING PROTEIN")
+# download the reference sequence for those regions
+# BLAST to : T. aestivum (taxa id: 4565), T. dicoccoides (85692), H. vulgare (4513). Hits with query cover >80% were considered significant.  
+# Download Description Table (csv)
 
-threshold$NCBI_Description <- c("uncharacterized ; putative pentatricopeptide repeat-containing protein", "Sumai Fhb1 genomic region", "NA", "Sumai Fhb1 genomic region", "Sumai Fhb1 genomic region", "NA", "uncharacterized ; putative pentatricopeptide repeat-containing protein", "Sumai Fhb1 genomic region", "NA", "NA", "NA")
-threshold$NCBI_Species <- c("T.aestivum", "T.aestivum", "NA", "T.aestivum", "T.aestivum", "NA", "T.aestivum", "T.aestivum", "NA", "NA", "NA")
-threshold$Query <- c("88% ; 80%", "89%", "NA", "74%", "74%", "NA", "88% ; 80%", "89%", "NA", "NA", "NA")
-threshold$Per.Ident <- c("91.01% ; 86.55%", "95%", "NA", "95.97%", "95.97%", "NA", "91.01% ; 86.55%", "95%", "NA", "NA", "NA")
-
-# NCBI BLAST
-
-threshold$NCBI_Description <- c("Sumai 3 FHB1 region genomic sequence", "eudesmanediol synthase-like transcript variant", "general transcription factor IIE subunit 2", "Sumai 3 FHB1 region genomic sequence", "E3 ubiquitin-protein ligase SINA", "E3 ubiquitin-protein ligase SINA", "E3 ubiquitin-protein ligase SINA", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "NA", "putative F-box protein", "F-box protein", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "putative pentatricopeptide repeat-containing protein", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence", "Sumai 3 FHB1 region genomic sequence")
-threshold$NCBI_Species <- c("T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "NA", "T.dicoccoides", "H.vulgarer subsp.vulgare", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "T.aestivum", "T.aestivum", "T.aestivum","T.aestivum")
-threshold$Query <- c("100%", "100%", "96%", "90%", "68%", "61%", "61%", "74%", "100%", "100%", "34%", "NA", "50%", "50%", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "80%", "89%", "74%", "96%")
-threshold$Per.Ident <- c("97.55%", "99%", "92.23%", "94.01", "97.83", "97.58%", "97.58%", "92%", "81.22%", "81.22%", "93.15%", "NA", "96.04%", "95.10%", "NA", "NA", "NA", "NA", "NA", "NA", "NA", "86.55%", "95%", "95.97%", "92.46%")
+threshold$NCBI_Description <- c("Triticum aestivum chromosome 3B-specific BAC library", "Sumai 3 Fhb1 region", "Triticum aestivum chromosome arm 3DS-specific BAC library", "Sumai 3 Fhb1 region", "Sumai 3 Fhb1 region", "Sumai 3 Fhb1 region", "Triticum aestivum chromosome 3B-specific BAC library", "Sumai 3 Fhb1 region", "Triticum aestivum chromosome arm 3DS-specific BAC library", "Sumai 3 Fhb1 region", "Sumai 3 Fhb1 region")
+threshold$NCBI_Species <- c("T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum", "T.aestivum")
+threshold$Query <- c("88", "90", "100", "74", "74", "100", "88", "90", "100", "100", "100")
+threshold$Per.Ident <- c("91.01", "95", "85.57", "95.97", "95.97", "92.17", "91.01", "95", "85.57", "92.17", "92.17")
 
 # write.csv(threshold, 'data/Final_Files/FHB1_sig.markers_adjusted_threshold.csv')
 
 ```
 
-```{r}
-# Another way to try looking for markers above threshold: 
-#combine lists of markers in region and then semi_join with all2018 to see if any are in both lists
-mega <- bind_rows(J03, V03, S03) #combind lists of each chro into long list
-colnames(mega)[1] <- "SNP" #rename marker as SNP
-try <- semi_join(all2018, mega, by="SNP") #return rows in all2018 that are in the mega list
-#sort by chr and visually look at P. values 
-try <- semi_join(all2019, mega, by="SNP") #return rows in all2018 that are in the mega list
-try <- semi_join(all2020, mega, by="SNP") #return rows in all2018 that are in the mega list
-
-rm(try)
-rm(mega)
-```
 
 ```{r clean_up}
 rm(threshold_0.05_O2022, threshold_0.05_O2021, threshold_0.05_S2022, threshold_0.05_S2021, threshold_0.05_2020, threshold_0.05_2019, threshold_0.05_2018, threshold_0.01_2018, threshold_0.01_2019, threshold_0.01_2020, threshold_0.01_O2021, threshold_0.01_O2022, threshold_0.01_S2021, threshold_0.01_S2022, threshold_0.10_2018, threshold_0.10_2019, threshold_0.10_2020, threshold_0.10_O2021, threshold_0.10_O2022, threshold_0.10_S2021, threshold_0.10_S2022)
 rm(all2018,all2019,all2020,allO2021,allO2022,allS2021,allS2022)
 rm(J03,V03,S03,GM)
+rm(`2022O_FHBDON`,`2022O_FHBZEA`,`2022S_FHBDON`,`2022S_FHBZEA`)
 ```
 
