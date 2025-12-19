@@ -6,25 +6,23 @@ editor_options:
   chunk_output_type: console
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
-
 # Objective
 
 Average number of markers per chromosome
 Range of number of markers for each chromosome 
 Principle Component Analysis
 
-```{r}
-rm(list=ls(all=TRUE))
-#set current working directory
-#setwd()
-#setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
-```
-
 ```{r include=FALSE}
 library(ggplot2)
+library(here)
+```
+
+```{r}
+knitr::opts_knit$set(root.dir = here::here())
+```
+
+```{r}
+here::i_am("0.5_Genotypic_Analysis.Rmd")
 ```
 
 ```{r load_data, include=FALSE}
@@ -35,7 +33,7 @@ library(ggplot2)
   # FHB_for_GS_GWAS.txt is the imputed (all data) calls changed to a -1, 0, 1 format 
   # FHB_Imputed.hmp.txt has the allele calls (A, C, G, T, etc.)
 
-FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+FHB_for_GS_GWAS <- read.table(file = here('data','Original_Files','FHB_for_GS_GWAS.txt'), header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
 #make a copy of master file to work with
 GENO <- FHB_for_GS_GWAS
 GENO <- GENO + 1 # change geno numeric format from -101 to 012
@@ -107,7 +105,7 @@ colnames(table2)[2] <- "number_of_markers"
 table2$SubGenome <- table2$Chromosome
 table2$SubGenome <- gsub("0.*", "",table2$SubGenome) #Remove 0 and all characters after
 
-write.csv(table2, "data/Final_Files/Markers_per_Chrom_Summary.csv", row.names = FALSE)
+# write.csv(table2, here("data","Final_Files","Markers_per_Chrom_Summary.csv"), row.names = FALSE)
 
 ```
 
@@ -142,7 +140,7 @@ p<-ggplot(table2, aes(x=Chromosome, y=`Number of Markers`, fill=SubGenome)) +
   geom_bar(stat="identity", show.legend = FALSE)+theme_minimal()
 p+scale_fill_manual(values=c("#332288", "#888888", "#6699CC")) 
 
-# Export as pdf : ~/data/Figures/Markers_per_Chromosome2.pdf
+# Export as pdf : ~/output/Figures/Markers_per_Chromosome2.pdf
 
 ```
 
@@ -164,7 +162,7 @@ sum_tab <- as.data.frame(sum_tab)
 colnames(sum_tab)[1] <- "Group"
 colnames(sum_tab)[2] <- "Count"
 
-write.csv(sum_tab, "data/Final_Files/Markers_Summary.csv", row.names = TRUE)
+# write.csv(sum_tab, here("data","Final_Files","Markers_Summary.csv"), row.names = TRUE)
 
 ```
 
