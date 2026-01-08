@@ -357,6 +357,183 @@ emmeans(model_FHBSPKINC, pairwise ~ Cycle) #estimates of the difference between 
 # C07 has a significantly higher FHBSPKINC value compared with C10 by 24.476 units (after controlling for Site)
 ```
 
+```{r}
+# anova table
+library(flextable)
+library(tibble)
+library(htmltools)
+
+aov.table.D3G.DON <- anova(model_D3G.DON)
+aov.table.FHBDISIND <- anova(model_FHBDISIND)
+aov.table.FHBDON <- anova(model_FHBDON)
+aov.table.FHBSPKINC <- anova(model_FHBSPKINC)
+
+table.D3G.DON = flextable(data = aov.table.D3G.DON %>%
+                    filter(`Pr(>F)` < 0.05) %>%
+                    mutate(`Pr(>F)` = formatC(`Pr(>F)`, format = "e", digits = 2)) %>% 
+                    select(`Pr(>F)`) %>%
+                    rownames_to_column(" ")) 
+table.D3G.DON<-bold(table.D3G.DON, bold = TRUE, part = "header")%>%autofit()
+
+table.FHBDISIND = flextable(data = aov.table.FHBDISIND %>%
+                    filter(`Pr(>F)` < 0.05) %>%
+                    mutate(`Pr(>F)` = formatC(`Pr(>F)`, format = "e", digits = 2)) %>% 
+                    select(`Pr(>F)`) %>%
+                    rownames_to_column(" ")) 
+table.FHBDISIND<- bold(table.FHBDISIND, bold = TRUE, part = "header")%>%autofit()
+
+table.FHBDON = flextable(data = aov.table.FHBDON %>%
+                    filter(`Pr(>F)` < 0.05) %>%
+                    mutate(`Pr(>F)` = formatC(`Pr(>F)`, format = "e", digits = 2)) %>% 
+                    select(`Pr(>F)`) %>%
+                    rownames_to_column(" ")) 
+table.FHBDON<- bold(table.FHBDON, bold = TRUE, part = "header")%>%autofit()
+
+table.FHBSPKINC = flextable(data = aov.table.FHBSPKINC %>%
+                    filter(`Pr(>F)` < 0.05) %>%
+                    mutate(`Pr(>F)` = formatC(`Pr(>F)`, format = "e", digits = 2)) %>% 
+                    select(`Pr(>F)`) %>%
+                    rownames_to_column(" ")) 
+table.FHBSPKINC <- bold(table.FHBSPKINC, bold = TRUE, part = "header")%>%autofit()
+
+
+
+browsable(
+  tagList(
+    tags$div(
+      style = "display: grid; grid-template-columns: 1fr 1fr; gap: 20px;",
+      htmltools_value(table.D3G.DON),
+      htmltools_value(table.FHBDISIND),
+      htmltools_value(table.FHBDON),
+      htmltools_value(table.FHBSPKINC)
+    )
+  )
+)
+
+
+browsable(
+  tags$div(
+    style = "
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.005px;
+    ",
+
+    tags$div(
+      tags$h4("FHBDISIND"),
+      htmltools_value(table.FHBDISIND)
+    ),
+
+    tags$div(
+      tags$h4("FHBSPKINC"),
+      htmltools_value(table.FHBSPKINC)
+    ), 
+    
+    tags$div(
+      tags$h4("FHBDON"),
+      htmltools_value(table.FHBDON)
+    ),
+
+    tags$div(
+      tags$h4("FHBD3G.DON"),
+      htmltools_value(table.D3G.DON)
+    )
+  )
+)
+```
+
+```{r}
+# estimated marginal means (emmeans) tables
+library(kableExtra)
+# Cycle only 
+emm <- emmeans(model_D3G.DON, list(pairwise~Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Cycle"]])
+sig_pairs <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBD3G.DON")%>%
+  select(Trait, `1`, estimate, p.value)
+rm(emm, pairs_df)
+emm <- emmeans(model_FHBDISIND, list(pairwise~Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBDISIND")%>%
+  select(Trait, `1`, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+emm <- emmeans(model_FHBDON, list(pairwise~Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBDON")%>%
+  select(Trait, `1`, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+emm <- emmeans(model_FHBSPKINC, list(pairwise~Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBSPKINC")%>%
+  select(Trait, `1`, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+
+sig_pairs <- sig_pairs %>% mutate(p.value = formatC(as.numeric(p.value), format = "e", digits = 2))%>%
+  rename(contrast = `1`)
+
+kbl(sig_pairs, digits= 2, caption = "Pairwise comparisons of Cycles") %>%
+  kable_classic(full_width = F, html_font = "Helvetica")
+
+
+# Time * Cycle 
+emm <- emmeans(model_D3G.DON, list(pairwise~Time|Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Time | Cycle"]])
+sig_pairs <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBD3G.DON")%>%
+  select(Trait, Cycle, contrast, estimate, p.value)
+rm(emm, pairs_df)
+emm <- emmeans(model_FHBDISIND, list(pairwise~Time|Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Time | Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBDISIND")%>%
+  select(Trait, Cycle, contrast, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+emm <- emmeans(model_FHBDON, list(pairwise~Time|Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Time | Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBDON")%>%
+  select(Trait, Cycle, contrast, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+emm <- emmeans(model_FHBSPKINC, list(pairwise~Time|Cycle), adjust='tukey')
+pairs_df <- as.data.frame(emm[["pairwise differences of Time | Cycle"]])
+pairs_df <- pairs_df %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)%>%
+  mutate(Trait = "FHBSPKINC")%>%
+  select(Trait, Cycle, contrast, estimate, p.value)
+sig_pairs <- rbind(sig_pairs,pairs_df)
+rm(emm,pairs_df)
+
+sig_pairs <- sig_pairs %>% mutate(p.value = formatC(as.numeric(p.value), format = "e", digits = 2))%>%
+  arrange(Trait, desc(Cycle))
+
+kbl(sig_pairs, digits= 2, caption = "Pairwise comparisons of Time within Cycle") %>%
+  kable_classic(full_width = F, html_font = "Helvetica")
+```
+
+
 # Population Structure 
 
 Reviewer Comment: The authors' explanation is insufficient. This requires much deeper investigation. For instance, were sensitivity analyses performed with different GWAS models, kinship matrices, or subsets of data? Could these represent strong linkage disequilibrium (LD) blocks containing major-effect genes, or are they statistical artifacts? 

@@ -188,6 +188,7 @@ difference_table_function <- function(data, Min_col = NULL, Max_col = NULL, Mean
       summarise(
         diff = abs(diff(value)),
         Station = STATION[which.max(value)],
+        variable = value_col,
         .groups = "drop"
       )
   }
@@ -243,7 +244,7 @@ MeanTemp_summary <- file %>%
          Min  = as.numeric(gsub("T|s", "", Min)),
          Max  = as.numeric(gsub("T|s", "", Max)),
          Mean = as.numeric(gsub("T|s", "", Mean))
-         ) %>%
+  ) %>%
   arrange(DATE, STATION)
 
 difference_table_function(
@@ -360,3 +361,285 @@ ttest_table_function(
 )
 
 
+
+# Is there differences between years
+# precipitation
+DailyPrecip_summary2 <- DailyPrecip_summary %>% 
+  mutate(
+    YEAR = substr(DATE, 1, 4),
+    YEARMONTH = substr(DATE, 1, 7)) %>%
+  group_by(YEAR, YEARMONTH, STATION) %>%
+  summarise(mean = mean(DailyPrecipitation))%>%
+  ungroup()
+
+# repeated measure anova
+library(lmerTest)
+library(lme4)
+library(emmeans)
+library(kableExtra)
+anova.model <- anova(lmer(mean ~ YEARMONTH + (1|STATION),data = DailyPrecip_summary2))
+anova.model
+
+
+# https://www.statology.org/repeated-measures-anova-in-r/
+aov_model <- aov(mean ~ factor(YEARMONTH) + Error(factor(STATION)), data = DailyPrecip_summary2)
+summary(aov_model)
+
+# https://www.r-bloggers.com/2025/02/one-way-repeated-measure-anova-in-r/
+model <- aov(formula = mean ~ YEARMONTH + Error(STATION/YEARMONTH), data = DailyPrecip_summary2)
+summary(model)
+pttest <- pairwise.t.test(x=DailyPrecip_summary2$mean,
+                          g = DailyPrecip_summary2$YEARMONTH,
+                          p.adjust.method = 'bonferroni')
+
+pub_table <- as.data.frame(as.table(pttest$p.value)) %>%
+  drop_na() %>%
+  rename(
+    Group_1 = Var1,
+    Group_2 = Var2,
+    P_value = Freq
+  ) %>%
+  mutate(
+    P_value = round(P_value, 4),
+    Significance = case_when(
+      P_value < 0.001 ~ "***",
+      P_value < 0.01  ~ "**",
+      P_value < 0.05  ~ "*",
+      TRUE ~ "ns"
+    )
+  )%>%filter(P_value < 0.05,
+             str_sub(Group_1, -2, -1) == str_sub(Group_2, -2, -1)
+  )
+
+library(gt)
+
+pub_table %>%
+  gt() %>%
+  tab_header(
+    title = "Pairwise t-test Results",
+    subtitle = "Bonferroni-adjusted p-values"
+  ) %>%
+  cols_label(
+    Group_1 = "Group 1",
+    Group_2 = "Group 2",
+    P_value = "Adjusted p-value",
+    Significance = "Significance"
+  ) %>%
+  fmt_number(
+    columns = P_value,
+    decimals = 4
+  ) %>%
+  tab_source_note(
+    source_note = "Significance codes: *** p < 0.001, ** p < 0.01, * p < 0.05"
+  )
+
+
+# temperature 
+DailyTemp_summary2 <- DailyAvTemp_summary %>% 
+  mutate(
+    YEAR = substr(DATE, 1, 4),
+    YEARMONTH = substr(DATE, 1, 7)) %>%
+  group_by(YEAR, YEARMONTH, STATION) %>%
+  summarise(mean = mean(DailyAvTemp))%>%
+  ungroup()
+
+model2 <- aov(formula = mean ~ YEARMONTH + Error(STATION/YEARMONTH), data = DailyTemp_summary2)
+summary(model2)
+pttest2 <- pairwise.t.test(x=DailyTemp_summary2$mean,
+                           g = DailyTemp_summary2$YEARMONTH,
+                           p.adjust.method = 'bonferroni')
+
+pub_table2 <- as.data.frame(as.table(pttest2$p.value)) %>%
+  drop_na() %>%
+  rename(
+    Group_1 = Var1,
+    Group_2 = Var2,
+    P_value = Freq
+  ) %>%
+  mutate(
+    P_value = round(P_value, 4),
+    Significance = case_when(
+      P_value < 0.001 ~ "***",
+      P_value < 0.01  ~ "**",
+      P_value < 0.05  ~ "*",
+      TRUE ~ "ns"
+    )
+  )%>%filter(P_value < 0.05,
+             str_sub(Group_1, -2, -1) == str_sub(Group_2, -2, -1)
+  )%>%
+  arrange(Group_1)
+
+pub_table2 %>%
+  gt() %>%
+  tab_header(
+    title = "Pairwise t-test Results",
+    subtitle = "Bonferroni-adjusted p-values"
+  ) %>%
+  cols_label(
+    Group_1 = "Group 1",
+    Group_2 = "Group 2",
+    P_value = "Adjusted p-value",
+    Significance = "Significance"
+  ) %>%
+  fmt_number(
+    columns = P_value,
+    decimals = 4
+  ) %>%
+  tab_source_note(
+    source_note = "Significance codes: *** p < 0.001, ** p < 0.01, * p < 0.05"
+  )
+
+
+
+
+# Sig differences in months of interest (comparing June, July, Aug to same month in each year)
+#Precipitation 
+#2020-08 2019-08 : 2019 > 2020
+#2021-07 2020-07 : 2020 > 2021
+
+#Temperature
+#2019-06 2018-06 : 2018 > 2019
+
+interest <- DailyPrecip_summary2[
+  DailyPrecip_summary2$YEARMONTH %in% c("2020-08", "2019-08"),
+]
+arrange(interest,YEARMONTH)
+
+interest <- DailyPrecip_summary2[
+  DailyPrecip_summary2$YEARMONTH %in% c("2021-07", "2020-07"),
+]
+arrange(interest,YEARMONTH)
+
+interest <- DailyTemp_summary2[
+  DailyTemp_summary2$YEARMONTH %in% c("2019-06","2018-06"),
+]
+arrange(interest,YEARMONTH)
+
+
+
+
+# Sig differences in June-Aug
+DailyPrecip_summary3 <- DailyPrecip_summary2 %>% 
+  filter(str_sub(YEARMONTH, -2, -1) %in% c("06", "07", "08"))%>%
+  group_by(YEAR, STATION) %>%
+  summarise(mean = mean(mean))%>%
+  ungroup()
+
+model3 <- aov(formula = mean ~ YEAR + Error(STATION/YEAR), data = DailyPrecip_summary3)
+summary(model3)
+# not significant (Pr(>F) = 0.0858)
+
+
+DailyTemp_summary3 <- DailyTemp_summary2 %>% 
+  filter(str_sub(YEARMONTH, -2, -1) %in% c("06", "07", "08"))%>%
+  group_by(YEAR, STATION) %>%
+  summarise(mean = mean(mean))%>%
+  ungroup()
+
+model4 <- aov(formula = mean ~ YEAR + Error(STATION/YEAR), data = DailyTemp_summary3)
+summary(model4)
+pttest4 <- pairwise.t.test(x=DailyTemp_summary3$mean,
+                           g = DailyTemp_summary3$YEAR,
+                           p.adjust.method = 'bonferroni')
+
+emm <- emmeans(model4, list(pairwise ~ YEAR), adjust = "tukey")
+
+pub_table4 <- as.data.frame(emm[["pairwise differences of YEAR"]]) %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)
+pub_table4
+
+# 2018- 2019 : 2018 > 2019
+# 2019 - 2022 : 2022 > 2019
+# 2019 - 2021 : 2021 > 2019
+
+interest <- DailyTemp_summary3[
+  DailyTemp_summary3$YEAR %in% c("2018","2019"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary3[
+  DailyTemp_summary3$YEAR %in% c("2019","2022"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary3[
+  DailyTemp_summary3$YEAR %in% c("2019","2021"),
+]
+arrange(interest,YEAR)
+
+
+
+
+# Sig differences in June-July
+DailyPrecip_summary4 <- DailyPrecip_summary2 %>% 
+  filter(str_sub(YEARMONTH, -2, -1) %in% c("06", "07"))%>%
+  group_by(YEAR, STATION) %>%
+  summarise(mean = mean(mean))%>%
+  ungroup()
+
+model5 <- aov(formula = mean ~ YEAR + Error(STATION/YEAR), data = DailyPrecip_summary4)
+summary(model5)
+# not significant (Pr(>F) = 0.0836)
+
+DailyTemp_summary4 <- DailyTemp_summary2 %>% 
+  filter(str_sub(YEARMONTH, -2, -1) %in% c("06", "07"))%>%
+  group_by(YEAR, STATION) %>%
+  summarise(mean = mean(mean))%>%
+  ungroup()
+
+model6 <- aov(formula = mean ~ YEAR + Error(STATION/YEAR), data = DailyTemp_summary4)
+summary(model6)
+pttest5 <- pairwise.t.test(x=DailyTemp_summary4$mean,
+                           g = DailyTemp_summary4$YEAR,
+                           p.adjust.method = 'bonferroni')
+
+emm <- emmeans(model6, list(pairwise ~ YEAR), adjust = "tukey")
+
+pub_table5 <- as.data.frame(emm[["pairwise differences of YEAR"]]) %>%
+  filter(p.value < 0.05) %>%
+  arrange(p.value)
+pub_table5
+
+# 2018 - 2019 : 2018 > 2019
+# 2019 - 2020 : 2020 > 2019
+# 2019 - 2022 : 2022 > 2019
+# 2018 - 2021 : 2018 > 2021
+# 2019 - 2021 : 2021 > 2019
+# 2018 - 2022 : 2018 > 2022
+# 2018 - 2020 : 2018 > 2020
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2018","2019"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2019","2020"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2019","2022"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2018","2021"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2019","2021"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2018","2022"),
+]
+arrange(interest,YEAR)
+
+interest <- DailyTemp_summary4[
+  DailyTemp_summary4$YEAR %in% c("2018","2020"),
+]
+arrange(interest,YEAR)
