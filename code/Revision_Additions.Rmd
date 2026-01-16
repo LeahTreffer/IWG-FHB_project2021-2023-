@@ -73,17 +73,18 @@ most genotypes aren’t repeated across sites so there was an issue where no pla
 ```{r H2}
 # FHBDISIND
 # C07 fit linear model using aov 
-C07_FHBDISIND <- pheno[str_detect(C07$trait_id, "FHBDISIND"),]
-model_C07_FHBDISIND <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBDISIND)
+C07_FHBDISIND <- C07[str_detect(C07$trait_id, "FHBDISIND"),]
+model_C07_FHBDISIND <- aov(phenotype_value ~ plant_id*Time, data=C07_FHBDISIND)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C07_FHBDISIND)[[1]] # extract summary stats
 # Estimate variance components
 MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
 MSg <- unname(MS["plant_id"])
-MSgl <- unname(MS["plant_id:Site"])
-# MSgl <- 0 # if plant_id:Site interaction is omited from model
+#MSgl <- unname(MS["plant_id:Site"])
+MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0 # if no residuals 
 # number of locations and years
 l <- nlevels(C07_FHBDISIND$Site)
 y <- nlevels(C07_FHBDISIND$Time)
@@ -96,7 +97,7 @@ H2_C07_FHBDISIND <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y)
 rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # C10 fit linear model using aov 
-C10_FHBDISIND <- pheno[str_detect(C10$trait_id, "FHBDISIND"),]
+C10_FHBDISIND <- C10[str_detect(C10$trait_id, "FHBDISIND"),]
 model_C10_FHBDISIND <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBDISIND)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C10_FHBDISIND)[[1]] # extract summary stats
@@ -106,7 +107,8 @@ MSg <- unname(MS["plant_id"])
 MSgl <- unname(MS["plant_id:Site"])
 # MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0 # if no residuals 
 # number of locations and years
 l <- nlevels(C10_FHBDISIND$Site)
 y <- nlevels(C10_FHBDISIND$Time)
@@ -143,17 +145,17 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # FHBSPKINC
 # C07 fit linear model using aov 
-C07_FHBSPKINC <- pheno[str_detect(C07$trait_id, "FHBSPKINC"),]
-model_C07_FHBSPKINC <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBSPKINC)
+C07_FHBSPKINC <- C07[str_detect(C07$trait_id, "FHBSPKINC"),]
+model_C07_FHBSPKINC <- aov(phenotype_value ~ plant_id*Time, data=C07_FHBSPKINC)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C07_FHBSPKINC)[[1]] # extract summary stats
 # Estimate variance components
 MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
 MSg <- unname(MS["plant_id"])
-MSgl <- unname(MS["plant_id:Site"])
-# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0
 # number of locations and years
 l <- nlevels(C07_FHBSPKINC$Site)
 y <- nlevels(C07_FHBSPKINC$Time)
@@ -166,7 +168,7 @@ H2_C07_FHBSPKINC <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y)
 rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # C10 fit linear model using aov 
-C10_FHBSPKINC <- pheno[str_detect(C10$trait_id, "FHBSPKINC"),]
+C10_FHBSPKINC <- C10[str_detect(C10$trait_id, "FHBSPKINC"),]
 model_C10_FHBSPKINC <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBSPKINC)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C10_FHBSPKINC)[[1]] # extract summary stats
@@ -176,7 +178,8 @@ MSg <- unname(MS["plant_id"])
 MSgl <- unname(MS["plant_id:Site"])
 # MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0
 # number of locations and years
 l <- nlevels(C10_FHBSPKINC$Site)
 y <- nlevels(C10_FHBSPKINC$Time)
@@ -190,17 +193,17 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # FHBDON
 # C07 fit linear model using aov 
-C07_FHBDON <- pheno[str_detect(C07$trait_id, "FHBDON"),]
-model_C07_FHBDON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBDON)
+C07_FHBDON <- C07[str_detect(C07$trait_id, "FHBDON"),]
+model_C07_FHBDON <- aov(phenotype_value ~ plant_id*Time, data=C07_FHBDON)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C07_FHBDON)[[1]] # extract summary stats
 # Estimate variance components
 MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
 MSg <- unname(MS["plant_id"])
-MSgl <- unname(MS["plant_id:Site"])
-# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0
 # number of locations and years
 l <- nlevels(C07_FHBDON$Site)
 y <- nlevels(C07_FHBDON$Time)
@@ -213,7 +216,7 @@ H2_C07_FHBDON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y) + 
 rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # C10 fit linear model using aov 
-C10_FHBDON <- pheno[str_detect(C10$trait_id, "FHBDON"),]
+C10_FHBDON <- C10[str_detect(C10$trait_id, "FHBDON"),]
 model_C10_FHBDON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBDON)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C10_FHBDON)[[1]] # extract summary stats
@@ -237,17 +240,17 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # FHBD3G:DON
 # C07 fit linear model using aov 
-C07_FHBD3G.DON <- pheno[str_detect(C07$trait_id, "FHBD3G.DON"),]
-model_C07_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C07_FHBD3G.DON)
+C07_FHBD3G.DON <- C07[str_detect(C07$trait_id, "FHBD3G.DON"),]
+model_C07_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Time, data=C07_FHBD3G.DON)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C07_FHBD3G.DON)[[1]] # extract summary stats
 # Estimate variance components
 MS <- setNames(anova_table[,"Mean Sq"], trimws(rownames(anova_table))) # named string with extra blank space removed from names
 MSg <- unname(MS["plant_id"])
-MSgl <- unname(MS["plant_id:Site"])
-# MSgl <- 0 # if plant_id:Site interaction is omited from model
+MSgl <- 0 # if plant_id:Site interaction is omited from model
 MSgy <- unname(MS["plant_id:Time"])
-MSe <- unname(MS["Residuals"])
+#MSe <- unname(MS["Residuals"])
+MSe <- 0
 # number of locations and years
 l <- nlevels(C07_FHBD3G.DON$Site)
 y <- nlevels(C07_FHBD3G.DON$Time)
@@ -260,7 +263,7 @@ H2_C07_FHBD3G.DON <- sigma_g^2 / (sigma_g^2 + (sigma_gl^2 / l) + (sigma_gy^2 / y
 rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 # C10 fit linear model using aov 
-C10_FHBD3G.DON <- pheno[str_detect(C10$trait_id, "FHBD3G.DON"),]
+C10_FHBD3G.DON <- C10[str_detect(C10$trait_id, "FHBD3G.DON"),]
 model_C10_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Site + plant_id*Time, data=C10_FHBD3G.DON)
 # extract the mean squares (MS) from the ANOVA table
 anova_table <- summary(model_C10_FHBD3G.DON)[[1]] # extract summary stats
@@ -304,7 +307,7 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 
 Reviewer 2 comment: Figures 1a and 1b show differences in disease levels between C07 and C10. Are these differences statistically significant? Should it be a concern for the breeding program? Some statistical support (e.g., mixed models) would strengthen the interpretation. 
 
-```{r}
+```{r models}
 # get both cycles for a given trait
 FHBD3G.DON <- rbind(C07_FHBD3G.DON, C10_FHBD3G.DON)
 FHBDISIND <- rbind(C07_FHBDISIND, C10_FHBDISIND)
@@ -357,7 +360,7 @@ emmeans(model_FHBSPKINC, pairwise ~ Cycle) #estimates of the difference between 
 # C07 has a significantly higher FHBSPKINC value compared with C10 by 24.476 units (after controlling for Site)
 ```
 
-```{r}
+```{r anova table}
 # anova table
 library(flextable)
 library(tibble)
@@ -440,9 +443,10 @@ browsable(
     )
   )
 )
+# save as FHB_anova_table   475x360
 ```
 
-```{r}
+```{r emmeans pairwise}
 # estimated marginal means (emmeans) tables
 library(kableExtra)
 # Cycle only 
@@ -491,7 +495,7 @@ kbl(sig_pairs, digits= 2, caption = "Pairwise comparisons of Cycles") %>%
 
 # Time * Cycle 
 emm <- emmeans(model_D3G.DON, list(pairwise~Time|Cycle), adjust='tukey')
-pairs_df <- as.data.frame(emm[["pairwise differences of Time | Cycle"]])
+pairs_df <- as.data.frame(emm[[" of Time | Cycle"]])
 sig_pairs <- pairs_df %>%
   filter(p.value < 0.05) %>%
   arrange(p.value)%>%
@@ -531,8 +535,356 @@ sig_pairs <- sig_pairs %>% mutate(p.value = formatC(as.numeric(p.value), format 
 
 kbl(sig_pairs, digits= 2, caption = "Pairwise comparisons of Time within Cycle") %>%
   kable_classic(full_width = F, html_font = "Helvetica")
+# save FHB_emmeans_TimeCycle   410x340
 ```
 
+```{r emmeans figure}
+library(multcomp)
+custom_letters <- c("a", "b", "c", "d", "e", "f", "g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z")
+pd <- position_dodge(width = 0.8)
+
+# load in means of annual wheat
+load(here("data","Intermediate_Files","wheat_means.RData")) # List2
+
+List2$FHBD3GDON <- List2$FHBD3GDON %>%
+  mutate(
+    # Split Plot into Cycle, Site, Year
+    Cycle = sub("_.*", "", Plot),
+    rest = sub("^[^_]+_", "", Plot),
+    Site = sub("_.*", "", rest),
+    Time = sub(".*_", "", Plot)
+  )
+
+List2$FHBDISIND <- List2$FHBDISIND %>%
+  mutate(
+    # Split Plot into Cycle, Site, Year
+    Cycle = sub("_.*", "", Plot),
+    rest = sub("^[^_]+_", "", Plot),
+    Site = sub("_.*", "", rest),
+    Time = sub(".*_", "", Plot)
+  )
+
+List2$FHBDON <- List2$FHBDON %>%
+  mutate(
+    # Split Plot into Cycle, Site, Year
+    Cycle = sub("_.*", "", Plot),
+    rest = sub("^[^_]+_", "", Plot),
+    Site = sub("_.*", "", rest),
+    Time = sub(".*_", "", Plot)
+  )
+
+List2$FHBSPKINC <- List2$FHBSPKINC %>%
+  mutate(
+    # Split Plot into Cycle, Site, Year
+    Cycle = sub("_.*", "", Plot),
+    rest = sub("^[^_]+_", "", Plot),
+    Site = sub("_.*", "", rest),
+    Time = sub(".*_", "", Plot)
+  )
+
+# FHBD3G.DON
+modD3GDON<-lmer(phenotype_value~ Cycle*Time*Site + (1|Cycle:Site), data=FHBD3G.DON)
+emmsD3GDON <- emmeans(modD3GDON, specs = ~ Cycle:Time:Site, type = "response")
+cld_dataD3GDON <- cld(emmsD3GDON, Letters=custom_letters) # Create compact letter display
+cld_dataD3GDON$emmean <- format(cld_dataD3GDON$emmean, digits = 3)
+cld_dataD3GDON$lower.CL <- format(cld_dataD3GDON$lower.CL, digits = 3)
+cld_dataD3GDON$upper.CL <- format(cld_dataD3GDON$upper.CL, digits = 3)
+rownames(cld_dataD3GDON) <- NULL
+cld_dataD3GDON  <- cld_dataD3GDON%>%
+  dplyr::select(Cycle, Time, Site, emmean, lower.CL, upper.CL, .group) %>%
+  filter(.group != "")
+colnames(cld_dataD3GDON) <- c("Cycle", "Time", "Site", "D3G.DON","l","h", "Group")
+cld_dataD3GDON    |> 
+  data.frame() |> 
+  kbl(align = "c") |> 
+  kable_paper(full_width = F) |> 
+  column_spec(1, bold = T)
+
+cld_df <-as.data.frame(cld_dataD3GDON)
+cld_df$mergelist <- paste0(cld_df$Cycle,'_',cld_df$Time,'_',cld_df$Site)
+emms_df <- as.data.frame(emmsD3GDON)
+emms_df$mergelist <- paste0(emms_df$Cycle,'_',emms_df$Time,'_',emms_df$Site)
+merged_df <- merge(emms_df, cld_df,by = c("mergelist")) 
+merged_df <- merged_df[, !names(merged_df) %in% c("mergelist", "Cycle.y", "Time.y", "Site.y", "D3G.DON", "l", "h")] #remove column
+names(merged_df)[names(merged_df) == "Time.x"] <- "Time" # rename column 
+names(merged_df)[names(merged_df) == "Cycle.x"] <- "Cycle" # rename column 
+names(merged_df)[names(merged_df) == "Site.x"] <- "Site" # rename column 
+merged_df$Time <- as.character(merged_df$Time)
+merged_df$Cycle <- as.character(merged_df$Cycle)
+merged_df$Time[merged_df$Time == "1"] <- "2018"
+merged_df$Time[merged_df$Time == "2"] <- "2019"
+merged_df$Time[merged_df$Time == "3"] <- "2020"
+merged_df$Time[merged_df$Time == "4"] <- "2021"
+merged_df$Time[merged_df$Time == "5"] <- "2022"
+merged_df$Cycle[merged_df$Cycle == "C7"] <- "C07"
+merged_df$Time <- as.factor(merged_df$Time)
+merged_df$Cycle <- as.factor(merged_df$Cycle)
+merged_df$Site <- as.factor(merged_df$Site)
+FHBD3G.DON$Time <- as.character(FHBD3G.DON$Time)
+FHBD3G.DON$Cycle <- as.character(FHBD3G.DON$Cycle)
+FHBD3G.DON$Time[FHBD3G.DON$Time == "1"] <- "2018"
+FHBD3G.DON$Time[FHBD3G.DON$Time == "2"] <- "2019"
+FHBD3G.DON$Time[FHBD3G.DON$Time == "3"] <- "2020"
+FHBD3G.DON$Time[FHBD3G.DON$Time == "4"] <- "2021"
+FHBD3G.DON$Time[FHBD3G.DON$Time == "5"] <- "2022"
+FHBD3G.DON$Cycle[FHBD3G.DON$Cycle == "C7"] <- "C07"
+
+BoxPlot_FHBD3G.DON<-ggplot(FHBD3G.DON, aes(x = Time, y = phenotype_value, fill = interaction(Site, Cycle))) +
+  geom_boxplot(position = pd, outlier.shape = NA) +
+    geom_point(
+    data = List2$FHBD3GDON,
+    aes(x = Time, y = trait_mean, group = interaction(Site, Cycle)),
+    shape = 23,  # diamond
+    size = 3,
+    inherit.aes = FALSE,
+    position = pd
+  ) +
+  geom_text(data = merged_df, aes(x = Time, y = emmean, label = Group, group = interaction(Site, Cycle)), position = pd, inherit.aes=FALSE, vjust = -4)+
+  coord_cartesian(ylim = c(0, 7.75)) +
+  labs(x = "Year", y = "FHBD3G.DON") +
+  theme_minimal()+
+  theme(legend.position = "none")
+BoxPlot_FHBD3G.DON
+rm(cld_df,emms_df,merged_df)
+
+# FHBDISIND
+modDISIND<-lmer(phenotype_value~ Cycle*Time + (1|Site), data=FHBDISIND)
+modDISIND<-lmer(phenotype_value~ Cycle*Time*Site + (1|Cycle:Site), data=FHBDISIND)
+emmsDISIND <- emmeans(modDISIND, specs = ~ Cycle:Time, type = "response")
+emmsDISIND <- emmeans(modDISIND, specs = ~ Cycle:Time:Site, type = "response")
+cld_dataDISIND <- cld(emmsDISIND, Letters=custom_letters) # Create compact letter display
+cld_dataDISIND$emmean <- format(cld_dataDISIND$emmean, digits = 3)
+cld_dataDISIND$lower.CL <- format(cld_dataDISIND$lower.CL, digits = 3)
+cld_dataDISIND$upper.CL <- format(cld_dataDISIND$upper.CL, digits = 3)
+rownames(cld_dataDISIND) <- NULL
+cld_dataDISIND  <- cld_dataDISIND%>%
+  dplyr::select(Cycle, Time, Site, emmean, lower.CL, upper.CL, .group) %>%
+  filter(.group != "")
+colnames(cld_dataDISIND) <- c("Cycle", "Time", "Site", "DISIND","l","h", "Group")
+cld_dataDISIND    |> 
+  data.frame() |> 
+  kbl(align = "c") |> 
+  kable_paper(full_width = F) |> 
+  column_spec(1, bold = T)
+
+cld_df <-as.data.frame(cld_dataDISIND)
+cld_df$mergelist <- paste0(cld_df$Cycle,'_',cld_df$Time,'_',cld_df$Site)
+emms_df <- as.data.frame(emmsDISIND)
+emms_df$mergelist <- paste0(emms_df$Cycle,'_',emms_df$Time,'_',emms_df$Site)
+merged_df <- merge(emms_df, cld_df,by = c("mergelist")) 
+merged_df <- merged_df[, !names(merged_df) %in% c("mergelist", "Cycle.y", "Time.y", "Site.y", "DISIND", "l", "h")] #remove column
+names(merged_df)[names(merged_df) == "Time.x"] <- "Time" # rename column 
+names(merged_df)[names(merged_df) == "Cycle.x"] <- "Cycle" # rename column 
+names(merged_df)[names(merged_df) == "Site.x"] <- "Site" # rename column 
+merged_df$Time <- as.character(merged_df$Time)
+merged_df$Cycle <- as.character(merged_df$Cycle)
+merged_df$Time[merged_df$Time == "1"] <- "2018"
+merged_df$Time[merged_df$Time == "2"] <- "2019"
+merged_df$Time[merged_df$Time == "3"] <- "2020"
+merged_df$Time[merged_df$Time == "4"] <- "2021"
+merged_df$Time[merged_df$Time == "5"] <- "2022"
+merged_df$Cycle[merged_df$Cycle == "C7"] <- "C07"
+merged_df$Time <- as.factor(merged_df$Time)
+merged_df$Cycle <- as.factor(merged_df$Cycle)
+merged_df$Site <- as.factor(merged_df$Site)
+FHBDISIND$Time <- as.character(FHBDISIND$Time)
+FHBDISIND$Cycle <- as.character(FHBDISIND$Cycle)
+FHBDISIND$Time[FHBDISIND$Time == "1"] <- "2018"
+FHBDISIND$Time[FHBDISIND$Time == "2"] <- "2019"
+FHBDISIND$Time[FHBDISIND$Time == "3"] <- "2020"
+FHBDISIND$Time[FHBDISIND$Time == "4"] <- "2021"
+FHBDISIND$Time[FHBDISIND$Time == "5"] <- "2022"
+FHBDISIND$Cycle[FHBDISIND$Cycle == "C7"] <- "C07"
+
+BoxPlot_FHBDISIND<-ggplot(FHBDISIND, aes(x = Time, y = phenotype_value, fill = interaction(Site, Cycle))) +
+  geom_boxplot(position = pd, outlier.shape = NA) +
+  geom_point(
+    data = List2$FHBDISIND,
+    aes(x = Time, y = trait_mean, group = interaction(Site, Cycle)),
+    shape = 23,  # diamond
+    size = 3,
+    inherit.aes = FALSE,
+    position = pd
+  ) +
+  geom_text(data = merged_df, aes(x = Time, y = emmean, label = Group, group = interaction(Site, Cycle)), position = pd, inherit.aes=FALSE, vjust = -9)+
+  #coord_cartesian(ylim = c(0, 5)) +
+  labs(x = NULL, y = "FHB Disease Index") +
+  theme_minimal()+
+  theme(legend.position = "none")
+BoxPlot_FHBDISIND
+rm(cld_df,emms_df,merged_df)
+
+# FHBDON
+modDON<-lmer(phenotype_value~ Cycle*Time*Site + (1|Cycle:Site), data=FHBDON)
+emmsDON <- emmeans(modDON, specs = ~ Cycle:Time:Site, type = "response")
+cld_dataDON <- cld(emmsDON, Letters=custom_letters) # Create compact letter display
+cld_dataDON$emmean <- format(cld_dataDON$emmean, digits = 3)
+cld_dataDON$lower.CL <- format(cld_dataDON$lower.CL, digits = 3)
+cld_dataDON$upper.CL <- format(cld_dataDON$upper.CL, digits = 3)
+rownames(cld_dataDON) <- NULL
+cld_dataDON  <- cld_dataDON%>%
+  dplyr::select(Cycle, Time, Site, emmean, lower.CL, upper.CL, .group) %>%
+  filter(.group != "")
+colnames(cld_dataDON) <- c("Cycle", "Time", "Site", "DON","l","h", "Group")
+cld_dataDON    |> 
+  data.frame() |> 
+  kbl(align = "c") |> 
+  kable_paper(full_width = F) |> 
+  column_spec(1, bold = T)
+
+cld_df <-as.data.frame(cld_dataDON)
+cld_df$mergelist <- paste0(cld_df$Cycle,'_',cld_df$Time,'_',cld_df$Site)
+emms_df <- as.data.frame(emmsDON)
+emms_df$mergelist <- paste0(emms_df$Cycle,'_',emms_df$Time,'_',emms_df$Site)
+merged_df <- merge(emms_df, cld_df,by = c("mergelist")) 
+merged_df <- merged_df[, !names(merged_df) %in% c("mergelist", "Cycle.y", "Time.y", "Site.y", "DON", "l", "h")] #remove column
+names(merged_df)[names(merged_df) == "Time.x"] <- "Time" # rename column 
+names(merged_df)[names(merged_df) == "Cycle.x"] <- "Cycle" # rename column 
+names(merged_df)[names(merged_df) == "Site.x"] <- "Site" # rename column 
+merged_df$Time <- as.character(merged_df$Time)
+merged_df$Cycle <- as.character(merged_df$Cycle)
+merged_df$Time[merged_df$Time == "1"] <- "2018"
+merged_df$Time[merged_df$Time == "2"] <- "2019"
+merged_df$Time[merged_df$Time == "3"] <- "2020"
+merged_df$Time[merged_df$Time == "4"] <- "2021"
+merged_df$Time[merged_df$Time == "5"] <- "2022"
+merged_df$Cycle[merged_df$Cycle == "C7"] <- "C07"
+merged_df$Time <- as.factor(merged_df$Time)
+merged_df$Cycle <- as.factor(merged_df$Cycle)
+merged_df$Site <- as.factor(merged_df$Site)
+FHBDON$Time <- as.character(FHBDON$Time)
+FHBDON$Cycle <- as.character(FHBDON$Cycle)
+FHBDON$Time[FHBDON$Time == "1"] <- "2018"
+FHBDON$Time[FHBDON$Time == "2"] <- "2019"
+FHBDON$Time[FHBDON$Time == "3"] <- "2020"
+FHBDON$Time[FHBDON$Time == "4"] <- "2021"
+FHBDON$Time[FHBDON$Time == "5"] <- "2022"
+FHBDON$Cycle[FHBDON$Cycle == "C7"] <- "C07"
+
+BoxPlot_FHBDON<-ggplot(FHBDON, aes(x = Time, y = phenotype_value, fill = interaction(Site, Cycle))) +
+  geom_boxplot(position = pd, outlier.shape = NA) +
+    geom_point(
+    data = List2$FHBDON,
+    aes(x = Time, y = trait_mean, group = interaction(Site, Cycle)),
+    shape = 23,  # diamond
+    size = 3,
+    inherit.aes = FALSE,
+    position = pd
+  ) +
+  geom_text(data = merged_df, aes(x = Time, y = emmean, label = Group, group = interaction(Site, Cycle)), position = pd, inherit.aes=FALSE, vjust = -6)+
+  coord_cartesian(ylim = c(0, 55)) +
+  labs(x = "Year", y = "FHBDON") +
+  theme_minimal()+
+  theme(legend.position = "none")
+BoxPlot_FHBDON
+rm(cld_df,emms_df,merged_df)
+
+
+# FHBSPKINC
+modSPKINC<-lmer(phenotype_value~ Cycle*Time*Site + (1|Cycle:Site), data=FHBSPKINC)
+emmsSPKINC <- emmeans(modSPKINC, specs = ~ Cycle:Time:Site, type = "response")
+cld_dataSPKINC <- cld(emmsSPKINC, Letters=custom_letters) # Create compact letter display
+cld_dataSPKINC$emmean <- format(cld_dataSPKINC$emmean, digits = 3)
+cld_dataSPKINC$lower.CL <- format(cld_dataSPKINC$lower.CL, digits = 3)
+cld_dataSPKINC$upper.CL <- format(cld_dataSPKINC$upper.CL, digits = 3)
+rownames(cld_dataSPKINC) <- NULL
+cld_dataSPKINC  <- cld_dataSPKINC%>%
+  dplyr::select(Cycle, Time, Site, emmean, lower.CL, upper.CL, .group) %>%
+  filter(.group != "")
+colnames(cld_dataSPKINC) <- c("Cycle", "Time", "Site", "SPKINC","l","h", "Group")
+cld_dataSPKINC    |> 
+  data.frame() |> 
+  kbl(align = "c") |> 
+  kable_paper(full_width = F) |> 
+  column_spec(1, bold = T)
+
+cld_df <-as.data.frame(cld_dataSPKINC)
+cld_df$mergelist <- paste0(cld_df$Cycle,'_',cld_df$Time,'_',cld_df$Site)
+emms_df <- as.data.frame(emmsSPKINC)
+emms_df$mergelist <- paste0(emms_df$Cycle,'_',emms_df$Time,'_',emms_df$Site)
+merged_df <- merge(emms_df, cld_df,by = c("mergelist")) 
+merged_df <- merged_df[, !names(merged_df) %in% c("mergelist", "Cycle.y", "Time.y", "Site.y", "SPKINC", "l", "h")] #remove column
+names(merged_df)[names(merged_df) == "Time.x"] <- "Time" # rename column 
+names(merged_df)[names(merged_df) == "Cycle.x"] <- "Cycle" # rename column 
+names(merged_df)[names(merged_df) == "Site.x"] <- "Site" # rename column 
+merged_df$Time <- as.character(merged_df$Time)
+merged_df$Cycle <- as.character(merged_df$Cycle)
+merged_df$Time[merged_df$Time == "1"] <- "2018"
+merged_df$Time[merged_df$Time == "2"] <- "2019"
+merged_df$Time[merged_df$Time == "3"] <- "2020"
+merged_df$Time[merged_df$Time == "4"] <- "2021"
+merged_df$Time[merged_df$Time == "5"] <- "2022"
+merged_df$Cycle[merged_df$Cycle == "C7"] <- "C07"
+merged_df$Time <- as.factor(merged_df$Time)
+merged_df$Cycle <- as.factor(merged_df$Cycle)
+merged_df$Site <- as.factor(merged_df$Site)
+FHBSPKINC$Time <- as.character(FHBSPKINC$Time)
+FHBSPKINC$Cycle <- as.character(FHBSPKINC$Cycle)
+FHBSPKINC$Time[FHBSPKINC$Time == "1"] <- "2018"
+FHBSPKINC$Time[FHBSPKINC$Time == "2"] <- "2019"
+FHBSPKINC$Time[FHBSPKINC$Time == "3"] <- "2020"
+FHBSPKINC$Time[FHBSPKINC$Time == "4"] <- "2021"
+FHBSPKINC$Time[FHBSPKINC$Time == "5"] <- "2022"
+FHBSPKINC$Cycle[FHBSPKINC$Cycle == "C7"] <- "C07"
+
+legend_df <- data.frame(
+  label = c("C07 SAL", "C10 OLA", "C10 SAL", "Wheat check"))
+
+BoxPlot_FHBSPKINC<-ggplot(FHBSPKINC, aes(x = Time, y = phenotype_value, fill = interaction(Site, Cycle))) +
+  geom_boxplot(position = pd, outlier.shape = NA) +
+  geom_point(
+    data = List2$FHBSPKINC,
+    aes(x = Time, y = trait_mean, group = interaction(Site, Cycle)),
+    shape = 23,  # diamond
+    size = 3,
+    inherit.aes = FALSE,
+    position = pd
+  ) +  
+  geom_text(data = merged_df, aes(x = Time, y = emmean, label = Group, group = interaction(Site, Cycle)), position = pd, inherit.aes=FALSE, vjust = 9)+
+  labs(x = NULL, y = "FHB Spikelet Incidence") +
+  geom_point(data = legend_df, aes(x = 0, y = NA, color = label, shape = label), inherit.aes = FALSE, size = 3)+
+  scale_color_manual(
+    name = "Legend", values = c("C07 SAL" = "#F8766D", "C10 OLA" = "#00BA38", "C10 SAL" = "#619CFF", "Wheat check" = "black"))+
+  scale_shape_manual(
+    name = "Legend", values = c("C07 SAL" = 15, "C10 OLA" = 15, "C10 SAL" = 15, "Wheat check" = 23))+
+  theme_minimal()+
+  guides(fill = "none")
+BoxPlot_FHBSPKINC
+rm(cld_df,emms_df,merged_df)
+
+install.packages("patchwork")
+library(patchwork)
+
+BoxPlot_FHBD3G.DON <- BoxPlot_FHBD3G.DON +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text = element_text(size = 12)
+  )
+BoxPlot_FHBDISIND <- BoxPlot_FHBDISIND +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text = element_text(size = 12)
+  )
+BoxPlot_FHBDON <- BoxPlot_FHBDON +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text = element_text(size = 12)
+  )
+BoxPlot_FHBSPKINC <- BoxPlot_FHBSPKINC +
+  theme(
+    axis.title = element_text(size = 18),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 14),
+    legend.text = element_text(size = 14)
+  )
+
+combined_plot <- (BoxPlot_FHBDISIND | BoxPlot_FHBSPKINC) /
+                 (BoxPlot_FHBD3G.DON | BoxPlot_FHBDON)+ plot_layout(heights = c(1,1), guides = "collect")
+combined_plot
+
+# save FHB_box_plot_emmeans   1200x950  1400x1110
+
+```
 
 # Population Structure 
 

@@ -15,23 +15,32 @@ checks <- rbind(overley,bacup,roblin,everest)
 fhbdisind <- checks[str_detect(checks$trait_id, "FHBDISIND"),]
 fhbspkinc <- checks[str_detect(checks$trait_id, "FHBSPKINC"),]
 fhbdon <- checks[str_detect(checks$trait_id, "FHBDON"),]
+fhbd3gdon <- checks[str_detect(checks$trait_id, "FHBD3G.DON"),]
 #fhbzea <- checks[str_detect(checks$trait_id, "FHBZEA"),]
 
 fhbdisind$phenotype_value <- as.numeric(fhbdisind$phenotype_value)
 fhbspkinc$phenotype_value <- as.numeric(fhbspkinc$phenotype_value)
 fhbdon$phenotype_value <- as.numeric(fhbdon$phenotype_value)
+fhbd3gdon$phenotype_value <- as.numeric(fhbd3gdon$phenotype_value)
 #fhbzea$phenotype_value <- as.numeric(fhbzea$phenotype_value)
 
 fhbdisind$year_site <- paste(fhbdisind$phenotype_year,"_",fhbdisind$Site)
 fhbspkinc$year_site <- paste(fhbspkinc$phenotype_year,"_",fhbspkinc$Site)
 fhbdon$year_site <- paste(fhbdon$phenotype_year,"_",fhbdon$Site)
+fhbd3gdon$year_site <- paste(fhbd3gdon$phenotype_year,"_",fhbd3gdon$Site)
 #fhbzea$year_site <- paste(fhbzea$phenotype_year,"_",fhbzea$Site)
+
+# 2018 FHBSPKINC in wrong format
+fhbspkinc <- fhbspkinc %>%
+  mutate(phenotype_value = if_else(phenotype_year == "2018", phenotype_value * 100, phenotype_value)) # multiply 2018 values by 100
 
 STATS_fhbdisind<- fhbdisind %>% group_by(year_site) %>% 
   dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
 STATS_fhbspkinc<- fhbspkinc %>% group_by(year_site) %>% 
   dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
 STATS_fhbdon<- fhbdon %>% group_by(year_site) %>% 
+  dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
+STATS_fhbd3gdon<- fhbd3gdon %>% group_by(year_site) %>% 
   dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
 #STATS_fhbzea<- fhbzea %>% group_by(year_site) %>% 
   #dplyr::summarise(trait_mean = mean(na.omit(phenotype_value)))
@@ -40,12 +49,14 @@ STATS_fhbdon<- fhbdon %>% group_by(year_site) %>%
 STATS_fhbdisind$Plot <- c("C07_SAL_2018","C07_SAL_2019","C07_OLA_2020","C07_SAL_2020","C10_OLA_2021","C10_SAL_2021","C10_OLA_2022","C10_SAL_2022")
 STATS_fhbspkinc$Plot <- c("C07_SAL_2018","C07_SAL_2019","C07_OLA_2020","C07_SAL_2020","C10_OLA_2021","C10_SAL_2021","C10_OLA_2022","C10_SAL_2022")
 STATS_fhbdon$Plot <- c("C07_SAL_2018","C07_SAL_2019","C10_OLA_2021","C10_SAL_2021")
+STATS_fhbd3gdon$Plot <- c("C07_SAL_2018","C07_SAL_2019","C10_OLA_2021","C10_SAL_2021")
 
 STATS_fhbdisind <- STATS_fhbdisind[c(1:2,4:8),c(3,2)]
 STATS_fhbspkinc <- STATS_fhbspkinc[c(1:2,4:8),c(3,2)]
 STATS_fhbdon <- STATS_fhbdon[,c(3,2)]
+STATS_fhbd3gdon <- STATS_fhbd3gdon[,c(3,2)]
 
-List2 <- list(FHBDISIND = STATS_fhbdisind, FHBSPKINC = STATS_fhbspkinc, FHBDON = STATS_fhbdon)
+List2 <- list(FHBDISIND = STATS_fhbdisind, FHBSPKINC = STATS_fhbspkinc, FHBDON = STATS_fhbdon, FHBD3GDON = STATS_fhbd3gdon)
 
 # phenotype rating changed from numeric continuous to discrete
 # I only care about doing this for FHBSPKINC and FHBDISIND for the bar plot figure so only writing code for those
@@ -72,3 +83,7 @@ STATS_fhbdisind$select <- ifelse(STATS_fhbdisind$trait_mean > 3 & STATS_fhbdisin
 STATS_fhbdisind$select <- ifelse(STATS_fhbdisind$trait_mean > 4 & STATS_fhbdisind$trait_mean <= 5, "4.01-5", STATS_fhbdisind$select) 
 
 List3 <- list(FHBDISIND = STATS_fhbdisind, FHBSPKINC = STATS_fhbspkinc, FHBDON = STATS_fhbdon)
+
+save(List2, file = "data/Intermediate_Files/wheat_means.RData")
+
+
