@@ -15,6 +15,12 @@ library(stringr)
 library(dplyr)
 library(lmerTest)
 library(emmeans)
+library(flextable)
+library(tibble)
+library(htmltools)
+library(kableExtra)
+library(multcomp)
+library(ggplot2)
 
 if (!requireNamespace("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
@@ -26,10 +32,11 @@ library(SNPRelate)
 
 ```{r setup, include=FALSE}
 knitr::opts_knit$set(root.dir = here::here())
+here::i_am("code/Revision_Additions.Rmd")
 ```
 
 ```{r}
-FHB_for_GS_GWAS <- read.table(file = 'data/Original_Files/FHB_for_GS_GWAS.txt', header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
+FHB_for_GS_GWAS <- read.table(file = here('data','Original_Files','FHB_for_GS_GWAS.txt'), header = TRUE, row.names = 1, stringsAsFactors = FALSE) #load genotype calls
 #make a copy of master file to work with
 GENO <- FHB_for_GS_GWAS
 geno <- GENO + 1 # change geno numeric format from -101 to 012
@@ -40,7 +47,7 @@ geno <- geno[, !grepl('SUN', colnames(geno), ignore.case = TRUE) ]
 
 ```{r}
 #load in phenotype tables
-pheno <- read.delim('data/Intermediate_Files/Phenotypic_Format_long_2.txt') #read in file with all cycles and years and locations
+pheno <- read.delim(here('data','Intermediate_Files','Phenotypic_Format_long_2.txt')) #read in file with all cycles and years and locations
 pheno$plant_id <- as.factor(pheno$plant_id)
 pheno$phenotype_year <- as.factor(pheno$phenotype_year)
 pheno$Site <- as.factor(pheno$Site)
@@ -319,6 +326,7 @@ rm(anova_table,MS,MSg,MSgl,MSgy,MSe,l,y,sigma_g,sigma_gl,sigma_gy,sigma_e)
 # not replication within year
 C10_FHBD3G.DON <- C10[str_detect(C10$trait_id, "FHBD3G.DON"),]
 C10_FHBD3G.DON <- droplevels(C10_FHBD3G.DON)
+model_C10_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Time*Site, data=C10_FHBD3G.DON)
 
 H2_FHBD3G.DON <- rbind(C07_FHBD3G.DON, C10_FHBD3G.DON)
 H2_model_FHBD3G.DON <- aov(phenotype_value ~ plant_id*Site*Time, data=H2_FHBD3G.DON)
@@ -443,10 +451,6 @@ emmeans(model_FHBSPKINC, pairwise ~ Cycle) #estimates of the difference between 
 
 ```{r anova table}
 # anova table
-library(flextable)
-library(tibble)
-library(htmltools)
-
 aov.table.D3G.DON <- anova(model_D3G.DON)
 aov.table.FHBDISIND <- anova(model_FHBDISIND)
 aov.table.FHBDON <- anova(model_FHBDON)
@@ -529,7 +533,6 @@ browsable(
 
 ```{r emmeans pairwise}
 # estimated marginal means (emmeans) tables
-library(kableExtra)
 # Cycle only 
 emm <- emmeans(model_D3G.DON, list(pairwise~Cycle), adjust='tukey')
 pairs_df <- as.data.frame(emm[["pairwise differences of Cycle"]])
@@ -620,7 +623,6 @@ kbl(sig_pairs, digits= 2, caption = "Pairwise comparisons of Time within Cycle")
 ```
 
 ```{r emmeans figure}
-library(multcomp)
 custom_letters <- c("a", "b", "c", "d", "e", "f", "g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z")
 pd <- position_dodge(width = 0.8)
 
