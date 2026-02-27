@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 rm(list=ls(all=TRUE))
 #set current working directory
 #setwd()
-setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
+#setwd('/Volumes/Backup_Plus/AM/New_GWAS/2023.01.27/IWG_GWAS')
 ```
 
 ## Objective
@@ -27,6 +27,7 @@ https://cran.r-project.org/web/packages/LinkageMapView/vignettes/LinkageMapView.
 library(LinkageMapView)
 library(tidyr)
 library(tidyverse)
+library(here)
 ```
 
 # List of all Markers
@@ -641,3 +642,194 @@ p + geom_segment(data=marks4, aes(x=Chromosome-0.45, xend=Chromosome+0.45, y=Pos
 
 ```
 
+
+
+
+re-done 2025
+
+```{r Sig marker list}
+directories = c("C07_SAL_2018", "C07_SAL_2019", "C07_SAL_2020", "C10_SAL_2021", "C10_SAL_2022", "C10_OLA_2021", "C10_OLA_2022")
+datalist = vector("list", length = 7)
+for(i in directories){
+  one = (paste0('output/FarmCPU_2025/', i, '/GAPIT.Association.Filter_GWAS_results.csv'))
+  one <- read.csv(one, header=TRUE)
+  i <- paste0(i)
+  one$Year = i #add year
+  one$Trait = gsub('^.*.', '', one$traits) #split string and extract trait name
+  one$Trait = str_remove(one$traits, "FarmCPU.")
+  one$ID = paste0(one$Trait,"_",one$Year)
+  Table <- one[,c("SNP","Chr","Pos","ID")]
+  
+  datalist[[i]] <- Table # add it to your list
+}
+
+big_data = do.call(rbind, datalist)
+rownames(big_data) <- NULL 
+big_data$ID <- gsub("\\(NYC\\)", "", big_data$ID)
+
+# write.csv(big_data, 'data/Intermediate_Files/SigM_2.csv', row.names = FALSE)
+Sig <- read.csv('data/Intermediate_Files/SigM.csv', head=TRUE)
+#Sig <- read.csv('data/Intermediate_Files/SigM_2.csv', head=TRUE)
+
+Sig <- Sig[,c("Chr","Pos","ID","SNP")]
+colnames(Sig)[1] <- "group"
+colnames(Sig)[2] <- "postion"
+colnames(Sig)[3] <- "id"
+colnames(Sig)[4] <- "locus"
+```
+
+```{r}
+chrom = GM$group
+chrom = unique(chrom)
+
+data <- Sig[! str_detect(Sig$id, "ERGSEV"),] # remove ERGSEV
+data <- data[! str_detect(data$id, "BLSSEV"),] # remove ERGSEV
+data <- data[! str_detect(data$id, "GLBLSEV"),] # remove ERGSEV
+data <- data[! str_detect(data$id, "HSATIVLSEV"),] # remove ERGSEV
+rownames(data) <- NULL
+
+data$P <- data$postion / 1000000 # Position from 100,000,000 to 100.000000 Mbp
+data$pmbp <- round(data$P, digits=2) # change number of decimal places
+data$ID  = sub("\\_C.*", "", data$id) # remove _ and everything after from trait name
+data$MbpP <- paste0(data$ID,"_",data$pmbp) # new id of trait_mbp
+
+hm <- merge(GM, data[,c("locus", "MbpP")], all=TRUE)
+colnames(hm)[4] <- "qtl"
+
+hm$q <- hm$qtl
+  
+hm$q[is.na(hm$q)] <- hm$locus
+
+data <- arrange(data, group, postion)
+```
+
+```{r}
+# Make tables
+#define data
+# Name of each chromosome and the size taken from phytozome
+dfChrSize2 <- data.frame(chrName=rep(c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')))
+dfChrSize2$chrSize <- as.numeric(dfChrSize2$chrSize)
+
+dat2 <- dfChrSize2
+colnames(dat2)[1] <- "chromosome"
+colnames(dat2)[2] <- "size"
+marks2 <- dfMarkPos2[,c(1,2,4)]
+colnames(marks2)[1] <- "Chromosome"
+colnames(marks2)[2] <- "Position"
+colnames(marks2)[3] <- "Type"
+
+# take significant marker list and format to fit input style
+dfMarkPos2 <- Sig[,c('group', 'postion', 'id')]
+dfMarkPos2$markSize <- c(50000) #rand column in the tutorial table, so adding it to my table too
+colnames(dfMarkPos2)[1] <- "chrName"
+colnames(dfMarkPos2)[2] <- "markPos"
+colnames(dfMarkPos2)[3] <- "markName"
+dfMarkPos2$markName <- gsub("\\_C.*","",dfMarkPos2$markName) #remove characters after the trait name
+dfMarkPos2 <- dfMarkPos2[,c('chrName', 'markPos', 'markSize', 'markName')] # reorder
+dfMarkPos2 <- dfMarkPos2[! str_detect(dfMarkPos2$markName, "ERGSEV"),] # remove ERGSEV
+dfMarkPos2 <- dfMarkPos2[! str_detect(dfMarkPos2$markName, "BLSSEV"),] # remove ERGSEV
+dfMarkPos2 <- dfMarkPos2[! str_detect(dfMarkPos2$markName, "GLBLSEV"),] # remove ERGSEV
+dfMarkPos2 <- dfMarkPos2[! str_detect(dfMarkPos2$markName, "HSATIVLSEV"),] # remove ERGSEV
+
+```
+
+```{r}
+dfChrSize3 <- data.frame(chrName=rep(c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')))
+dfChrSize3$chrSize <- as.numeric(dfChrSize3$chrSize)
+dfChrSize3$chrName <- as.numeric(dfChrSize3$chrName)
+
+dat3 <- dfChrSize3
+colnames(dat3)[1] <- "chromosome"
+colnames(dat3)[2] <- "size"
+
+marks3 <- marks2
+marks3$Chromosome[marks3$Chromosome == "J01"] <- "1" #replace
+marks3$Chromosome[marks3$Chromosome == "J02"] <- "2" #replace
+marks3$Chromosome[marks3$Chromosome == "J03"] <- "3" #replace
+marks3$Chromosome[marks3$Chromosome == "J04"] <- "4" #replace
+marks3$Chromosome[marks3$Chromosome == "J05"] <- "5" #replace
+marks3$Chromosome[marks3$Chromosome == "J06"] <- "6" #replace
+marks3$Chromosome[marks3$Chromosome == "J07"] <- "7" #replace
+marks3$Chromosome[marks3$Chromosome == "S01"] <- "8" #replace
+marks3$Chromosome[marks3$Chromosome == "S02"] <- "9" #replace
+marks3$Chromosome[marks3$Chromosome == "S03"] <- "10" #replace
+marks3$Chromosome[marks3$Chromosome == "S04"] <- "11" #replace
+marks3$Chromosome[marks3$Chromosome == "S05"] <- "12" #replace
+marks3$Chromosome[marks3$Chromosome == "S06"] <- "13" #replace
+marks3$Chromosome[marks3$Chromosome == "S07"] <- "14" #replace
+marks3$Chromosome[marks3$Chromosome == "V01"] <- "15" #replace
+marks3$Chromosome[marks3$Chromosome == "V02"] <- "16" #replace
+marks3$Chromosome[marks3$Chromosome == "V03"] <- "17" #replace
+marks3$Chromosome[marks3$Chromosome == "V04"] <- "18" #replace
+marks3$Chromosome[marks3$Chromosome == "V05"] <- "19" #replace
+marks3$Chromosome[marks3$Chromosome == "V06"] <- "20" #replace
+marks3$Chromosome[marks3$Chromosome == "V07"] <- "21" #replace
+marks3$Chromosome <- as.numeric(marks3$Chromosome)
+
+marks4 <- marks3[!str_detect(marks3$Type, "ERGSEV"),] #remove trait from list of significant markers
+marks4 <- marks4[!str_detect(marks4$Type, "BLSSEV"),] #remove trait from list of significant markers
+marks4 <- marks4[!str_detect(marks4$Type, "GLBLSEV"),] #remove trait from list of significant markers
+marks4 <- marks4[!str_detect(marks4$Type, "HSATIVLSEV"),] #remove trait from list of significant markers
+colnames(marks4)[3] <- "Trait"
+```
+
+```{r}
+
+myColors2 <- c("#b6dbff", "#006ddb", "#6db6ff", "#004949", "#009292", "#db6d00", "#999933", "#CC6677", "#ffb6db" , "#920000", "#924900", "#DDCC77") # in alphabetical order
+# "#490092" BLSSEV , "#332288" GLBLSEV , "#b66dff" HSATIVLSEV
+names(myColors2) <- levels(marks4$Trait)
+colScale2 <- scale_colour_manual(name = "Trait",values = myColors2)
+
+chromo_lables <- c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')
+
+###
+#breaks between each chromosome group
+
+dat4 <- data.frame(chrName=rep(c('1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21')),
+                 chrSize=rep(c('548726614', '694191331', '664523050', '541250370', '602542912', '566711382', '686173349', '422989602', '507709987','493345210', '377353484', '549394082', '408503727', '482783349', '574115619', '618570211', '526408016', '490142664 ', '591402192', '462045100', '761377749')),
+                 chrGroup=rep(c('J', 'J', 'J', 'J', 'J', 'J', 'J', 'S', 'S', 'S', 'S', 'S', 'S', 'S', 'V', 'V', 'V', 'V', 'V', 'V', 'V')),
+                 chr=rep(c('J01', 'J02', 'J03', 'J04', 'J05', 'J06', 'J07', 'S01', 'S02', 'S03', 'S04', 'S05', 'S06', 'S07', 'V01', 'V02', 'V03', 'V04', 'V05', 'V06', 'V07')))
+                 
+dat4$chrSize <- as.numeric(dat4$chrSize)
+dat4$chrName <- as.numeric(dat4$chrName)
+
+colnames(dat4)[1] <- "chromosome"
+colnames(dat4)[2] <- "size"
+
+
+marks4$chrGroup <- marks4$Chromosome
+marks4$chrGroup[marks4$chrGroup == "21"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "20"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "19"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "18"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "17"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "16"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "15"] <- "V" #replace
+marks4$chrGroup[marks4$chrGroup == "14"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "13"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "12"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "11"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "10"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "9"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "8"] <- "S" #replace
+marks4$chrGroup[marks4$chrGroup == "7"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "6"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "5"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "4"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "3"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "2"] <- "J" #replace
+marks4$chrGroup[marks4$chrGroup == "1"] <- "J" #replace
+
+## Taking off title, uppercase axis labels
+
+p <- ggplot(data=dat4, aes(chromosome, size)) + geom_bar( stat="identity", fill="grey70") + theme_classic()
+p + geom_segment(data=marks4, aes(x=Chromosome-0.45, xend=Chromosome+0.45, y=Position, yend=Position, colour=Trait), linewidth=0.5) + colScale2 + labs(y = "Position") + xlab("Chromosome") + theme(plot.title = element_text(hjust = 0.5), axis.ticks.x=element_blank(), axis.text.x=element_blank()) + facet_wrap(vars(chrGroup), scale = "free_x", strip.position = "bottom")+
+     geom_text(aes(label=chr), position=position_dodge(width=0.9), vjust=0, size=2)
+
+# Export > Save as PDF.. > Directory= '~output/Figures' ; File Name = Map_of_all_Sig_Markers_by_group_legend2_2025
+# orientation: Portrait 
+# dimensions: 5.75x5.36
+
+```
