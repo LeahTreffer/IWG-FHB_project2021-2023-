@@ -8,6 +8,9 @@
 .Rhistory
 .Rproj.user
 .Ruserdata
+.DS_Store
+output/.DS_Store
+output/FarmCPU_2025/.DS_Store
 data/Intermediate_Files/
 data/Intermediate_Files/TASSEL_LD_out.txt
 data/Intermediate_Files/FHB_gwaspoly.hmp.csv
